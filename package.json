@@ -1,0 +1,29 @@
+{
+	"name": "@fidan/runtime",
+	"version": "0.0.1",
+	"description": "High performance and easy way for building web user interfaces.",
+	"scripts": {
+		"build": "copyfiles ./types/** ./build & microbundle --format cjs",
+		"dev": "microbundle watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {},
+	"devDependencies": {
+		"@babel/core": "^7.2.0",
+		"@types/babel-traverse": "^6.25.4",
+		"@types/node": "^10.12.12",
+		"babel-plugin-jsx-dom-expressions": "^0.2.0",
+		"babel-plugin-transform-react-jsx": "^6.24.1",
+		"copyfiles": "^2.1.0",
+		"jasmine": "^3.3.0",
+		"jasmine-spec-reporter": "^4.2.1",
+		"jasmine-ts": "^0.3.0",
+		"microbundle": "^0.8.3",
+		"typescript": "^3.2.1"
+	},
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"source": "src/index.ts"
+}

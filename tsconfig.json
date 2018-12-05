@@ -1,0 +1,7 @@
+{
+    "compilerOptions": {
+        "experimentalDecorators": true,
+        "jsx": "preserve",
+        "lib": ["dom", "es2015"]
+    }
+}

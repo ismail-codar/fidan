@@ -1,0 +1,28 @@
+{
+	"name": "fidan",
+	"version": "0.0.1",
+	"description": "",
+	"scripts": {
+		"build": "parcel build index.html",
+		"start": "parcel index.html"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"dependencies": {
+		"@fidan/runtime": "../../"
+	},
+	"devDependencies": {
+		"@fidan/babel-plugin-transform-fidan-jsx": "../babel-plugin-transform-fidan-jsx",
+		"@types/node": "^10.12.12",
+		"@babel/core": "^7.2.0",
+		"@types/babel-traverse": "^6.25.4",
+		"babel-plugin-jsx-dom-expressions": "^0.2.0",
+		"babel-plugin-transform-react-jsx": "^6.24.1",
+		"jasmine": "^3.3.0",
+		"jasmine-spec-reporter": "^4.2.1",
+		"jasmine-ts": "^0.3.0",
+		"microbundle": "^0.8.3",
+		"typescript": "^3.2.1"
+	}
+}
