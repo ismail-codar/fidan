@@ -1,0 +1,17 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "babel-plugin-transform-fidan-jsx",
+      "program": "/Users/macbook/DEV/GitHub/fidan/.packages/babel-plugin-transform-fidan-jsx/node_modules/jasmine-ts/lib/index.js",
+      "args": [
+        "/Users/macbook/DEV/GitHub/fidan/.packages/babel-plugin-transform-fidan-jsx/index.ts"
+      ]
+    }
+  ]
+}
