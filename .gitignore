@@ -1,4 +1,4 @@
 .cache
 .rts2_*
-dist
+build
 node_modules

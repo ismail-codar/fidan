@@ -7,11 +7,41 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "babel-plugin-transform-fidan-jsx",
-      "program": "/Users/macbook/DEV/GitHub/fidan/.packages/babel-plugin-transform-fidan-jsx/node_modules/jasmine-ts/lib/index.js",
+      "name": "fidan-jasmine-ts",
+      "program": "${workspaceFolder}/node_modules/jasmine-ts/lib/index.js",
+      "args": ["${file}"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "server-examples",
+      "cwd": "${workspaceFolder}/packages/fidan-examples",
+      "program": "${workspaceFolder}/packages/fidan-examples/server.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "server-material",
+      "cwd": "${workspaceFolder}/packages/fidan-material",
+      "program": "${workspaceFolder}/packages/fidan-material/server.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "fidan-syntax",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceFolder}/packages/babel-plugin-transform-fidan-syntax",
       "args": [
-        "/Users/macbook/DEV/GitHub/fidan/.packages/babel-plugin-transform-fidan-jsx/index.ts"
+        "${workspaceFolder}/packages/babel-plugin-transform-fidan-syntax/test/index.ts"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ts-node",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${fileDirname}",
+      "args": ["${file}"]
     }
   ]
 }

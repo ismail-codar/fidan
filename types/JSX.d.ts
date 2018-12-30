@@ -1,5 +1,5 @@
 // Type definitions modified from React 16.1
-// Project: http://facebook.github.io/DOM/
+// Project: http://facebook.github.io/Fidan/
 // Definitions by: Asana <https://asana.com>
 //                 AssureSign <http://www.assuresign.com>
 //                 Microsoft <https://microsoft.com>
@@ -23,12 +23,12 @@
 Known Problems & Workarounds
 1. The type of cloneElement is incorrect.
 cloneElement(element, props) should accept props object with a subset of properties on element.props.
-DOM attributes, such as key and ref, should also be accepted in props, but should not exist on element.props.
+Fidan attributes, such as key and ref, should also be accepted in props, but should not exist on element.props.
 The "correct" way to model this, then, is with:
 declare function cloneElement<P extends Q, Q>(
-    element: DOMElement<P>,
+    element: FidanElement<P>,
     props?: Q & Attributes,
-    ...children: DOMNode[]): DOMElement<P>;
+    ...children: FidanNode[]): FidanElement<P>;
 However, type inference for Q defaults to {} when intersected with another type.
 (https://github.com/Microsoft/TypeScript/pull/5738#issuecomment-181904905)
 And since any object is assignable to {}, we would lose the type safety of the P extends Q constraint.
@@ -38,13 +38,13 @@ interface ButtonProps {
     label: string;
     isDisabled?: boolean;
 }
-var element: DOM.CElement<ButtonProps, Button>;
-DOM.cloneElement(element, { label: "label" });
+var element: Fidan.CElement<ButtonProps, Button>;
+Fidan.cloneElement(element, { label: "label" });
 // cloning with optional props requires a cast
-DOM.cloneElement(element, <{ isDisabled?: boolean }>{ isDisabled: true });
+Fidan.cloneElement(element, <{ isDisabled?: boolean }>{ isDisabled: true });
 // cloning with key or ref requires a cast
-DOM.cloneElement(element, <DOM.ClassAttributes<Button>>{ ref: button => button.reset() });
-DOM.cloneElement(element, <{ isDisabled?: boolean } & DOM.Attributes>{
+Fidan.cloneElement(element, <Fidan.ClassAttributes<Button>>{ ref: button => button.reset() });
+Fidan.cloneElement(element, <{ isDisabled?: boolean } & Fidan.Attributes>{
     key: "disabledButton",
     isDisabled: true
 });
@@ -65,15 +65,15 @@ type NativeUIEvent = UIEvent;
 type NativeWheelEvent = WheelEvent;
 
 // tslint:disable-next-line:export-just-namespace
-export = DOM;
-export as namespace DOM;
+export = Fidan;
+export as namespace Fidan;
 
-declare namespace DOM {
+declare namespace Fidan {
 	//
-	// DOM Elements
+	// Fidan Elements
 	// ----------------------------------------------------------------------
 
-	type DOMType<T> = <T>(props: T) => HTMLElement;
+	type FidanType<T> = <T>(props: T) => HTMLElement;
 
 	type Key = string | number;
 	// type Ref<T> = (elem: Element) => any;
@@ -86,30 +86,30 @@ declare namespace DOM {
 		ref?: Ref<T>;
 	}
 
-	interface DOMElement<P> extends HTMLElement {
+	interface FidanElement<P> extends HTMLElement {
 		props: P;
 		key: Key | null;
 	}
 
 	// string fallback for custom web-components
-	interface DomElement<P extends HTMLAttributes<T> | SVGAttributes<T>, T extends Element> extends DOMElement<P> {
+	interface DomElement<P extends HTMLAttributes<T> | SVGAttributes<T>, T extends Element> extends FidanElement<P> {
 		type: string;
 		ref: Ref<T>;
 	}
 
 	//
-	// DOM Nodes
-	// http://facebook.github.io/DOM/docs/glossary.html
+	// Fidan Nodes
+	// http://facebook.github.io/Fidan/docs/glossary.html
 	// ----------------------------------------------------------------------
 
-	type DOMText = string | number;
-	type DOMChild = DOMElement<any> | DOMText;
+	type FidanText = string | number;
+	type FidanChild = FidanElement<any> | FidanText;
 
-	// Should be Array<DOMNode> but type aliases cannot be recursive
-	type DOMFragment = {} | Array<DOMChild | any[] | boolean>;
-	type DOMNode = DOMChild | DOMFragment | string | number | boolean | null | undefined;
+	// Should be Array<FidanNode> but type aliases cannot be recursive
+	type FidanFragment = {} | Array<FidanChild | any[] | boolean>;
+	type FidanNode = FidanChild | FidanFragment | string | number | boolean | null | undefined;
 
-	const Children: DOMChildren;
+	const Children: FidanChildren;
 	const Fragment: any;
 	const version: string;
 
@@ -182,11 +182,11 @@ declare namespace DOM {
 		charCode: number;
 		ctrlKey: boolean;
 		/**
-     * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
+     * See [Fidan Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
      */
 		getModifierState(key: string): boolean;
 		/**
-     * See the [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#named-key-attribute-values). for possible values
+     * See the [Fidan Level 3 Events spec](https://www.w3.org/TR/uievents-key/#named-key-attribute-values). for possible values
      */
 		key: string;
 		keyCode: number;
@@ -207,7 +207,7 @@ declare namespace DOM {
 		clientY: number;
 		ctrlKey: boolean;
 		/**
-     * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
+     * See [Fidan Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
      */
 		getModifierState(key: string): boolean;
 		metaKey: boolean;
@@ -225,7 +225,7 @@ declare namespace DOM {
 		changedTouches: TouchList;
 		ctrlKey: boolean;
 		/**
-     * See [DOM Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
+     * See [Fidan Level 3 Events spec](https://www.w3.org/TR/uievents-key/#keys-modifier). for a list of valid (case-sensitive) arguments to this method.
      */
 		getModifierState(key: string): boolean;
 		metaKey: boolean;
@@ -271,7 +271,7 @@ declare namespace DOM {
 		bivarianceHack(event: E): void;
 	}['bivarianceHack'];
 
-	type DOMEventHandler<T> = EventHandler<SyntheticEvent<T>>;
+	type FidanEventHandler<T> = EventHandler<SyntheticEvent<T>>;
 
 	type ClipboardEventHandler<T> = EventHandler<ClipboardEvent<T>>;
 	type CompositionEventHandler<T> = EventHandler<CompositionEvent<T>>;
@@ -288,7 +288,7 @@ declare namespace DOM {
 	type TransitionEventHandler<T> = EventHandler<TransitionEvent<T>>;
 
 	//
-	// Props / DOM Attributes
+	// Props / Fidan Attributes
 	// ----------------------------------------------------------------------
 
 	/**
@@ -306,7 +306,7 @@ declare namespace DOM {
    * ```
    */
 	interface Props<T> {
-		children?: DOMNode;
+		children?: FidanNode;
 		key?: Key;
 		ref?: Ref<T>;
 	}
@@ -317,8 +317,8 @@ declare namespace DOM {
 
 	interface SVGProps<T> extends SVGAttributes<T>, ClassAttributes<T> {}
 
-	interface DOMAttributes<T> {
-		children?: DOMNode;
+	interface FidanAttributes<T> {
+		children?: FidanNode;
 		dangerouslySetInnerHTML?: {
 			__html: string;
 		};
@@ -358,10 +358,10 @@ declare namespace DOM {
 		onInvalidCapture?: FormEventHandler<T>;
 
 		// Image Events
-		onLoad?: DOMEventHandler<T>;
-		onLoadCapture?: DOMEventHandler<T>;
-		onError?: DOMEventHandler<T>; // also a Media Event
-		onErrorCapture?: DOMEventHandler<T>; // also a Media Event
+		onLoad?: FidanEventHandler<T>;
+		onLoadCapture?: FidanEventHandler<T>;
+		onError?: FidanEventHandler<T>; // also a Media Event
+		onErrorCapture?: FidanEventHandler<T>; // also a Media Event
 
 		// Keyboard Events
 		onKeyDown?: KeyboardEventHandler<T>;
@@ -372,50 +372,50 @@ declare namespace DOM {
 		onKeyUpCapture?: KeyboardEventHandler<T>;
 
 		// Media Events
-		onAbort?: DOMEventHandler<T>;
-		onAbortCapture?: DOMEventHandler<T>;
-		onCanPlay?: DOMEventHandler<T>;
-		onCanPlayCapture?: DOMEventHandler<T>;
-		onCanPlayThrough?: DOMEventHandler<T>;
-		onCanPlayThroughCapture?: DOMEventHandler<T>;
-		onDurationChange?: DOMEventHandler<T>;
-		onDurationChangeCapture?: DOMEventHandler<T>;
-		onEmptied?: DOMEventHandler<T>;
-		onEmptiedCapture?: DOMEventHandler<T>;
-		onEncrypted?: DOMEventHandler<T>;
-		onEncryptedCapture?: DOMEventHandler<T>;
-		onEnded?: DOMEventHandler<T>;
-		onEndedCapture?: DOMEventHandler<T>;
-		onLoadedData?: DOMEventHandler<T>;
-		onLoadedDataCapture?: DOMEventHandler<T>;
-		onLoadedMetadata?: DOMEventHandler<T>;
-		onLoadedMetadataCapture?: DOMEventHandler<T>;
-		onLoadStart?: DOMEventHandler<T>;
-		onLoadStartCapture?: DOMEventHandler<T>;
-		onPause?: DOMEventHandler<T>;
-		onPauseCapture?: DOMEventHandler<T>;
-		onPlay?: DOMEventHandler<T>;
-		onPlayCapture?: DOMEventHandler<T>;
-		onPlaying?: DOMEventHandler<T>;
-		onPlayingCapture?: DOMEventHandler<T>;
-		onProgress?: DOMEventHandler<T>;
-		onProgressCapture?: DOMEventHandler<T>;
-		onRateChange?: DOMEventHandler<T>;
-		onRateChangeCapture?: DOMEventHandler<T>;
-		onSeeked?: DOMEventHandler<T>;
-		onSeekedCapture?: DOMEventHandler<T>;
-		onSeeking?: DOMEventHandler<T>;
-		onSeekingCapture?: DOMEventHandler<T>;
-		onStalled?: DOMEventHandler<T>;
-		onStalledCapture?: DOMEventHandler<T>;
-		onSuspend?: DOMEventHandler<T>;
-		onSuspendCapture?: DOMEventHandler<T>;
-		onTimeUpdate?: DOMEventHandler<T>;
-		onTimeUpdateCapture?: DOMEventHandler<T>;
-		onVolumeChange?: DOMEventHandler<T>;
-		onVolumeChangeCapture?: DOMEventHandler<T>;
-		onWaiting?: DOMEventHandler<T>;
-		onWaitingCapture?: DOMEventHandler<T>;
+		onAbort?: FidanEventHandler<T>;
+		onAbortCapture?: FidanEventHandler<T>;
+		onCanPlay?: FidanEventHandler<T>;
+		onCanPlayCapture?: FidanEventHandler<T>;
+		onCanPlayThrough?: FidanEventHandler<T>;
+		onCanPlayThroughCapture?: FidanEventHandler<T>;
+		onDurationChange?: FidanEventHandler<T>;
+		onDurationChangeCapture?: FidanEventHandler<T>;
+		onEmptied?: FidanEventHandler<T>;
+		onEmptiedCapture?: FidanEventHandler<T>;
+		onEncrypted?: FidanEventHandler<T>;
+		onEncryptedCapture?: FidanEventHandler<T>;
+		onEnded?: FidanEventHandler<T>;
+		onEndedCapture?: FidanEventHandler<T>;
+		onLoadedData?: FidanEventHandler<T>;
+		onLoadedDataCapture?: FidanEventHandler<T>;
+		onLoadedMetadata?: FidanEventHandler<T>;
+		onLoadedMetadataCapture?: FidanEventHandler<T>;
+		onLoadStart?: FidanEventHandler<T>;
+		onLoadStartCapture?: FidanEventHandler<T>;
+		onPause?: FidanEventHandler<T>;
+		onPauseCapture?: FidanEventHandler<T>;
+		onPlay?: FidanEventHandler<T>;
+		onPlayCapture?: FidanEventHandler<T>;
+		onPlaying?: FidanEventHandler<T>;
+		onPlayingCapture?: FidanEventHandler<T>;
+		onProgress?: FidanEventHandler<T>;
+		onProgressCapture?: FidanEventHandler<T>;
+		onRateChange?: FidanEventHandler<T>;
+		onRateChangeCapture?: FidanEventHandler<T>;
+		onSeeked?: FidanEventHandler<T>;
+		onSeekedCapture?: FidanEventHandler<T>;
+		onSeeking?: FidanEventHandler<T>;
+		onSeekingCapture?: FidanEventHandler<T>;
+		onStalled?: FidanEventHandler<T>;
+		onStalledCapture?: FidanEventHandler<T>;
+		onSuspend?: FidanEventHandler<T>;
+		onSuspendCapture?: FidanEventHandler<T>;
+		onTimeUpdate?: FidanEventHandler<T>;
+		onTimeUpdateCapture?: FidanEventHandler<T>;
+		onVolumeChange?: FidanEventHandler<T>;
+		onVolumeChangeCapture?: FidanEventHandler<T>;
+		onWaiting?: FidanEventHandler<T>;
+		onWaitingCapture?: FidanEventHandler<T>;
 
 		// MouseEvents
 		onClick?: MouseEventHandler<T>;
@@ -454,8 +454,8 @@ declare namespace DOM {
 		onMouseUpCapture?: MouseEventHandler<T>;
 
 		// Selection Events
-		onSelect?: DOMEventHandler<T>;
-		onSelectCapture?: DOMEventHandler<T>;
+		onSelect?: FidanEventHandler<T>;
+		onSelectCapture?: FidanEventHandler<T>;
 
 		// Touch Events
 		onTouchCancel?: TouchEventHandler<T>;
@@ -500,7 +500,7 @@ declare namespace DOM {
 	type CSSLength = number | string;
 
 	// This interface is not complete. Only properties accepting
-	// unitless numbers are listed here (see CSSProperty.js in DOM)
+	// unitless numbers are listed here (see CSSProperty.js in Fidan)
 	interface CSSProperties {
 		/**
      * Aligns a flex container's lines within the flex container when there is extra space in the cross-axis, similar to how justify-content aligns individual items within the main-axis.
@@ -2173,8 +2173,8 @@ declare namespace DOM {
 		[propertyName: string]: any;
 	}
 
-	interface HTMLAttributes<T> extends DOMAttributes<T> {
-		// DOM-specific Attributes
+	interface HTMLAttributes<T> extends FidanAttributes<T> {
+		// Fidan-specific Attributes
 		defaultChecked?: boolean;
 		defaultValue?: string | string[];
 		suppressContentEditableWarning?: boolean;
@@ -2230,8 +2230,8 @@ declare namespace DOM {
 	}
 
 	// All the WAI-ARIA 1.1 attributes from https://www.w3.org/TR/wai-aria-1.1/
-	interface HTMLAttributes<T> extends DOMAttributes<T> {
-		/** Identifies the currently active element when DOM focus is on a composite widget, textbox, group, or application. */
+	interface HTMLAttributes<T> extends FidanAttributes<T> {
+		/** Identifies the currently active element when Fidan focus is on a composite widget, textbox, group, or application. */
 		'aria-activedescendant'?: string;
 		/** Indicates whether assistive technologies will present all, or only parts of, the changed region based on the change notifications defined by the aria-relevant attribute. */
 		'aria-atomic'?: boolean | 'false' | 'true';
@@ -2344,7 +2344,7 @@ declare namespace DOM {
 		'aria-orientation'?: 'horizontal' | 'vertical';
 		/**
      * Identifies an element (or elements) in order to define a visual, functional, or contextual parent/child relationship
-     * between DOM elements where the DOM hierarchy cannot be used to represent the relationship.
+     * between Fidan elements where the Fidan hierarchy cannot be used to represent the relationship.
      * @see aria-controls.
      */
 		'aria-owns'?: string;
@@ -2354,7 +2354,7 @@ declare namespace DOM {
      */
 		'aria-placeholder'?: string;
 		/**
-     * Defines an element's number or position in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
+     * Defines an element's number or position in the current set of listitems or treeitems. Not required if all elements in the set are present in the Fidan.
      * @see aria-setsize.
      */
 		'aria-posinset'?: number;
@@ -2398,7 +2398,7 @@ declare namespace DOM {
      */
 		'aria-selected'?: boolean | 'false' | 'true';
 		/**
-     * Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the DOM.
+     * Defines the number of items in the current set of listitems or treeitems. Not required if all elements in the set are present in the Fidan.
      * @see aria-posinset.
      */
 		'aria-setsize'?: number;
@@ -2916,16 +2916,16 @@ declare namespace DOM {
 	}
 
 	// this list is "complete" in that it contains every SVG attribute
-	// that DOM supports, but the types can be improved.
-	// Full list here: https://facebook.github.io/DOM/docs/dom-elements.html
+	// that Fidan supports, but the types can be improved.
+	// Full list here: https://facebook.github.io/Fidan/docs/dom-elements.html
 	//
 	// The three broad type categories are (in order of restrictiveness):
 	//   - "number | string"
 	//   - "string"
 	//   - union of string literals
-	interface SVGAttributes<T> extends DOMAttributes<T> {
+	interface SVGAttributes<T> extends FidanAttributes<T> {
 		// Attributes which also defined in HTMLAttributes
-		// See comment in SVGDOMPropertyConfig.js
+		// See comment in SVGFidanPropertyConfig.js
 		className?: string;
 		color?: string;
 		height?: number | string;
@@ -3221,11 +3221,11 @@ declare namespace DOM {
 	}
 
 	//
-	// DOM.DOM
+	// Fidan.Fidan
 	// ----------------------------------------------------------------------
 
 	//
-	// DOM.PropTypes
+	// Fidan.PropTypes
 	// ----------------------------------------------------------------------
 
 	type Validator<T> = {
@@ -3238,7 +3238,7 @@ declare namespace DOM {
 
 	type ValidationMap<T> = { [K in keyof T]?: Validator<T> };
 
-	interface DOMPropTypes {
+	interface FidanPropTypes {
 		any: Requireable<any>;
 		array: Requireable<any>;
 		bool: Requireable<any>;
@@ -3257,15 +3257,15 @@ declare namespace DOM {
 	}
 
 	//
-	// DOM.Children
+	// Fidan.Children
 	// ----------------------------------------------------------------------
 
-	interface DOMChildren {
-		map<T>(children: DOMNode, fn: (child: DOMChild, index: number) => T): T[];
-		forEach(children: DOMNode, fn: (child: DOMChild, index: number) => void): void;
-		count(children: DOMNode): number;
-		only(children: DOMNode): DOMElement<any>;
-		toArray(children: DOMNode): DOMChild[];
+	interface FidanChildren {
+		map<T>(children: FidanNode, fn: (child: FidanChild, index: number) => T): T[];
+		forEach(children: FidanNode, fn: (child: FidanChild, index: number) => void): void;
+		count(children: FidanNode): number;
+		only(children: FidanNode): FidanElement<any>;
+		toArray(children: FidanNode): FidanChild[];
 	}
 
 	//
@@ -3310,7 +3310,7 @@ declare namespace DOM {
 declare global {
 	namespace JSX {
 		// tslint:disable-next-line:no-empty-interface
-		interface Element extends DOM.DOMElement<any> {}
+		interface Element extends Fidan.FidanElement<any> {}
 
 		interface ElementAttributesProperty {
 			props: {};
@@ -3320,185 +3320,185 @@ declare global {
 		}
 
 		// tslint:disable-next-line:no-empty-interface
-		interface IntrinsicAttributes extends DOM.Attributes {}
+		interface IntrinsicAttributes extends Fidan.Attributes {}
 		// tslint:disable-next-line:no-empty-interface
-		interface IntrinsicClassAttributes<T> extends DOM.ClassAttributes<T> {}
+		interface IntrinsicClassAttributes<T> extends Fidan.ClassAttributes<T> {}
 
 		interface IntrinsicElements {
 			// HTML
-			a: DOM.DetailedHTMLProps<DOM.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
-			abbr: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			address: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			area: DOM.DetailedHTMLProps<DOM.AreaHTMLAttributes<HTMLAreaElement>, HTMLAreaElement>;
-			article: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			aside: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			audio: DOM.DetailedHTMLProps<DOM.AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement>;
-			b: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			base: DOM.DetailedHTMLProps<DOM.BaseHTMLAttributes<HTMLBaseElement>, HTMLBaseElement>;
-			bdi: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			bdo: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			big: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			blockquote: DOM.DetailedHTMLProps<DOM.BlockquoteHTMLAttributes<HTMLElement>, HTMLElement>;
-			body: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLBodyElement>, HTMLBodyElement>;
-			br: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLBRElement>, HTMLBRElement>;
-			button: DOM.DetailedHTMLProps<DOM.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
-			canvas: DOM.DetailedHTMLProps<DOM.CanvasHTMLAttributes<HTMLCanvasElement>, HTMLCanvasElement>;
-			caption: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			cite: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			code: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			col: DOM.DetailedHTMLProps<DOM.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
-			colgroup: DOM.DetailedHTMLProps<DOM.ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
-			data: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			datalist: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
-			dd: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			del: DOM.DetailedHTMLProps<DOM.DelHTMLAttributes<HTMLElement>, HTMLElement>;
-			details: DOM.DetailedHTMLProps<DOM.DetailsHTMLAttributes<HTMLElement>, HTMLElement>;
-			dfn: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			dialog: DOM.DetailedHTMLProps<DOM.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>;
-			div: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
-			dl: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLDListElement>, HTMLDListElement>;
-			dt: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			em: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			embed: DOM.DetailedHTMLProps<DOM.EmbedHTMLAttributes<HTMLEmbedElement>, HTMLEmbedElement>;
-			fieldset: DOM.DetailedHTMLProps<DOM.FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>;
-			figcaption: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			figure: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			footer: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			form: DOM.DetailedHTMLProps<DOM.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
-			h1: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			h2: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			h3: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			h4: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			h5: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			h6: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
-			head: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHeadElement>, HTMLHeadElement>;
-			header: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			hgroup: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			hr: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLHRElement>, HTMLHRElement>;
-			html: DOM.DetailedHTMLProps<DOM.HtmlHTMLAttributes<HTMLHtmlElement>, HTMLHtmlElement>;
-			i: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			iframe: DOM.DetailedHTMLProps<DOM.IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>;
-			img: DOM.DetailedHTMLProps<DOM.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
-			input: DOM.DetailedHTMLProps<DOM.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
-			ins: DOM.DetailedHTMLProps<DOM.InsHTMLAttributes<HTMLModElement>, HTMLModElement>;
-			kbd: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			keygen: DOM.DetailedHTMLProps<DOM.KeygenHTMLAttributes<HTMLElement>, HTMLElement>;
-			label: DOM.DetailedHTMLProps<DOM.LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
-			legend: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>;
-			li: DOM.DetailedHTMLProps<DOM.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
-			link: DOM.DetailedHTMLProps<DOM.LinkHTMLAttributes<HTMLLinkElement>, HTMLLinkElement>;
-			main: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			map: DOM.DetailedHTMLProps<DOM.MapHTMLAttributes<HTMLMapElement>, HTMLMapElement>;
-			mark: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			menu: DOM.DetailedHTMLProps<DOM.MenuHTMLAttributes<HTMLElement>, HTMLElement>;
-			menuitem: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			meta: DOM.DetailedHTMLProps<DOM.MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>;
-			meter: DOM.DetailedHTMLProps<DOM.MeterHTMLAttributes<HTMLElement>, HTMLElement>;
-			nav: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			noindex: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			noscript: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			object: DOM.DetailedHTMLProps<DOM.ObjectHTMLAttributes<HTMLObjectElement>, HTMLObjectElement>;
-			ol: DOM.DetailedHTMLProps<DOM.OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>;
-			optgroup: DOM.DetailedHTMLProps<DOM.OptgroupHTMLAttributes<HTMLOptGroupElement>, HTMLOptGroupElement>;
-			option: DOM.DetailedHTMLProps<DOM.OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement>;
-			output: DOM.DetailedHTMLProps<DOM.OutputHTMLAttributes<HTMLElement>, HTMLElement>;
-			p: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>;
-			param: DOM.DetailedHTMLProps<DOM.ParamHTMLAttributes<HTMLParamElement>, HTMLParamElement>;
-			picture: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			pre: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLPreElement>, HTMLPreElement>;
-			progress: DOM.DetailedHTMLProps<DOM.ProgressHTMLAttributes<HTMLProgressElement>, HTMLProgressElement>;
-			q: DOM.DetailedHTMLProps<DOM.QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>;
-			rp: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			rt: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			ruby: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			s: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			samp: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			script: DOM.DetailedHTMLProps<DOM.ScriptHTMLAttributes<HTMLScriptElement>, HTMLScriptElement>;
-			section: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			select: DOM.DetailedHTMLProps<DOM.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement>;
-			small: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			source: DOM.DetailedHTMLProps<DOM.SourceHTMLAttributes<HTMLSourceElement>, HTMLSourceElement>;
-			span: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
-			strong: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			style: DOM.DetailedHTMLProps<DOM.StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>;
-			sub: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			summary: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			sup: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			table: DOM.DetailedHTMLProps<DOM.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
-			tbody: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-			td: DOM.DetailedHTMLProps<DOM.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
-			textarea: DOM.DetailedHTMLProps<DOM.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
-			tfoot: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-			th: DOM.DetailedHTMLProps<DOM.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>;
-			thead: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
-			time: DOM.DetailedHTMLProps<DOM.TimeHTMLAttributes<HTMLElement>, HTMLElement>;
-			title: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLTitleElement>, HTMLTitleElement>;
-			tr: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
-			track: DOM.DetailedHTMLProps<DOM.TrackHTMLAttributes<HTMLTrackElement>, HTMLTrackElement>;
-			u: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			ul: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLUListElement>, HTMLUListElement>;
-			var: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			video: DOM.DetailedHTMLProps<DOM.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>;
-			wbr: DOM.DetailedHTMLProps<DOM.HTMLAttributes<HTMLElement>, HTMLElement>;
-			webview: DOM.DetailedHTMLProps<DOM.WebViewHTMLAttributes<HTMLWebViewElement>, HTMLWebViewElement>;
+			a: Fidan.DetailedHTMLProps<Fidan.AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>;
+			abbr: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			address: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			area: Fidan.DetailedHTMLProps<Fidan.AreaHTMLAttributes<HTMLAreaElement>, HTMLAreaElement>;
+			article: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			aside: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			audio: Fidan.DetailedHTMLProps<Fidan.AudioHTMLAttributes<HTMLAudioElement>, HTMLAudioElement>;
+			b: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			base: Fidan.DetailedHTMLProps<Fidan.BaseHTMLAttributes<HTMLBaseElement>, HTMLBaseElement>;
+			bdi: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			bdo: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			big: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			blockquote: Fidan.DetailedHTMLProps<Fidan.BlockquoteHTMLAttributes<HTMLElement>, HTMLElement>;
+			body: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLBodyElement>, HTMLBodyElement>;
+			br: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLBRElement>, HTMLBRElement>;
+			button: Fidan.DetailedHTMLProps<Fidan.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
+			canvas: Fidan.DetailedHTMLProps<Fidan.CanvasHTMLAttributes<HTMLCanvasElement>, HTMLCanvasElement>;
+			caption: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			cite: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			code: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			col: Fidan.DetailedHTMLProps<Fidan.ColHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+			colgroup: Fidan.DetailedHTMLProps<Fidan.ColgroupHTMLAttributes<HTMLTableColElement>, HTMLTableColElement>;
+			data: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			datalist: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLDataListElement>, HTMLDataListElement>;
+			dd: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			del: Fidan.DetailedHTMLProps<Fidan.DelHTMLAttributes<HTMLElement>, HTMLElement>;
+			details: Fidan.DetailedHTMLProps<Fidan.DetailsHTMLAttributes<HTMLElement>, HTMLElement>;
+			dfn: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			dialog: Fidan.DetailedHTMLProps<Fidan.DialogHTMLAttributes<HTMLDialogElement>, HTMLDialogElement>;
+			div: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+			dl: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLDListElement>, HTMLDListElement>;
+			dt: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			em: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			embed: Fidan.DetailedHTMLProps<Fidan.EmbedHTMLAttributes<HTMLEmbedElement>, HTMLEmbedElement>;
+			fieldset: Fidan.DetailedHTMLProps<Fidan.FieldsetHTMLAttributes<HTMLFieldSetElement>, HTMLFieldSetElement>;
+			figcaption: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			figure: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			footer: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			form: Fidan.DetailedHTMLProps<Fidan.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>;
+			h1: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			h2: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			h3: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			h4: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			h5: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			h6: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>;
+			head: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHeadElement>, HTMLHeadElement>;
+			header: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			hgroup: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			hr: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLHRElement>, HTMLHRElement>;
+			html: Fidan.DetailedHTMLProps<Fidan.HtmlHTMLAttributes<HTMLHtmlElement>, HTMLHtmlElement>;
+			i: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			iframe: Fidan.DetailedHTMLProps<Fidan.IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>;
+			img: Fidan.DetailedHTMLProps<Fidan.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>;
+			input: Fidan.DetailedHTMLProps<Fidan.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>;
+			ins: Fidan.DetailedHTMLProps<Fidan.InsHTMLAttributes<HTMLModElement>, HTMLModElement>;
+			kbd: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			keygen: Fidan.DetailedHTMLProps<Fidan.KeygenHTMLAttributes<HTMLElement>, HTMLElement>;
+			label: Fidan.DetailedHTMLProps<Fidan.LabelHTMLAttributes<HTMLLabelElement>, HTMLLabelElement>;
+			legend: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLLegendElement>, HTMLLegendElement>;
+			li: Fidan.DetailedHTMLProps<Fidan.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>;
+			link: Fidan.DetailedHTMLProps<Fidan.LinkHTMLAttributes<HTMLLinkElement>, HTMLLinkElement>;
+			main: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			map: Fidan.DetailedHTMLProps<Fidan.MapHTMLAttributes<HTMLMapElement>, HTMLMapElement>;
+			mark: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			menu: Fidan.DetailedHTMLProps<Fidan.MenuHTMLAttributes<HTMLElement>, HTMLElement>;
+			menuitem: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			meta: Fidan.DetailedHTMLProps<Fidan.MetaHTMLAttributes<HTMLMetaElement>, HTMLMetaElement>;
+			meter: Fidan.DetailedHTMLProps<Fidan.MeterHTMLAttributes<HTMLElement>, HTMLElement>;
+			nav: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			noindex: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			noscript: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			object: Fidan.DetailedHTMLProps<Fidan.ObjectHTMLAttributes<HTMLObjectElement>, HTMLObjectElement>;
+			ol: Fidan.DetailedHTMLProps<Fidan.OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>;
+			optgroup: Fidan.DetailedHTMLProps<Fidan.OptgroupHTMLAttributes<HTMLOptGroupElement>, HTMLOptGroupElement>;
+			option: Fidan.DetailedHTMLProps<Fidan.OptionHTMLAttributes<HTMLOptionElement>, HTMLOptionElement>;
+			output: Fidan.DetailedHTMLProps<Fidan.OutputHTMLAttributes<HTMLElement>, HTMLElement>;
+			p: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>;
+			param: Fidan.DetailedHTMLProps<Fidan.ParamHTMLAttributes<HTMLParamElement>, HTMLParamElement>;
+			picture: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			pre: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLPreElement>, HTMLPreElement>;
+			progress: Fidan.DetailedHTMLProps<Fidan.ProgressHTMLAttributes<HTMLProgressElement>, HTMLProgressElement>;
+			q: Fidan.DetailedHTMLProps<Fidan.QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>;
+			rp: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			rt: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			ruby: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			s: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			samp: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			script: Fidan.DetailedHTMLProps<Fidan.ScriptHTMLAttributes<HTMLScriptElement>, HTMLScriptElement>;
+			section: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			select: Fidan.DetailedHTMLProps<Fidan.SelectHTMLAttributes<HTMLSelectElement>, HTMLSelectElement>;
+			small: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			source: Fidan.DetailedHTMLProps<Fidan.SourceHTMLAttributes<HTMLSourceElement>, HTMLSourceElement>;
+			span: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>;
+			strong: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			style: Fidan.DetailedHTMLProps<Fidan.StyleHTMLAttributes<HTMLStyleElement>, HTMLStyleElement>;
+			sub: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			summary: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			sup: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			table: Fidan.DetailedHTMLProps<Fidan.TableHTMLAttributes<HTMLTableElement>, HTMLTableElement>;
+			tbody: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+			td: Fidan.DetailedHTMLProps<Fidan.TdHTMLAttributes<HTMLTableDataCellElement>, HTMLTableDataCellElement>;
+			textarea: Fidan.DetailedHTMLProps<Fidan.TextareaHTMLAttributes<HTMLTextAreaElement>, HTMLTextAreaElement>;
+			tfoot: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+			th: Fidan.DetailedHTMLProps<Fidan.ThHTMLAttributes<HTMLTableHeaderCellElement>, HTMLTableHeaderCellElement>;
+			thead: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLTableSectionElement>, HTMLTableSectionElement>;
+			time: Fidan.DetailedHTMLProps<Fidan.TimeHTMLAttributes<HTMLElement>, HTMLElement>;
+			title: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLTitleElement>, HTMLTitleElement>;
+			tr: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLTableRowElement>, HTMLTableRowElement>;
+			track: Fidan.DetailedHTMLProps<Fidan.TrackHTMLAttributes<HTMLTrackElement>, HTMLTrackElement>;
+			u: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			ul: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLUListElement>, HTMLUListElement>;
+			var: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			video: Fidan.DetailedHTMLProps<Fidan.VideoHTMLAttributes<HTMLVideoElement>, HTMLVideoElement>;
+			wbr: Fidan.DetailedHTMLProps<Fidan.HTMLAttributes<HTMLElement>, HTMLElement>;
+			webview: Fidan.DetailedHTMLProps<Fidan.WebViewHTMLAttributes<HTMLWebViewElement>, HTMLWebViewElement>;
 
 			// SVG
-			svg: DOM.SVGProps<SVGSVGElement>;
+			svg: Fidan.SVGProps<SVGSVGElement>;
 
-			animate: DOM.SVGProps<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
-			animateTransform: DOM.SVGProps<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
-			circle: DOM.SVGProps<SVGCircleElement>;
-			clipPath: DOM.SVGProps<SVGClipPathElement>;
-			defs: DOM.SVGProps<SVGDefsElement>;
-			desc: DOM.SVGProps<SVGDescElement>;
-			ellipse: DOM.SVGProps<SVGEllipseElement>;
-			feBlend: DOM.SVGProps<SVGFEBlendElement>;
-			feColorMatrix: DOM.SVGProps<SVGFEColorMatrixElement>;
-			feComponentTransfer: DOM.SVGProps<SVGFEComponentTransferElement>;
-			feComposite: DOM.SVGProps<SVGFECompositeElement>;
-			feConvolveMatrix: DOM.SVGProps<SVGFEConvolveMatrixElement>;
-			feDiffuseLighting: DOM.SVGProps<SVGFEDiffuseLightingElement>;
-			feDisplacementMap: DOM.SVGProps<SVGFEDisplacementMapElement>;
-			feDistantLight: DOM.SVGProps<SVGFEDistantLightElement>;
-			feFlood: DOM.SVGProps<SVGFEFloodElement>;
-			feFuncA: DOM.SVGProps<SVGFEFuncAElement>;
-			feFuncB: DOM.SVGProps<SVGFEFuncBElement>;
-			feFuncG: DOM.SVGProps<SVGFEFuncGElement>;
-			feFuncR: DOM.SVGProps<SVGFEFuncRElement>;
-			feGaussianBlur: DOM.SVGProps<SVGFEGaussianBlurElement>;
-			feImage: DOM.SVGProps<SVGFEImageElement>;
-			feMerge: DOM.SVGProps<SVGFEMergeElement>;
-			feMergeNode: DOM.SVGProps<SVGFEMergeNodeElement>;
-			feMorphology: DOM.SVGProps<SVGFEMorphologyElement>;
-			feOffset: DOM.SVGProps<SVGFEOffsetElement>;
-			fePointLight: DOM.SVGProps<SVGFEPointLightElement>;
-			feSpecularLighting: DOM.SVGProps<SVGFESpecularLightingElement>;
-			feSpotLight: DOM.SVGProps<SVGFESpotLightElement>;
-			feTile: DOM.SVGProps<SVGFETileElement>;
-			feTurbulence: DOM.SVGProps<SVGFETurbulenceElement>;
-			filter: DOM.SVGProps<SVGFilterElement>;
-			foreignObject: DOM.SVGProps<SVGForeignObjectElement>;
-			g: DOM.SVGProps<SVGGElement>;
-			image: DOM.SVGProps<SVGImageElement>;
-			line: DOM.SVGProps<SVGLineElement>;
-			linearGradient: DOM.SVGProps<SVGLinearGradientElement>;
-			marker: DOM.SVGProps<SVGMarkerElement>;
-			mask: DOM.SVGProps<SVGMaskElement>;
-			metadata: DOM.SVGProps<SVGMetadataElement>;
-			path: DOM.SVGProps<SVGPathElement>;
-			pattern: DOM.SVGProps<SVGPatternElement>;
-			polygon: DOM.SVGProps<SVGPolygonElement>;
-			polyline: DOM.SVGProps<SVGPolylineElement>;
-			radialGradient: DOM.SVGProps<SVGRadialGradientElement>;
-			rect: DOM.SVGProps<SVGRectElement>;
-			stop: DOM.SVGProps<SVGStopElement>;
-			switch: DOM.SVGProps<SVGSwitchElement>;
-			symbol: DOM.SVGProps<SVGSymbolElement>;
-			text: DOM.SVGProps<SVGTextElement>;
-			textPath: DOM.SVGProps<SVGTextPathElement>;
-			tspan: DOM.SVGProps<SVGTSpanElement>;
-			use: DOM.SVGProps<SVGUseElement>;
-			view: DOM.SVGProps<SVGViewElement>;
+			animate: Fidan.SVGProps<SVGElement>; // TODO: It is SVGAnimateElement but is not in TypeScript's lib.dom.d.ts for now.
+			animateTransform: Fidan.SVGProps<SVGElement>; // TODO: It is SVGAnimateTransformElement but is not in TypeScript's lib.dom.d.ts for now.
+			circle: Fidan.SVGProps<SVGCircleElement>;
+			clipPath: Fidan.SVGProps<SVGClipPathElement>;
+			defs: Fidan.SVGProps<SVGDefsElement>;
+			desc: Fidan.SVGProps<SVGDescElement>;
+			ellipse: Fidan.SVGProps<SVGEllipseElement>;
+			feBlend: Fidan.SVGProps<SVGFEBlendElement>;
+			feColorMatrix: Fidan.SVGProps<SVGFEColorMatrixElement>;
+			feComponentTransfer: Fidan.SVGProps<SVGFEComponentTransferElement>;
+			feComposite: Fidan.SVGProps<SVGFECompositeElement>;
+			feConvolveMatrix: Fidan.SVGProps<SVGFEConvolveMatrixElement>;
+			feDiffuseLighting: Fidan.SVGProps<SVGFEDiffuseLightingElement>;
+			feDisplacementMap: Fidan.SVGProps<SVGFEDisplacementMapElement>;
+			feDistantLight: Fidan.SVGProps<SVGFEDistantLightElement>;
+			feFlood: Fidan.SVGProps<SVGFEFloodElement>;
+			feFuncA: Fidan.SVGProps<SVGFEFuncAElement>;
+			feFuncB: Fidan.SVGProps<SVGFEFuncBElement>;
+			feFuncG: Fidan.SVGProps<SVGFEFuncGElement>;
+			feFuncR: Fidan.SVGProps<SVGFEFuncRElement>;
+			feGaussianBlur: Fidan.SVGProps<SVGFEGaussianBlurElement>;
+			feImage: Fidan.SVGProps<SVGFEImageElement>;
+			feMerge: Fidan.SVGProps<SVGFEMergeElement>;
+			feMergeNode: Fidan.SVGProps<SVGFEMergeNodeElement>;
+			feMorphology: Fidan.SVGProps<SVGFEMorphologyElement>;
+			feOffset: Fidan.SVGProps<SVGFEOffsetElement>;
+			fePointLight: Fidan.SVGProps<SVGFEPointLightElement>;
+			feSpecularLighting: Fidan.SVGProps<SVGFESpecularLightingElement>;
+			feSpotLight: Fidan.SVGProps<SVGFESpotLightElement>;
+			feTile: Fidan.SVGProps<SVGFETileElement>;
+			feTurbulence: Fidan.SVGProps<SVGFETurbulenceElement>;
+			filter: Fidan.SVGProps<SVGFilterElement>;
+			foreignObject: Fidan.SVGProps<SVGForeignObjectElement>;
+			g: Fidan.SVGProps<SVGGElement>;
+			image: Fidan.SVGProps<SVGImageElement>;
+			line: Fidan.SVGProps<SVGLineElement>;
+			linearGradient: Fidan.SVGProps<SVGLinearGradientElement>;
+			marker: Fidan.SVGProps<SVGMarkerElement>;
+			mask: Fidan.SVGProps<SVGMaskElement>;
+			metadata: Fidan.SVGProps<SVGMetadataElement>;
+			path: Fidan.SVGProps<SVGPathElement>;
+			pattern: Fidan.SVGProps<SVGPatternElement>;
+			polygon: Fidan.SVGProps<SVGPolygonElement>;
+			polyline: Fidan.SVGProps<SVGPolylineElement>;
+			radialGradient: Fidan.SVGProps<SVGRadialGradientElement>;
+			rect: Fidan.SVGProps<SVGRectElement>;
+			stop: Fidan.SVGProps<SVGStopElement>;
+			switch: Fidan.SVGProps<SVGSwitchElement>;
+			symbol: Fidan.SVGProps<SVGSymbolElement>;
+			text: Fidan.SVGProps<SVGTextElement>;
+			textPath: Fidan.SVGProps<SVGTextPathElement>;
+			tspan: Fidan.SVGProps<SVGTSpanElement>;
+			use: Fidan.SVGProps<SVGUseElement>;
+			view: Fidan.SVGProps<SVGViewElement>;
 		}
 	}
 }

@@ -9,7 +9,9 @@
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
-	"dependencies": {},
+	"dependencies": {
+		"symbol-observable": "^1.2.0"
+	},
 	"devDependencies": {
 		"@babel/core": "^7.2.0",
 		"@types/babel-traverse": "^6.25.4",
@@ -17,6 +19,7 @@
 		"babel-plugin-jsx-dom-expressions": "^0.2.0",
 		"babel-plugin-transform-react-jsx": "^6.24.1",
 		"copyfiles": "^2.1.0",
+		"@types/jasmine": "^3.0.0",
 		"jasmine": "^3.3.0",
 		"jasmine-spec-reporter": "^4.2.1",
 		"jasmine-ts": "^0.3.0",

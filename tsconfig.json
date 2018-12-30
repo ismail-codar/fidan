@@ -1,7 +1,19 @@
 {
     "compilerOptions": {
-        "experimentalDecorators": true,
-        "jsx": "preserve",
-        "lib": ["dom", "es2015"]
-    }
-}
+      "target": "es2015",
+      "lib": ["es2015", "dom"],
+      "module": "es2015",
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "removeComments": false,
+      "noImplicitAny": false,
+      "allowUnreachableCode": true,
+      "allowSyntheticDefaultImports": true,
+      "strictFunctionTypes": false,
+      "jsx": "preserve"
+    },
+    "exclude": ["node_modules", "build", "spec", "packages", "bench"]
+  }
+  

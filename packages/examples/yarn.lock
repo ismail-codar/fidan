@@ -2556,6 +2556,10 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+reactorjs@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/reactorjs/-/reactorjs-1.0.1.tgz#448d89a82bcf278d353fdede41c971d50218fc92"
+
 read-pkg-up@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/read-pkg-up/-/read-pkg-up-2.0.0.tgz#6b72a8048984e0c41e79510fd5e9fa99b3b549be"

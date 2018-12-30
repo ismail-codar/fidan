@@ -1,0 +1,66 @@
+<html>
+
+<head>
+    <title>Create Element</title>
+    <style>
+        .test-div {
+            background-color:moccasin;
+            color: navy;
+            margin-left: 20px;
+        }
+    </style>
+    <script>
+        const createElement = function(parent, data) {
+            var e = document.createElement("div");
+            e.className = "test-div";
+            e.innerText = data;
+            parent.appendChild(e);
+            return e
+        }
+    </script>
+    <!-- <script>
+        window.onload = function() {
+            var time = new Date().getTime()
+            var count = 10000;
+            var c = document.body;
+            for(var i=0; i<count;i++) {
+                createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(c,i),i*3) ,i*4) ,i*5),i*6),i*7),i*8),i*9),i*10),i*11),i*12),i*13),i*14),i*15),i*16),i*17),i*18),i*19),i*20);
+            }
+            time = new Date().getTime()-time
+            document.title = time;
+        }
+    </script> -->
+    <script>
+        window.onload = function() {
+            var time = new Date().getTime()
+            var count = 10000;
+            var c = document.createDocumentFragment();
+            for(var i=0; i<count;i++) {
+                createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(c,i),i*3) ,i*4) ,i*5),i*6),i*7),i*8),i*9),i*10),i*11),i*12),i*13),i*14),i*15),i*16),i*17),i*18),i*19),i*20);
+            }
+            document.body.appendChild(c);
+            time = new Date().getTime()-time
+            document.title = time;
+        }
+    </script>
+</head>
+
+<body>
+    <!-- <script>
+        var time = new Date().getTime()
+        var count = 10000;
+        var c = document.createDocumentFragment();
+        for(var i=0; i<count;i++) {
+            for (var i = 0; i < 10000; i++) {
+                var e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i;
+                c.appendChild(e);
+            }
+        }
+        document.body.appendChild(c);
+        console.log(new Date().getTime()-time)
+    </script> -->
+</body>
+
+</html>

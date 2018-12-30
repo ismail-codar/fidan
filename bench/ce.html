@@ -1,0 +1,178 @@
+<html>
+
+<head>
+    <title>Create Element</title>
+    <style>
+        .test-div {
+            background-color:moccasin;
+            color: navy;
+            margin-left: 20px;
+        }
+    </style>
+    <script>
+        const createElement = function(parent, data) {
+            var e = document.createElement("div");
+            e.className = "test-div";
+            e.innerText = data;
+            parent.appendChild(e);
+            return e
+        }
+    </script>
+    <!-- <script>
+        window.onload = function() {
+            var time = new Date().getTime()
+            var count = 10000;
+            var c = document.body;
+            for(var i=0; i<count;i++) {
+                createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(c,i),i*3) ,i*4) ,i*5),i*6),i*7),i*8),i*9),i*10),i*11),i*12),i*13),i*14),i*15),i*16),i*17),i*18),i*19),i*20);
+            }
+            time = new Date().getTime()-time
+            document.title = time;
+        }
+    </script> -->
+    <!-- <script>
+        window.onload = function() {
+            var time = new Date().getTime()
+            var count = 10000;
+            var c = document.createDocumentFragment();
+            for(var i=0; i<count;i++) {
+                createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(c,i),i*3) ,i*4) ,i*5),i*6),i*7),i*8),i*9),i*10),i*11),i*12),i*13),i*14),i*15),i*16),i*17),i*18),i*19),i*20);
+            }
+            document.body.appendChild(c);
+            time = new Date().getTime()-time
+            document.title = time;
+        }
+    </script> -->
+    <!-- <script>
+        window.onload = function() {
+            var time = new Date().getTime()
+            var count = 10000;
+            var c = document.createDocumentFragment();
+            for(var i=0; i<count;i++) {
+                var parent = c;
+                var e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*2;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*3;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*4;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*5;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*6;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*7;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*8;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*9;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*10;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*11;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*12;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*13;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*14;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*15;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*16;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*17;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*18;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*19;
+                parent = parent.appendChild(e);
+                e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i*20;
+                parent = parent.appendChild(e);
+            }
+            document.body.appendChild(c);
+            time = new Date().getTime()-time
+            document.title = time;
+        }
+    </script> -->
+    <script>
+            window.onload = function() {
+                var time = new Date().getTime()
+                var count = 10000;
+                var c = document.createDocumentFragment();
+                var template = null;
+                for(var i=1; i<count;i++) {
+                    if(template === null) {
+                        createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(createElement(c,i),i*3) ,i*4) ,i*5),i*6),i*7),i*8),i*9),i*10),i*11),i*12),i*13),i*14),i*15),i*16),i*17),i*18),i*19),i*20);
+                        template = c.cloneNode(true)
+                    }
+                    else
+                        c.appendChild(template.cloneNode(true))
+                }
+                document.body.appendChild(c);
+                time = new Date().getTime()-time
+                document.title = time;
+            }
+        </script>
+</head>
+
+<body>
+    <!-- <script>
+        var time = new Date().getTime()
+        var count = 10000;
+        var c = document.createDocumentFragment();
+        for(var i=0; i<count;i++) {
+            for (var i = 0; i < 10000; i++) {
+                var e = document.createElement("div");
+                e.className = "test-div";
+                e.innerText = i;
+                c.appendChild(e);
+            }
+        }
+        document.body.appendChild(c);
+        console.log(new Date().getTime()-time)
+    </script> -->
+</body>
+
+</html>
