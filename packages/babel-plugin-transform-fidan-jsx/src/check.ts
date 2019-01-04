@@ -155,10 +155,10 @@ const isTrackedKey = (scope: Scope, node: t.MemberExpression) => {
 		return true;
 };
 
-const isFjsxName = (str: string) => str.indexOf('fjsx') !== -1;
+const isFidanName = (str: string) => str.indexOf('fidan') !== -1;
 
-const fjsxValueBinaryInit = (
-	// fjsx.value(a.$val + b.$val); gibi mi diye bak
+const fidanValueBinaryInit = (
+	// fidan.value(a.$val + b.$val); gibi mi diye bak
 	expression: t.Expression
 ): expression is t.CallExpression => {
 	return (
@@ -167,7 +167,7 @@ const fjsxValueBinaryInit = (
 		t.isBinaryExpression(expression.arguments[0]) &&
 		t.isMemberExpression(expression.callee) &&
 		t.isIdentifier(expression.callee.object) &&
-		isFjsxName(expression.callee.object.name) &&
+		isFidanName(expression.callee.object.name) &&
 		t.isIdentifier(expression.callee.property) &&
 		expression.callee.property.name == 'value'
 	);
@@ -177,16 +177,16 @@ const parentPathComputeCallee = (path: NodePath<t.ExpressionStatement>) => {
 	if (!path.parentPath || !path.parentPath.parentPath || !path.parentPath.parentPath.parentPath) return false;
 	const parentPath = path.parentPath.parentPath.parentPath;
 	if (t.isCallExpression(parentPath.node) && t.isIdentifier(parentPath.node.callee))
-		return parentPath.node.callee.name === 'fjsx.compute';
+		return parentPath.node.callee.name === 'fidan.compute';
 	else return false;
 };
 
 /**
  * function (element) {
-      fjsx.compute... control
+      fidan.compute... control
     }
  */
-const isFjsxElementFunction = (node: t.BaseNode) => {
+const isFidanElementFunction = (node: t.BaseNode) => {
 	if (t.isFunctionExpression(node) && node.params.length === 1) {
 		const param0 = node.params[0];
 		if (t.isIdentifier(param0)) return param0.name === 'element';
@@ -229,7 +229,7 @@ const objectPropertyParentIsComponent = (path: NodePath<any>) => {
 			t.isCallExpression(path.node) &&
 			t.isMemberExpression(path.node.callee) &&
 			t.isIdentifier(path.node.callee.object) &&
-			isFjsxName(path.node.callee.object.name) &&
+			isFidanName(path.node.callee.object.name) &&
 			t.isIdentifier(path.node.callee.property) &&
 			path.node.callee.property.name === 'createElement'
 		) {
@@ -262,10 +262,10 @@ export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression)
 	);
 };
 
-export const isFjsxCall = (node: t.BaseNode) => {
+export const isFidanCall = (node: t.BaseNode) => {
 	if (!t.isCallExpression(node)) return false;
 	const member = found.callExpressionFirstMember(node);
-	return member && isFjsxName(member.name);
+	return member && isFidanName(member.name);
 };
 
 export const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
@@ -276,7 +276,7 @@ export const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
 		!(
 			t.isMemberExpression(expression.callee) &&
 			t.isIdentifier(expression.callee.object) &&
-			isFjsxName(expression.callee.object.name)
+			isFidanName(expression.callee.object.name)
 		));
 
 export const isSvgElementTagName = (tagName, openedTags: string[]) => {
@@ -287,8 +287,8 @@ export const isSvgElementTagName = (tagName, openedTags: string[]) => {
 };
 
 export const check = {
-	isFjsxName,
-	isFjsxCall,
+	isFidanName,
+	isFidanCall,
 	isValMemberProperty,
 	isTrackedByNodeName,
 	hasTrackedComment,
@@ -297,7 +297,7 @@ export const check = {
 	isTrackedVariable,
 	isTrackedKey,
 	specialMemberAccessKeywords,
-	fjsxValueBinaryInit,
+	fidanValueBinaryInit,
 	parentPathComputeCallee,
 	expressionContainerParentIsComponent,
 	objectPropertyParentIsComponent,
@@ -305,5 +305,5 @@ export const check = {
 	isArrayMapExpression,
 	isDynamicExpression,
 	isSvgElementTagName,
-	isFjsxElementFunction
+	isFidanElementFunction
 };

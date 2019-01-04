@@ -1,3 +1,3 @@
-fidanByReact(Button, {
-  variant: "primary"
+fidan.createElementByReact(Button, {
+	variant: 'primary'
 });

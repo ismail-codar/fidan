@@ -1,22 +1,22 @@
-var list = fjsx.array([
-  {
-    title: fjsx.value("a")
-  },
-  {
-    title: fjsx.value("b")
-  },
-  {
-    title: fjsx.value("c")
-  }
+var list = fidan.array([
+	{
+		title: fidan.value('a')
+	},
+	{
+		title: fidan.value('b')
+	},
+	{
+		title: fidan.value('c')
+	}
 ]);
 list.$val.push({
-  title: fjsx.value("d")
+	title: fidan.value('d')
 });
-var ul1 = fidan("ul", null, function(element) {
-  fjsx.arrayMap(list, element, function(
-    // @track_keys id|title
-    item
-  ) {
-    return fidan("li", null, item.title.$val);
-  });
+var ul1 = fidan.createElement('ul', null, function(element) {
+	fidan.arrayMap(list, element, function(
+		// @track_keys id|title
+		item
+	) {
+		return fidan.createElement('li', null, item.title.$val);
+	});
 });

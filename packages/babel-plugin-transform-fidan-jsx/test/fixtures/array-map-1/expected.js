@@ -1,7 +1,7 @@
 // @tracked
-var arr = fjsx.array([]);
-fidan("div", null, "list:", function(element) {
-  fjsx.arrayMap(arr, element, function(item, index) {
-    return item;
-  });
+var arr = fidan.array([]);
+fidan.createElement('div', null, 'list:', function(element) {
+	fidan.arrayMap(arr, element, function(item, index) {
+		return item;
+	});
 });

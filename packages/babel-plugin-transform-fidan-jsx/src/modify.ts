@@ -5,14 +5,14 @@ import * as t from '@babel/types';
 import { check } from './check';
 import { parameters } from './parameters';
 
-const fjsxValueInit = (init: t.Expression | t.PatternLike | t.SpreadElement | t.JSXNamespacedName) => {
+const fidanValueInit = (init: t.Expression | t.PatternLike | t.SpreadElement | t.JSXNamespacedName) => {
 	return t.callExpression(
-		t.memberExpression(t.identifier('fjsx'), t.identifier(t.isArrayExpression(init) ? 'array' : 'value')),
+		t.memberExpression(t.identifier('fidan'), t.identifier(t.isArrayExpression(init) ? 'array' : 'value')),
 		[ init == null ? t.nullLiteral() : init as any ]
 	);
 };
 
-const fjsxCall = (left: t.Expression | t.RestElement | t.LVal, right: t.Expression, operator: string) => {
+const fidanCall = (left: t.Expression | t.RestElement | t.LVal, right: t.Expression, operator: string) => {
 	if (operator === '=') return t.callExpression(left as any, [ right ]);
 	else {
 		operator = operator.substr(0, 1);
@@ -27,7 +27,7 @@ const assignmentExpressionToCallCompute = (expression: t.AssignmentExpression, f
 		expression.left.property.name === '$val'
 	)
 		return t.callExpression(
-			t.memberExpression(t.identifier('fjsx'), t.identifier('compute')),
+			t.memberExpression(t.identifier('fidan'), t.identifier('compute')),
 			[
 				t.functionExpression(
 					t.identifier(''),
@@ -42,17 +42,17 @@ const assignmentExpressionToCallCompute = (expression: t.AssignmentExpression, f
 
 const dynamicExpressionInitComputeValues = (expression: t.Expression | t.PatternLike, fComputeParameters: any[]) => {
 	return t.callExpression(
-		t.memberExpression(t.identifier('fjsx'), t.identifier('initCompute')),
+		t.memberExpression(t.identifier('fidan'), t.identifier('initCompute')),
 		[
 			t.functionExpression(t.identifier(''), [], t.blockStatement([ t.returnStatement(expression as any) ]))
 		].concat(fComputeParameters)
 	);
 };
 
-const fjsxAssignmentExpressionSetCompute = (expression: t.AssignmentExpression, fComputeParameters: any[]) => {
+const fidanAssignmentExpressionSetCompute = (expression: t.AssignmentExpression, fComputeParameters: any[]) => {
 	const leftName = t.isIdentifier(expression.left) ? expression.left.name : 'TODO';
 	return t.callExpression(
-		t.memberExpression(t.identifier('fjsx'), t.identifier('setCompute')),
+		t.memberExpression(t.identifier('fidan'), t.identifier('setCompute')),
 		[
 			t.identifier(leftName),
 			t.functionExpression(t.identifier(''), [], t.blockStatement([ t.returnStatement(expression.right) ]))
@@ -65,8 +65,8 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 	if (t.isAssignmentExpression(expression)) {
 		// const code = generate(path.node).code;
 		if (t.isMemberExpression(expression.left)) {
-			const rightIsFjsxCall = check.isFjsxCall(expression.right);
-			if (rightIsFjsxCall) return;
+			const rightIsFidanCall = check.isFidanCall(expression.right);
+			if (rightIsFidanCall) return;
 
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
 			const rightIsTracked = check.isTrackedVariable(path.scope, expression.right);
@@ -75,7 +75,7 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 				if (rightIsTracked) return;
 				else {
 					if (check.isDynamicExpression(expression.right)) {
-						const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+						const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 							path.scope,
 							expression.right
 						);
@@ -84,18 +84,18 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 							return;
 						}
 					}
-					expression.right = fjsxValueInit(expression.right);
+					expression.right = fidanValueInit(expression.right);
 					return;
 				}
 			}
 
 			if (rightIsTracked) {
 				if (leftIsTracked) {
-					path.node[propertyName] = modify.fjsxCall(expression.left, expression.right, expression.operator);
+					path.node[propertyName] = modify.fidanCall(expression.left, expression.right, expression.operator);
 				}
 			} else {
 				if (leftIsTracked) {
-					path.node[propertyName] = modify.fjsxCall(expression.left, expression.right, expression.operator);
+					path.node[propertyName] = modify.fidanCall(expression.left, expression.right, expression.operator);
 				}
 			}
 		}
@@ -103,11 +103,11 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 			if (
 				!(t.isIdentifier(expression.right) && check.isTrackedVariable(path.scope, expression.right)) // @tracked != @tracked ...
 			) {
-				const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+				const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 					path.scope,
 					expression.right
 				);
-				expression.right = modify.fjsxAssignmentExpressionSetCompute(expression, fComputeParameters);
+				expression.right = modify.fidanAssignmentExpressionSetCompute(expression, fComputeParameters);
 			}
 		} else if (t.isAssignmentExpression(expression)) {
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
@@ -117,14 +117,14 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 				leftIsTracked &&
 				!(t.isMemberExpression(expression.left) && expression.left.object.type === 'ThisExpression')
 			)
-				path.node[propertyName] = modify.fjsxCall(expression.left, expression.right, expression.operator);
+				path.node[propertyName] = modify.fidanCall(expression.left, expression.right, expression.operator);
 			else if (rightIsTracked && !check.isExportsMember(expression.left)) {
 				expression.right = modify.memberVal(expression.right);
 			}
 		}
 	} else if (t.isUpdateExpression(expression)) {
 		if (check.isTrackedVariable(path.scope, expression.argument)) {
-			path.node[propertyName] = modify.fjsxCall(expression.argument, t.numericLiteral(1), expression.operator);
+			path.node[propertyName] = modify.fidanCall(expression.argument, t.numericLiteral(1), expression.operator);
 		}
 	}
 };
@@ -140,11 +140,11 @@ export const moveContextArguments = (args: any[], contextArgIndex: number) => {
 	const contextArgProps: any[] = args[contextArgIndex].arguments[1].properties;
 	const contextArgs = args[contextArgIndex].arguments.splice(2);
 	contextArgs.push(
-		t.callExpression(t.memberExpression(t.identifier('fjsx'), t.identifier('endContext')), [
+		t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('endContext')), [
 			contextArgProps[0].value
 		])
 	);
-	args[contextArgIndex] = t.callExpression(t.memberExpression(t.identifier('fjsx'), t.identifier('startContext')), [
+	args[contextArgIndex] = t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('startContext')), [
 		contextArgProps[0].value,
 		contextArgProps[1].value
 	]);
@@ -173,12 +173,12 @@ export const pathNodeLeftRight = (path: NodePath<t.LogicalExpression | t.BinaryE
 };
 
 export const modify = {
-	fjsxValueInit,
-	fjsxCall,
+	fidanValueInit,
+	fidanCall,
 	memberVal,
 	dynamicExpressionInitComputeValues,
 	assignmentExpressionToCallCompute,
-	fjsxAssignmentExpressionSetCompute,
+	fidanAssignmentExpressionSetCompute,
 	expressionStatementGeneralProcess,
 	moveContextArguments,
 	pathNodeLeftRight

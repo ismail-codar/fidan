@@ -1,4 +1,4 @@
-const normalizedValue$ = fjsx.computeReturn(function() {
+const normalizedValue$ = fidan.computeReturn(function() {
 	if (props.value$ < 0) {
 		return 0;
 	}

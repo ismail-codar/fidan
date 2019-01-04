@@ -1,11 +1,11 @@
-var counter$ = fjsx.value(0);
-var x$ = fjsx.value(x + 1);
-var y$ = fjsx.initCompute(function() {
+var counter$ = fidan.value(0);
+var x$ = fidan.value(x + 1);
+var y$ = fidan.initCompute(function() {
 	return x$.$val + 1;
 }, x$);
-var a$ = fjsx.value(null);
-var b$ = fjsx.value(null);
-fidan(
+var a$ = fidan.value(null);
+var b$ = fidan.value(null);
+fidan.createElement(
 	'button',
 	{
 		onClick: function onClick() {

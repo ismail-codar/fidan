@@ -1,7 +1,7 @@
 var object1 = {
-  property1: fjsx.value(1),
-  property2: 2,
-  property3$: fjsx.value(3)
+	property1: fidan.value(1),
+	property2: 2,
+	property3$: fidan.value(3)
 };
 
 object1.property1(4);

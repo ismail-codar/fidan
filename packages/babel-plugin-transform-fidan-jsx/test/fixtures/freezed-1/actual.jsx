@@ -1,3 +1,3 @@
 // @tracked
-var variable1 = fjsx.value(1);
+var variable1 = fidan.value(1);
 variable1.freezed = true;

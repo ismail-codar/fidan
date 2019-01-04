@@ -1,5 +1,5 @@
-fidan("div", null, function(element) {
-  fjsx.arrayMap(data, element, function(item, index) {
-    return item;
-  });
+fidan.createElement('div', null, function(element) {
+	fidan.arrayMap(data, element, function(item, index) {
+		return item;
+	});
 });

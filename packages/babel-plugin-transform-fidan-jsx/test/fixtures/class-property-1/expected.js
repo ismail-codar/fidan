@@ -6,15 +6,15 @@ function _classCallCheck(instance, Constructor) {
 	}
 }
 
-var name1$ = fjsx.value('');
-var surname1$ = fjsx.value('');
+var name1$ = fidan.value('');
+var surname1$ = fidan.value('');
 
 var Test1 = function Test1() {
 	_classCallCheck(this, Test1);
 
-	this.value$ = fjsx.value(1);
+	this.value$ = fidan.value(1);
 	this.name$ = name1$;
-	this.fullname$ = fjsx.initCompute(
+	this.fullname$ = fidan.initCompute(
 		function() {
 			return name1$.$val + ' ' + surname1$.$val;
 		},

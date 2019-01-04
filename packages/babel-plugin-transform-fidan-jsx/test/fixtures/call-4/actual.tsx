@@ -1,9 +1,9 @@
-declare var fjsx;
+declare var fidan;
 var todoCtrl1 = {
-  filterBy(filter) {}
+	filterBy(filter) {}
 };
 // @tracked
-var $filterType1 = "";
-fjsx.compute(() => {
-  todoCtrl1.filterBy($filterType1);
+var $filterType1 = '';
+fidan.compute(() => {
+	todoCtrl1.filterBy($filterType1);
 }, $filterType1);

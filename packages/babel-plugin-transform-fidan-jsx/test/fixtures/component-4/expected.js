@@ -4,11 +4,11 @@ Object.defineProperty(exports, '__esModule', {
 exports.Main = void 0;
 var _ProgressCircular = require('../../components/vue/vuetify/VProgressCircular/ProgressCircular');
 var Main = function Main() {
-	var value$ = fjsx.value(10);
-	return fidan(
+	var value$ = fidan.value(10);
+	return fidan.createElement(
 		'div',
 		null,
-		fidan(_ProgressCircular.ProgressCircular, {
+		fidan.createElement(_ProgressCircular.ProgressCircular, {
 			value$: value$
 		})
 	);

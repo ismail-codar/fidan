@@ -1,5 +1,5 @@
 // @tracked
-var data = fjsx.value(false);
-var component1 = fidan(DemoView, {
-  data$: data
+var data = fidan.value(false);
+var component1 = fidan.createElement(DemoView, {
+	data$: data
 });

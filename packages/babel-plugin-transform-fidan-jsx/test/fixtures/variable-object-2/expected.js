@@ -1,9 +1,9 @@
-var obj$ = fjsx.initCompute(function() {
+var obj$ = fidan.initCompute(function() {
 	return {
 		data: 1,
 		value$: value$,
 		valueX: value$.$val,
-		amount$: fjsx.initCompute(function() {
+		amount$: fidan.initCompute(function() {
 			return value$.$val + data;
 		}, value$)
 	};

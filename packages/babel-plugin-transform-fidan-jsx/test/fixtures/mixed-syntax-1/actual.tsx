@@ -1,2 +1,2 @@
-declare var fjsx;
-export const todos = fjsx.array([]);
+declare var fidan;
+export const todos = fidan.array([]);

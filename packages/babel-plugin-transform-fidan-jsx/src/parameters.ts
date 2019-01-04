@@ -22,7 +22,7 @@ const listAddWithControl = (scope: Scope, expression: t.Expression, list: t.Expr
 	else if (check.isTrackedVariable(scope, expression)) list.push(expression);
 };
 
-const fjsxComputeParametersInExpression = (
+const fidanComputeParametersInExpression = (
 	scope: Scope,
 	expression: t.Expression | t.PatternLike | t.JSXEmptyExpression,
 	list: t.Expression[]
@@ -42,12 +42,12 @@ const fjsxComputeParametersInExpression = (
 			}
 		}
 		if (t.isIdentifier(expression.object)) {
-			fjsxComputeParametersInExpression(scope, expression.object, list);
+			fidanComputeParametersInExpression(scope, expression.object, list);
 		}
 	} else if (t.isBinaryExpression(expression)) checkBinaryExpression(scope, expression, list);
 	else if (t.isLogicalExpression(expression)) checkLogicalExpression(scope, expression, list);
 	else if (t.isConditionalExpression(expression)) checkConditionalExpression(scope, expression, list);
-	else if (t.isUnaryExpression(expression)) fjsxComputeParametersInExpression(scope, expression.argument, list);
+	else if (t.isUnaryExpression(expression)) fidanComputeParametersInExpression(scope, expression.argument, list);
 	else if (t.isCallExpression(expression)) {
 		const methodName = t.isIdentifier(expression.callee) ? expression.callee.name : null;
 		if (methodName) {
@@ -111,19 +111,19 @@ const checkFunctionBody = (
 };
 
 const checkConditionalExpression = (scope: Scope, expression: t.ConditionalExpression, list: t.Expression[]) => {
-	fjsxComputeParametersInExpression(scope, expression.test, list);
-	if (t.isExpression(expression.consequent)) fjsxComputeParametersInExpression(scope, expression.consequent, list);
-	if (t.isExpression(expression.alternate)) fjsxComputeParametersInExpression(scope, expression.alternate, list);
+	fidanComputeParametersInExpression(scope, expression.test, list);
+	if (t.isExpression(expression.consequent)) fidanComputeParametersInExpression(scope, expression.consequent, list);
+	if (t.isExpression(expression.alternate)) fidanComputeParametersInExpression(scope, expression.alternate, list);
 };
 
 const checkBinaryExpression = (scope: Scope, expression: t.BinaryExpression, list: t.Expression[]) => {
-	fjsxComputeParametersInExpression(scope, expression.left, list);
-	fjsxComputeParametersInExpression(scope, expression.right, list);
+	fidanComputeParametersInExpression(scope, expression.left, list);
+	fidanComputeParametersInExpression(scope, expression.right, list);
 };
 
 const checkLogicalExpression = (scope: Scope, expression: t.LogicalExpression, list: t.Expression[]) => {
-	fjsxComputeParametersInExpression(scope, expression.left, list);
-	fjsxComputeParametersInExpression(scope, expression.right, list);
+	fidanComputeParametersInExpression(scope, expression.left, list);
+	fidanComputeParametersInExpression(scope, expression.right, list);
 };
 
 const checkExpressionList = (
@@ -132,21 +132,21 @@ const checkExpressionList = (
 	list: t.Expression[]
 ) => {
 	argumentList.forEach((arg) => {
-		if (t.isExpression(arg)) fjsxComputeParametersInExpression(scope, arg as t.Expression, list);
-		else if (t.isObjectProperty(arg)) fjsxComputeParametersInExpression(scope, arg.value as t.Expression, list);
+		if (t.isExpression(arg)) fidanComputeParametersInExpression(scope, arg as t.Expression, list);
+		else if (t.isObjectProperty(arg)) fidanComputeParametersInExpression(scope, arg.value as t.Expression, list);
 		else throw 'not implemented argument type in checkExpressionList';
 	});
 };
 
-export const fjsxComputeParametersInExpressionWithScopeFilter = (
+export const fidanComputeParametersInExpressionWithScopeFilter = (
 	scope: Scope,
 	expression: t.Expression | t.PatternLike | t.JSXEmptyExpression
 ) => {
 	const fComputeParameters = [];
-	fjsxComputeParametersInExpression(scope, expression, fComputeParameters);
+	fidanComputeParametersInExpression(scope, expression, fComputeParameters);
 	return fComputeParameters;
 };
 
 export const parameters = {
-	fjsxComputeParametersInExpressionWithScopeFilter
+	fidanComputeParametersInExpressionWithScopeFilter
 };

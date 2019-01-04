@@ -70,7 +70,7 @@ export = function() {
 				if (doNotTraverse) return;
 				try {
 					if (t.isIdentifier(path.node.object) && path.node.object.name === 'React') {
-						path.node.object.name = 'fjsx';
+						path.node.object.name = 'fidan';
 					}
 					if (
 						(t.isMemberExpression(path.parent) && path.parent.property.name === '$val') == false &&
@@ -108,7 +108,7 @@ export = function() {
 						(check.isTrackedByNodeName(path.node) || check.hasTrackedComment(path))
 					) {
 						if (path.node.init && check.isDynamicExpression(path.node.init)) {
-							const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+							const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 								path.scope,
 								path.node.init
 							);
@@ -123,7 +123,7 @@ export = function() {
 								!check.isTrackedVariable(path.scope, path.node.init) &&
 								!t.isCallExpression(path.node.init)
 							)
-								path.node.init = modify.fjsxValueInit(path.node.init);
+								path.node.init = modify.fidanValueInit(path.node.init);
 						} else if (
 							!check.hasTrackedSetComment(path) &&
 							!check.isTrackedVariable(path.scope, path.node.init) &&
@@ -131,7 +131,7 @@ export = function() {
 						) {
 							if (check.isTrackedByNodeName(path.node) && t.isObjectExpression(path.node.init)) {
 								//variable-object-2
-								const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 									path.scope,
 									path.node.init
 								);
@@ -141,7 +141,7 @@ export = function() {
 										fComputeParameters
 									);
 								}
-							} else path.node.init = modify.fjsxValueInit(path.node.init);
+							} else path.node.init = modify.fidanValueInit(path.node.init);
 						}
 					} else if (
 						check.isTrackedVariable(path.scope, path.node.init) ||
@@ -166,7 +166,7 @@ export = function() {
 					} else if (leftIsTracked) {
 						const rightIsDynamic = check.isDynamicExpression(path.node.value);
 						if (rightIsDynamic) {
-							const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+							const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 								path.scope,
 								path.node.value
 							);
@@ -175,10 +175,13 @@ export = function() {
 									path.node.value,
 									fComputeParameters
 								);
-							} else if (!check.isFjsxCall(path.node.value))
-								path.node.value = modify.fjsxValueInit(path.node.value);
-						} else if (!check.isFjsxCall(path.node.value) && !check.isFjsxElementFunction(path.node.value))
-							path.node.value = modify.fjsxValueInit(path.node.value);
+							} else if (!check.isFidanCall(path.node.value))
+								path.node.value = modify.fidanValueInit(path.node.value);
+						} else if (
+							!check.isFidanCall(path.node.value) &&
+							!check.isFidanElementFunction(path.node.value)
+						)
+							path.node.value = modify.fidanValueInit(path.node.value);
 					}
 				} catch (e) {
 					errorReport(e, path, file);
@@ -207,7 +210,7 @@ export = function() {
 						t.isMemberExpression(path.node.callee) &&
 						path.node.callee.property.name == 'createElement' &&
 						t.isIdentifier(path.node.callee.object) &&
-						(path.node.callee.object.name === 'React' || check.isFjsxName(path.node.callee.object.name))
+						(path.node.callee.object.name === 'React' || check.isFidanName(path.node.callee.object.name))
 					) {
 						const firstArgument = path.node.arguments[0];
 						const secondArgument: any = path.node.arguments.length > 1 ? path.node.arguments[1] : null;
@@ -251,7 +254,7 @@ export = function() {
 						}
 					}
 					const member = found.callExpressionFirstMember(path.node);
-					if (member && member.name && !check.isFjsxName(member.name)) {
+					if (member && member.name && !check.isFidanName(member.name)) {
 						const contextArgumentIndex = found.findContextChildIndex(path.node.arguments);
 						if (contextArgumentIndex !== -1) {
 							modify.moveContextArguments(path.node.arguments, contextArgumentIndex);
@@ -268,7 +271,7 @@ export = function() {
 								if (rightIsTracked) {
 									if (!leftIsTracked) {
 										//call-2 call-3
-										path.node.arguments[index] = modify.fjsxValueInit(path.node.arguments[index]);
+										path.node.arguments[index] = modify.fidanValueInit(path.node.arguments[index]);
 									}
 								} else {
 									if (leftIsTracked) {
@@ -359,7 +362,7 @@ export = function() {
 								check.objectPropertyParentIsComponent(path);
 							if (t.isCallExpression(path.node.expression) && componentPropertyIsTracked) {
 								//class-names-6
-								const fComputeParameters = parameters.fjsxComputeParametersInExpressionWithScopeFilter(
+								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 									path.scope,
 									path.node.expression
 								);
@@ -368,7 +371,7 @@ export = function() {
 										path.node.expression,
 										fComputeParameters
 									);
-								else path.node.expression = modify.fjsxValueInit(path.node.expression);
+								else path.node.expression = modify.fidanValueInit(path.node.expression);
 							} else if (!componentPropertyIsTracked) {
 								// TODO bir yerde parent null olduğu için getProgramParent da hata oluşuyor
 								// bu hataya düşmemek için jsx içinde <div>{functionMethod(...)}</div> gibi kullanımdan kaçınılmalı
