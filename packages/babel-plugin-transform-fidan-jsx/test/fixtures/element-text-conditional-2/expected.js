@@ -1,4 +1,3 @@
-// @tracked
 fidan.createElement('div', null, function(element) {
 	var oldElement;
 	fidan.compute(function() {

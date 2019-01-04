@@ -1,6 +1,5 @@
-savedTodos.forEach(item => {
-  const todoItem = {
-    // @tracked
-    $title: item["$title"]
-  };
+savedTodos.forEach((item) => {
+	const todoItem = {
+		title$: item['$title']
+	};
 });

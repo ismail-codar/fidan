@@ -1,5 +1,5 @@
 savedTodos.forEach(function(item) {
 	var todoItem = {
-		$title: fidan.value(item['$title'])
+		title$: fidan.value(item['$title'])
 	};
 });

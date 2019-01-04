@@ -1,4 +1,4 @@
-var width = fidan.value(500);
+var width$ = fidan.value(500);
 fidan.createElement(
 	'div',
 	{
@@ -6,8 +6,8 @@ fidan.createElement(
 			color: 'red',
 			width: function(element) {
 				fidan.compute(function() {
-					element.style.width = width.$val < 200 ? width.$val : 200;
-				}, width);
+					element.style.width = width$.$val < 200 ? width$.$val : 200;
+				}, width$);
 			}
 		}
 	},

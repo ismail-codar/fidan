@@ -1,10 +1,9 @@
-// @tracked
-const width = 500;
+const width$ = 500;
 <div
-  style={{
-    color: "red",
-    width: width < 200 ? width : 200
-  }}
+	style={{
+		color: 'red',
+		width: width$ < 200 ? width$ : 200
+	}}
 >
-  test
+	test
 </div>;
