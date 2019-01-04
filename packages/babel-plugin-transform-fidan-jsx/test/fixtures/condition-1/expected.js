@@ -1,0 +1,1 @@
+todo.completed$.$val == true;

@@ -1,0 +1,3 @@
+fidanByReact(Button, {
+  variant: "primary"
+});

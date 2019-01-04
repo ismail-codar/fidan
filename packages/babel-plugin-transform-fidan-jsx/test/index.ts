@@ -11,10 +11,10 @@ require('@babel/register');
 
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
-RUN_SINGLE_TEST = 'prop-ref-1';
+// RUN_SINGLE_TEST = 'variable-object-3';
 ////////////////////////////////////////////////////////////////////////////
 
-var pluginPath = require.resolve('../index');
+var pluginPath = require.resolve('../src');
 var exitCode = 0;
 
 function runTests() {

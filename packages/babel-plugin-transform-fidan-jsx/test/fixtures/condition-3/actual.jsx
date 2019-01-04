@@ -1,0 +1,1 @@
+todoItem.completed$ ? true : false;

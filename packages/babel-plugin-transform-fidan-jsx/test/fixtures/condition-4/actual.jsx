@@ -1,0 +1,2 @@
+if (todoItem.completed$) {
+}
