@@ -1,15 +1,14 @@
-// @tracked
-var editing,
-  completed = false,
-  highlight = true;
+var editing$,
+	completed$ = false,
+	highlight$ = true;
 <div
-  className={classNames(
-    {
-      editing: editing,
-      completed: completed
-    },
-    highlight
-  )}
+	className={classNames(
+		{
+			editing: editing$,
+			completed: completed$
+		},
+		highlight$
+	)}
 >
-  test
+	test
 </div>;

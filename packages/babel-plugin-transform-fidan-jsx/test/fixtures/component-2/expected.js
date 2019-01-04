@@ -6,13 +6,12 @@ Object.defineProperty(exports, '__esModule', {
 exports.DemoView = void 0;
 
 var DemoView = function DemoView(props) {
-	// @tracked_set
-	var data = props.data;
+	var data$ = props.data$;
 	return fidan.createElement('div', null, function(element) {
 		element = fidan.createTextNode(element);
 		fidan.compute(function() {
-			element.textContent = data.$val;
-		}, data);
+			element.textContent = data$.$val;
+		}, data$);
 	});
 };
 

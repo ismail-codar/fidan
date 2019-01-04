@@ -1,7 +1,6 @@
-// @tracked
-var editing = fidan.value(null),
-	completed = fidan.value(false),
-	highlight = fidan.value(true);
+var editing$ = fidan.value(null),
+	completed$ = fidan.value(false),
+	highlight$ = fidan.value(true);
 fidan.createElement(
 	'div',
 	{
@@ -10,15 +9,15 @@ fidan.createElement(
 				function() {
 					element.className = classNames(
 						{
-							editing: editing.$val,
-							completed: completed.$val
+							editing: editing$.$val,
+							completed: completed$.$val
 						},
-						highlight.$val
+						highlight$.$val
 					);
 				},
-				editing,
-				completed,
-				highlight
+				editing$,
+				completed$,
+				highlight$
 			);
 		}
 	},

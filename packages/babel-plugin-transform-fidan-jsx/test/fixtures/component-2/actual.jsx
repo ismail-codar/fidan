@@ -1,5 +1,4 @@
-export const DemoView = props => {
-  // @tracked_set
-  const data = props.data;
-  return <div>{data}</div>;
+export const DemoView = (props) => {
+	const data$ = props.data$;
+	return <div>{data$}</div>;
 };
