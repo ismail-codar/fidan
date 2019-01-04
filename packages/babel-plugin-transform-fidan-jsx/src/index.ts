@@ -72,29 +72,36 @@ export = function() {
 					if (t.isIdentifier(path.node.object) && path.node.object.name === 'React') {
 						path.node.object.name = 'fidan';
 					}
-					if (
-						(t.isMemberExpression(path.parent) && path.parent.property.name === '$val') == false &&
-						check.isTrackedKey(path.scope, path.node) &&
-						t.isIdentifier(path.node.object)
-					) {
-						//track-item-keys-1
-						path.node.object = t.memberExpression(path.node.object, t.identifier(path.node.property.name));
-						path.node.property = t.identifier('$val');
-					} else if (
-						check.specialMemberAccessKeywords.indexOf(path.node.property.name) === -1 &&
-						check.isTrackedVariable(path.scope, path.node.object)
-					) {
-						path.node.object = modify.memberVal(path.node.object);
-					} else if (
-						t.isMemberExpression(path.node.property) &&
-						t.isCallExpression(path.parentPath.node) === false &&
-						t.isVariableDeclarator(path.parentPath.node) === false &&
-						check.isTrackedByNodeName(path.node.property) &&
-						(t.isMemberExpression(path.parentPath.node) && path.parentPath.node.property.name === '$val') ==
-							false
-					) {
-						//object-indexed-property-1
-						path.node.property = t.memberExpression(path.node.property, t.identifier('$val'));
+					const isExport = check.isExportsMember(path.node);
+					if (!isExport) {
+						if (
+							(t.isMemberExpression(path.parent) && path.parent.property.name === '$val') == false &&
+							check.isTrackedVariable(path.scope, path.node) &&
+							t.isIdentifier(path.node.object)
+						) {
+							// TODO iptal ????
+							//track-item-keys-1
+							path.node.object = t.memberExpression(
+								path.node.object,
+								t.identifier(path.node.property.name)
+							);
+							path.node.property = t.identifier('$val');
+						} else if (
+							check.specialMemberAccessKeywords.indexOf(path.node.property.name) === -1 &&
+							check.isTrackedVariable(path.scope, path.node.object)
+						) {
+							path.node.object = modify.memberVal(path.node.object);
+						} else if (
+							t.isMemberExpression(path.node.property) &&
+							t.isCallExpression(path.parentPath.node) === false &&
+							t.isVariableDeclarator(path.parentPath.node) === false &&
+							check.isTrackedByNodeName(path.node.property) &&
+							(t.isMemberExpression(path.parentPath.node) &&
+								path.parentPath.node.property.name === '$val') == false
+						) {
+							//object-indexed-property-1
+							path.node.property = t.memberExpression(path.node.property, t.identifier('$val'));
+						}
 					}
 				} catch (e) {
 					errorReport(e, path, file);
@@ -103,10 +110,7 @@ export = function() {
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>, file) {
 				if (doNotTraverse) return;
 				try {
-					if (
-						t.isVariableDeclaration(path.parent) &&
-						(check.isTrackedByNodeName(path.node) || check.hasTrackedComment(path))
-					) {
+					if (t.isVariableDeclaration(path.parent) && check.isTrackedByNodeName(path.node)) {
 						if (path.node.init && check.isDynamicExpression(path.node.init)) {
 							const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 								path.scope,
@@ -118,14 +122,11 @@ export = function() {
 									fComputeParameters
 								);
 							} else if (
-								//TODO reduce
-								!check.hasTrackedSetComment(path) &&
 								!check.isTrackedVariable(path.scope, path.node.init) &&
 								!t.isCallExpression(path.node.init)
 							)
 								path.node.init = modify.fidanValueInit(path.node.init);
 						} else if (
-							!check.hasTrackedSetComment(path) &&
 							!check.isTrackedVariable(path.scope, path.node.init) &&
 							!t.isCallExpression(path.node.init) //freezed-1
 						) {

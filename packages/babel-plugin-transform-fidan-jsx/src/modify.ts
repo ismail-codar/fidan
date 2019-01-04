@@ -64,7 +64,8 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 	const expression: t.Expression = path.node[propertyName];
 	if (t.isAssignmentExpression(expression)) {
 		// const code = generate(path.node).code;
-		if (t.isMemberExpression(expression.left)) {
+		const isExport = check.isExportsMember(expression.left);
+		if (t.isMemberExpression(expression.left) && !isExport) {
 			const rightIsFidanCall = check.isFidanCall(expression.right);
 			if (rightIsFidanCall) return;
 
@@ -99,17 +100,7 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 				}
 			}
 		}
-		if (check.hasTrackedSetComment(path)) {
-			if (
-				!(t.isIdentifier(expression.right) && check.isTrackedVariable(path.scope, expression.right)) // @tracked != @tracked ...
-			) {
-				const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
-					path.scope,
-					expression.right
-				);
-				expression.right = modify.fidanAssignmentExpressionSetCompute(expression, fComputeParameters);
-			}
-		} else if (t.isAssignmentExpression(expression)) {
+		if (!isExport && t.isAssignmentExpression(expression)) {
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
 			const rightIsTracked = check.isTrackedVariable(path.scope, expression.right);
 
