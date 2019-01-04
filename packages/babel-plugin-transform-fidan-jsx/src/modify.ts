@@ -127,6 +127,10 @@ const memberVal = (expression: t.Expression | t.SpreadElement | t.JSXNamespacedN
 	} else return t.memberExpression(expression as any, t.identifier('$val'));
 };
 
+const renameToVal = (node: t.MemberExpression, property) => {
+	node[property] = t.identifier('$val');
+};
+
 export const moveContextArguments = (args: any[], contextArgIndex: number) => {
 	const contextArgProps: any[] = args[contextArgIndex].arguments[1].properties;
 	const contextArgs = args[contextArgIndex].arguments.splice(2);
@@ -167,6 +171,7 @@ export const modify = {
 	fidanValueInit,
 	fidanCall,
 	memberVal,
+	renameToVal,
 	dynamicExpressionInitComputeValues,
 	assignmentExpressionToCallCompute,
 	fidanAssignmentExpressionSetCompute,

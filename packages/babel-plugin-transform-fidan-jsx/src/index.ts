@@ -85,6 +85,7 @@ export = function() {
 								path.node.object,
 								t.identifier(path.node.property.name)
 							);
+							modify.renameToVal(path.node, "property")
 							path.node.property = t.identifier('$val');
 						} else if (
 							check.specialMemberAccessKeywords.indexOf(path.node.property.name) === -1 &&
@@ -100,7 +101,7 @@ export = function() {
 								path.parentPath.node.property.name === '$val') == false
 						) {
 							//object-indexed-property-1
-							path.node.property = t.memberExpression(path.node.property, t.identifier('$val'));
+							path.node.property  = modify.memberVal(path.node.property)
 						}
 					}
 				} catch (e) {
