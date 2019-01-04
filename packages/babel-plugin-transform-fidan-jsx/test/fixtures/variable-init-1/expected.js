@@ -1,5 +1,6 @@
 var counter$ = fidan.value(0);
-var x$ = fidan.value(x + 1);
+var a = 0;
+var x$ = fidan.value(a + 1);
 var y$ = fidan.initCompute(function() {
 	return x$.$val + 1;
 }, x$);

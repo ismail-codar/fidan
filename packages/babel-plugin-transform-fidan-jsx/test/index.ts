@@ -76,7 +76,7 @@ function runTest(dir) {
 		str = str
 			.split('\n')
 			.map((line) => {
-				return line.indexOf('@tracked') !== -1 || line.indexOf('use strict') !== -1 ? null : line;
+				return line.indexOf('use strict') !== -1 ? null : line;
 			})
 			.filter((line) => line != null)
 			.join('\n');

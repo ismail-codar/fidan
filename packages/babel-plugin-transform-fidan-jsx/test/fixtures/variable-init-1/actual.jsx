@@ -1,5 +1,6 @@
 var counter$ = 0;
-var x$ = x + 1;
+var a = 0;
+var x$ = a + 1;
 var y$ = x$ + 1;
 var a$;
 let b$;
