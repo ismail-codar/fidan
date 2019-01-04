@@ -1,4 +1,4 @@
-import * as fjsx from '../src/index';
+import * as fidan from '../src/index';
 
 const prettyhtml = require('@starptech/prettyhtml');
 const { Document, Node, Text } = require('basichtml');
@@ -9,15 +9,15 @@ jasmine.getEnv().throwOnExpectationFailure(true);
 
 it('array value set', () => {
 	const added = [];
-	const arr = fjsx.array([]);
+	const arr = fidan.array([]);
 
 	arr.on('itemadded', (e) => {
 		added.push(e);
 	});
 
 	const parentDom = document.createElement('div');
-	fjsx.arrayMap(arr, parentDom, (item, idx) => {
-		return fjsx.createElement('span', null, item);
+	fidan.arrayMap(arr, parentDom, (item, idx) => {
+		return fidan.createElement('span', null, item);
 	});
 
 	arr.$val.push(1);

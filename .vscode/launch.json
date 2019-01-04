@@ -28,11 +28,11 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "fidan-syntax",
+      "name": "fidan-jsx",
       "runtimeArgs": ["-r", "ts-node/register"],
-      "cwd": "${workspaceFolder}/packages/babel-plugin-transform-fidan-syntax",
+      "cwd": "${workspaceFolder}/packages/babel-plugin-transform-fidan-jsx",
       "args": [
-        "${workspaceFolder}/packages/babel-plugin-transform-fidan-syntax/test/index.ts"
+        "${workspaceFolder}/packages/babel-plugin-transform-fidan-jsx/test/index.ts"
       ]
     },
     {
