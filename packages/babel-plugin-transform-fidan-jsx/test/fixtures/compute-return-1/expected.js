@@ -7,5 +7,5 @@ var normalizedValue$ = fidan.computeReturn(function() {
 		return 100;
 	}
 
-	return props.value$;
+	return props.value$.$val;
 }, props.value$);
