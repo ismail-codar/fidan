@@ -79,7 +79,8 @@ export = function() {
 							check.isTrackedVariable(path.scope, path.node) &&
 							t.isIdentifier(path.node.object) &&
 							!check.isTrackedVariable(path.parentPath.scope, path.parentPath.node) &&
-							!check.isFidanCall(path.parentPath.node)
+							!check.isFidanCall(path.parentPath.node) &&
+							!t.isAssignmentExpression(path.parentPath.node) // object-property-3
 						) {
 							path.node.object = t.memberExpression(
 								path.node.object,
