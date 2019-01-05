@@ -100,7 +100,29 @@ const expressionStatementGeneralProcess = (propertyName: string, path: NodePath<
 				}
 			}
 		}
-		if (!isExport && t.isAssignmentExpression(expression)) {
+		if (check.isTrackedByNodeName(expression.left) && t.isBinaryExpression(expression.right)) {
+			// variable-binary-call-1 setCompute
+			const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+				path.scope,
+				expression.right
+			);
+			const containsAnotherTracked =
+				fComputeParameters.find((param) => {
+					const node = t.isMemberExpression(param) ? param.object : param;
+					if (t.isIdentifier(node) && t.isIdentifier(expression.left)) {
+						if (node.name === expression.left.name) {
+							return false;
+						}
+					}
+					return check.isTrackedByNodeName(node);
+				}) != null;
+			if (containsAnotherTracked) {
+				expression.right = modify.fidanAssignmentExpressionSetCompute(expression, fComputeParameters);
+			} else {
+				// export-1
+				path.node[propertyName] = modify.fidanCall(expression.left, expression.right, expression.operator);
+			}
+		} else if (!isExport && t.isAssignmentExpression(expression)) {
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
 			const rightIsTracked = check.isTrackedVariable(path.scope, expression.right);
 

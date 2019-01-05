@@ -142,7 +142,7 @@ export const fidanComputeParametersInExpressionWithScopeFilter = (
 	scope: Scope,
 	expression: t.Expression | t.PatternLike | t.JSXEmptyExpression
 ) => {
-	const fComputeParameters = [];
+	const fComputeParameters: t.Expression[] = [];
 	fidanComputeParametersInExpression(scope, expression, fComputeParameters);
 	return fComputeParameters;
 };

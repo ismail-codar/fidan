@@ -14,7 +14,7 @@ d$ = fidan.setCompute(
 );
 var e = 3;
 var f$ = fidan.value(4);
-d$ = f$;
+d$(f$.$val);
 console.log(d$.$val);
 window.console.log(d$.$val);
 alert(d$.$val + e);

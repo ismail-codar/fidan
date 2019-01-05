@@ -9,9 +9,11 @@ var path = require('path');
 import 'better-log/install';
 require('@babel/register');
 
+// TODO https://github.com/stryker-mutator/robobar-example
+
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
-RUN_SINGLE_TEST = 'variable-binary-call-1';
+RUN_SINGLE_TEST = 'compute-return-1';
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve('../src');
