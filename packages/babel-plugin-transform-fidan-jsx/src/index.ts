@@ -280,7 +280,7 @@ export = function() {
 										path.node.arguments[index] = modify.fidanValueInit(path.node.arguments[index]);
 									}
 								} else {
-									if (methodCallIsTracked || paramValueIsTracked) {
+									if (paramValueIsTracked) {
 										//array-map-4 sortBy
 										path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
 									}
