@@ -13,7 +13,8 @@ require('@babel/register');
 
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
-RUN_SINGLE_TEST = 'compute-return-1';
+// RUN_SINGLE_TEST = 'compute-return-1';
+RUN_SINGLE_TEST = 'name-surname-2';
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve('../src');
