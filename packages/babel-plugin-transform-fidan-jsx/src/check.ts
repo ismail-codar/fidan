@@ -149,6 +149,10 @@ const isTrackedVariable = (
 	return false;
 };
 
+const isTrackedVariableDeclarator = (node: any) => {
+	return t.isVariableDeclarator(node) && isTrackedByNodeName(node);
+};
+
 // const isTrackedKey = (scope: Scope, node: t.MemberExpression) => {
 // 	const variableBinding = t.isIdentifier(node.object) ? found.variableBindingInScope(scope, node.object.name) : null;
 // 	if (variableBinding && hasTrackedKeyComment(variableBinding.path.node.leadingComments, node.property.name))
@@ -262,7 +266,7 @@ export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression)
 	);
 };
 
-export const isFidanCall = (node: t.BaseNode) => {
+export const isFidanCall = (node: any) => {
 	if (!t.isCallExpression(node)) return false;
 	const member = found.callExpressionFirstMember(node);
 	return member && isFidanName(member.name);
@@ -291,6 +295,7 @@ export const check = {
 	isFidanCall,
 	isValMemberProperty,
 	isTrackedByNodeName,
+	isTrackedVariableDeclarator,
 	// hasTrackedComment,
 	// hasTrackedSetComment,
 	// hasTrackedKeyComment,

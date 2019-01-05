@@ -77,16 +77,15 @@ export = function() {
 						if (
 							(t.isMemberExpression(path.parent) && path.parent.property.name === '$val') == false &&
 							check.isTrackedVariable(path.scope, path.node) &&
-							t.isIdentifier(path.node.object)
+							t.isIdentifier(path.node.object) &&
+							!check.isTrackedVariableDeclarator(path.parentPath.node) &&
+							!check.isFidanCall(path.parentPath.node)
 						) {
-							// TODO iptal ????
-							//track-item-keys-1
 							path.node.object = t.memberExpression(
 								path.node.object,
 								t.identifier(path.node.property.name)
 							);
-							modify.renameToVal(path.node, "property")
-							path.node.property = t.identifier('$val');
+							modify.renameToVal(path.node, 'property');
 						} else if (
 							check.specialMemberAccessKeywords.indexOf(path.node.property.name) === -1 &&
 							check.isTrackedVariable(path.scope, path.node.object)
@@ -101,7 +100,7 @@ export = function() {
 								path.parentPath.node.property.name === '$val') == false
 						) {
 							//object-indexed-property-1
-							path.node.property  = modify.memberVal(path.node.property)
+							path.node.property = modify.memberVal(path.node.property);
 						}
 					}
 				} catch (e) {
