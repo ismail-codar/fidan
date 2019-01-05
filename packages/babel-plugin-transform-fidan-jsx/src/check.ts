@@ -100,16 +100,12 @@ const isTrackedByNodeName = (node: t.BaseNode) => {
 
 const isTrackedVariable = (
 	scope: Scope,
-	node:
-		| t.Identifier
-		| t.Expression
-		| t.ObjectProperty
-		| t.LVal
-		| t.SpreadElement
-		| t.JSXNamespacedName
-		| t.JSXEmptyExpression
+	node: any
 ) => {
 	if (!node) return false;
+	if (t.isCallExpression(node) && t.isMemberExpression(node.callee)) {
+		node = node.callee.property; // condition-2
+	}
 	if (isTrackedByNodeName(node)) return true;
 	// if (leadingCommentsHasTracked(node.leadingComments)) {
 	// 	return true;

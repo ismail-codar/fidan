@@ -78,7 +78,7 @@ export = function() {
 							(t.isMemberExpression(path.parent) && path.parent.property.name === '$val') == false &&
 							check.isTrackedVariable(path.scope, path.node) &&
 							t.isIdentifier(path.node.object) &&
-							!check.isTrackedVariableDeclarator(path.parentPath.node) &&
+							!check.isTrackedVariable(path.parentPath.scope, path.parentPath.node) &&
 							!check.isFidanCall(path.parentPath.node)
 						) {
 							path.node.object = t.memberExpression(
@@ -261,21 +261,27 @@ export = function() {
 							modify.moveContextArguments(path.node.arguments, contextArgumentIndex);
 						} else if (!member.name.startsWith('React')) {
 							const methodParams = found.callingMethodParams(path, file.filename);
-							if (!methodParams || path.node.arguments.length !== methodParams.length) {
-								// debugger;
-								// throw "callingMethodParams is not found";
-							}
+							// if (!methodParams || path.node.arguments.length !== methodParams.length) {
+							// 	// debugger;
+							// 	// throw "callingMethodParams is not found";
+							// }
+							const methodCallIsTracked = check.isTrackedVariable(path.scope, path.node);
 							path.node.arguments.forEach((argument, index) => {
-								const leftIsTracked = check.isTrackedVariable(path.scope, argument);
-								const rightIsTracked =
+								const paramIsTracked =
 									methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
-								if (rightIsTracked) {
-									if (!leftIsTracked) {
+								const paramValueIsTracked = check.isTrackedVariable(path.scope, argument);
+								// methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
+								if (paramIsTracked) {
+									if (methodCallIsTracked) {
+										//condition-2
+										path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
+									} else if (!paramValueIsTracked) {
 										//call-2 call-3
 										path.node.arguments[index] = modify.fidanValueInit(path.node.arguments[index]);
 									}
 								} else {
-									if (leftIsTracked) {
+									if (methodCallIsTracked || paramValueIsTracked) {
+										//array-map-4 sortBy
 										path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
 									}
 								}
