@@ -84,24 +84,24 @@ const checkFunctionBody = (
 		body,
 		{
 			MemberExpression(path: NodePath<t.MemberExpression>, file) {
-				if (!listIncludes(list, path.node as any)) {
-					if (t.isIdentifier(path.node.object)) {
-						const searchName = path.node.object.name;
-						const argument = args[params.findIndex((p) => t.isIdentifier(p) && p.name == searchName)];
-						if (
-							argument &&
-							t.isIdentifier(argument) &&
-							check.isTrackedVariable(scope, path.node.property)
-						) {
-							list.push(t.memberExpression(argument, path.node.property));
-						} else if (check.isTrackedVariable(scope, path.node.object)) {
-							const variableBinding = found.variableBindingInScope(scope, searchName);
-							// assuming that local variables cannot be found in passed scope
-							// if the variableBinding is found it is not local variable in this function
-							if (variableBinding) {
-								list.push(path.node.object);
-							}
+				if (t.isIdentifier(path.node.object)) {
+					const searchName = path.node.object.name;
+					const argument = args[params.findIndex((p) => t.isIdentifier(p) && p.name == searchName)];
+					let listItem = null;
+					if (argument && t.isIdentifier(argument) && check.isTrackedVariable(scope, path.node.property)) {
+						listItem = t.memberExpression(argument, path.node.property);
+					} else if (check.isTrackedVariable(scope, path.node.object)) {
+						const variableBinding = found.variableBindingInScope(scope, searchName);
+						// assuming that local variables cannot be found in passed scope
+						// if the variableBinding is found it is not local variable in this function
+						if (variableBinding) {
+							listItem = path.node.object;
 						}
+					} else if (check.isTrackedVariable(scope, path.node.property)) {
+						listItem = t.memberExpression(path.node.object, path.node.property);
+					}
+					if (listItem && !listIncludes(list, listItem)) {
+						list.push(listItem);
 					}
 				}
 			}
@@ -148,5 +148,6 @@ export const fidanComputeParametersInExpressionWithScopeFilter = (
 };
 
 export const parameters = {
+	checkFunctionBody,
 	fidanComputeParametersInExpressionWithScopeFilter
 };

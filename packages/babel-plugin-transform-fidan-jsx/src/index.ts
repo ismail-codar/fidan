@@ -288,6 +288,17 @@ export = function() {
 								}
 							});
 						}
+					} else if (check.isComputeReturnExpression(path.node)) {
+						debugger;
+						const returnFunction = path.node.arguments[0] as t.FunctionExpression;
+						const list = [];
+						parameters.checkFunctionBody([], [], path.scope, returnFunction.body, list);
+						if (list.length) {
+							list.forEach((arg) => {
+								// TODO check if exists
+								path.node.arguments.push(arg);
+							});
+						}
 					}
 				} catch (e) {
 					errorReport(e, path, file);

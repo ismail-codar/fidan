@@ -98,18 +98,13 @@ const isTrackedByNodeName = (node: t.BaseNode) => {
 // 	return checker.commentHasTrackKey(comment.value, keyName);
 // };
 
-const isTrackedVariable = (
-	scope: Scope,
-	node: any
-) => {
+const isTrackedVariable = (scope: Scope, node: any) => {
 	if (!node) return false;
 	if (t.isCallExpression(node) && t.isMemberExpression(node.callee)) {
 		node = node.callee.property; // condition-2
 	}
 	if (isTrackedByNodeName(node)) return true;
-	// if (leadingCommentsHasTracked(node.leadingComments)) {
-	// 	return true;
-	// }
+
 	// if (t.isMemberExpression(node) && t.isIdentifier(node.object)) {
 	// 	// var object1 = {
 	// 	//   // @tracked
@@ -124,20 +119,22 @@ const isTrackedVariable = (
 	// 		const property = variableBinding.path.node.init.properties.find(
 	// 			(item) => t.isObjectProperty(item) && item.key.name === node.property.name
 	// 		);
-	// 		if (property) return leadingCommentsHasTracked(property.leadingComments);
 	// 	}
 	// }
 
 	// let searchName = t.isIdentifier(node) ? node.name : null;
 	// let variableBinding = searchName && found.variableBindingInScope(scope, searchName);
 	// if (variableBinding) {
-	// 	if (t.isImportSpecifier(variableBinding.path.node) && hasTrackedComment(variableBinding.path)) {
+	// 	if (
+	// 		t.isImportSpecifier(variableBinding.path.node) &&
+	// 		isTrackedVariable(variableBinding.path.scope, variableBinding.path.node)
+	// 	) {
 	// 		//TODO use export-sources
 	// 		return true;
 	// 	} else if (
 	// 		t.isVariableDeclarator(variableBinding.path.node) &&
 	// 		t.isVariableDeclaration(variableBinding.path.parent) &&
-	// 		hasTrackedComment(variableBinding.path)
+	// 		isTrackedVariable(variableBinding.path.scope, variableBinding.path.node)
 	// 	) {
 	// 		return true;
 	// 	}
@@ -253,6 +250,14 @@ export const isValMemberProperty = (node: t.BaseNode): node is t.MemberExpressio
 	return t.isMemberExpression(node) && t.isIdentifier(node.property) && node.property.name === '$val';
 };
 
+export const isComputeReturnExpression = (node: t.CallExpression) => {
+	return (
+		t.isMemberExpression(node.callee) &&
+		t.isIdentifier(node.callee.property) &&
+		node.callee.property.name === 'computeReturn'
+	);
+};
+
 export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 	return (
 		t.isMemberExpression(expression.callee) &&
@@ -292,6 +297,7 @@ export const check = {
 	isValMemberProperty,
 	isTrackedByNodeName,
 	isTrackedVariableDeclarator,
+	isComputeReturnExpression,
 	// hasTrackedComment,
 	// hasTrackedSetComment,
 	// hasTrackedKeyComment,
