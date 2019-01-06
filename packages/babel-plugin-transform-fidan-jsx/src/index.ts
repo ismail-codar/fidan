@@ -327,7 +327,7 @@ export = function() {
 			ArrowFunctionExpression(path: NodePath<t.ArrowFunctionExpression>, file) {
 				if (doNotTraverse) return;
 				try {
-					modify.expressionStatementGeneralProcess('body', path);
+					modify.expressionStatementGeneralProcess(path.scope, 'body', path);
 				} catch (e) {
 					errorReport(e, path, file);
 				}
@@ -353,7 +353,7 @@ export = function() {
 			ExpressionStatement(path: NodePath<t.ExpressionStatement>, file) {
 				if (doNotTraverse) return;
 				try {
-					modify.expressionStatementGeneralProcess('expression', path);
+					modify.expressionStatementGeneralProcess(path.scope, 'expression', path);
 				} catch (e) {
 					errorReport(e, path, file);
 				}

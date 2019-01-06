@@ -295,7 +295,6 @@ export const check = {
 	isFidanName,
 	isFidanCall,
 	isValMemberProperty,
-	isTrackedByNodeName,
 	isTrackedVariableDeclarator,
 	isComputeReturnExpression,
 	// hasTrackedComment,
