@@ -1,3 +1,6 @@
+.vscode
+.rts*
+bench
 src
 types
 spec

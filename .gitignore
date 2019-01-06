@@ -1,4 +1,7 @@
 .cache
 .rts2_*
+.yalc
+yalc.lock
+yarn.lock
 build
 node_modules
