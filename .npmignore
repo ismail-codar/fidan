@@ -2,7 +2,6 @@
 .rts*
 bench
 src
-types
 spec
 packages
 node_modules
