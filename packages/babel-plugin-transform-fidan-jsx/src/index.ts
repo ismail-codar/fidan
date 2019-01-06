@@ -96,7 +96,7 @@ export = function() {
 							t.isMemberExpression(path.node.property) &&
 							t.isCallExpression(path.parentPath.node) === false &&
 							t.isVariableDeclarator(path.parentPath.node) === false &&
-							check.isTrackedByNodeName(path.node.property) &&
+							check.isTrackedVariable(path.scope, path.node.property) &&
 							(t.isMemberExpression(path.parentPath.node) &&
 								path.parentPath.node.property.name === '$val') == false
 						) {
@@ -111,7 +111,7 @@ export = function() {
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>, file) {
 				if (doNotTraverse) return;
 				try {
-					if (t.isVariableDeclaration(path.parent) && check.isTrackedByNodeName(path.node)) {
+					if (t.isVariableDeclaration(path.parent) && check.isTrackedVariable(path.scope, path.node)) {
 						if (path.node.init && check.isDynamicExpression(path.node.init)) {
 							const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 								path.scope,
@@ -131,7 +131,10 @@ export = function() {
 							!check.isTrackedVariable(path.scope, path.node.init) &&
 							!t.isCallExpression(path.node.init) //freezed-1
 						) {
-							if (check.isTrackedByNodeName(path.node) && t.isObjectExpression(path.node.init)) {
+							if (
+								check.isTrackedVariable(path.scope, path.node) &&
+								t.isObjectExpression(path.node.init)
+							) {
 								//variable-object-2
 								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
 									path.scope,
@@ -159,7 +162,8 @@ export = function() {
 				if (doNotTraverse) return;
 				try {
 					const leftIsTracked =
-						check.isTrackedByNodeName(path.node.key) || check.isTrackedVariable(path.scope, path.node);
+						check.isTrackedVariable(path.scope, path.node.key) ||
+						check.isTrackedVariable(path.scope, path.node);
 					const rightIsTracked = check.isTrackedVariable(path.scope, path.node.value);
 					if (rightIsTracked) {
 						if (!leftIsTracked) {
@@ -377,7 +381,7 @@ export = function() {
 							modifyDom.setupStyleAttributeExpression(path.scope, path.node.expression);
 						else {
 							const componentPropertyIsTracked =
-								check.isTrackedByNodeName(path.container.name) &&
+								check.isTrackedVariable(path.scope, path.container.name) &&
 								check.objectPropertyParentIsComponent(path);
 							if (t.isCallExpression(path.node.expression) && componentPropertyIsTracked) {
 								//class-names-6

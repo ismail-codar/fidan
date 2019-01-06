@@ -35,7 +35,7 @@ const fidanComputeParametersInExpression = (
 			if (expression.property.name === '$val') {
 				const objectValue = expression as t.MemberExpression;
 				if (!listIncludes(list, objectValue)) listAddWithControl(scope, objectValue, list);
-			} else if (check.isTrackedByNodeName(expression.property)) {
+			} else if (check.isTrackedVariable(scope, expression.property)) {
 				const objectValue = expression as t.MemberExpression;
 				if (!listIncludes(list, objectValue))
 					listAddWithControl(scope, t.memberExpression(objectValue.object, objectValue.property), list);
