@@ -41,7 +41,11 @@ export = function() {
 				enter(path) {
 					if (!this.opts) return;
 					doNotTraverse = false;
+					const pragma = found.filePluginOptions('transform-react-jsx', this.file.opts.plugins).pragma;
 					try {
+						if (pragma) {
+							modify.insertPragma(path.node.body, pragma);
+						}
 						if (
 							(this.opts.include &&
 								micromatch(this.file.opts.filename, this.opts.include, {

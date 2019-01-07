@@ -1,5 +1,5 @@
 import fidan from '@fidanjs/runtime';
-global['fidan'] = fidan;
+fidan;
 
 var x$ = 0;
 const Main = () => {

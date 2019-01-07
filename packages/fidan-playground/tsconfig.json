@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
       "target": "es2015",
-      "module": "commonjs",
+      "lib": ["es2015", "dom"],
+      "module": "es2015",
       "moduleResolution": "node",
       "sourceMap": true,
       "emitDecoratorMetadata": true,
@@ -11,9 +12,8 @@
       "allowUnreachableCode": true,
       "allowSyntheticDefaultImports": true,
       "strictFunctionTypes": false,
-      "allowJs": true,
-      "outDir": "build"
+      "jsx": "preserve"
     },
-    "exclude": ["node_modules", "build", "scripts", "test"]
+    "exclude": ["node_modules", "build", "spec", "packages", "bench"]
   }
   

@@ -189,6 +189,19 @@ export const pathNodeLeftRight = (path: NodePath<t.LogicalExpression | t.BinaryE
 	}
 };
 
+const insertPragma = (body: t.BaseNode[], pragma: string) => {
+	body.splice(
+		0,
+		0,
+		t.variableDeclaration('const', [
+			t.variableDeclarator(
+				t.identifier(pragma),
+				t.memberExpression(t.identifier('fidan'), t.identifier('createElement'))
+			)
+		])
+	);
+};
+
 export const modify = {
 	fidanValueInit,
 	fidanCall,
@@ -199,5 +212,6 @@ export const modify = {
 	fidanAssignmentExpressionSetCompute,
 	expressionStatementGeneralProcess,
 	moveContextArguments,
-	pathNodeLeftRight
+	pathNodeLeftRight,
+	insertPragma
 };

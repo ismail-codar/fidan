@@ -7,7 +7,9 @@
       }
     ],
     "@babel/preset-typescript",
-    "@babel/preset-react"
+    ["@babel/preset-react",{
+      "pragma": "fd"
+    }]
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",
@@ -15,6 +17,7 @@
     [
       "@fidanjs/transform-jsx",
       {
+        
         "exclude": ["*.js", "*.jsx", "*.react.*", "material-ui"]
       }
     ]

@@ -26,7 +26,7 @@ const attributeExpression = (scope: Scope, attributeName: string, expression: t.
 	statements.push(
 		t.expressionStatement(
 			t.callExpression(
-				t.identifier('fidan.compute'),
+				t.memberExpression(t.identifier('fidan'), t.identifier('compute')),
 				[
 					t.functionExpression(
 						t.identifier(''),
@@ -76,7 +76,7 @@ const appendReplaceConditionallyExpression = (scope: Scope, expression: t.Expres
 			t.variableDeclaration('let', [ t.variableDeclarator(t.identifier('oldElement')) ]),
 			t.expressionStatement(
 				t.callExpression(
-					t.identifier('fidan.compute'),
+					t.memberExpression(t.identifier('fidan'), t.identifier('compute')),
 					[
 						t.functionExpression(
 							t.identifier(''),
@@ -86,15 +86,21 @@ const appendReplaceConditionallyExpression = (scope: Scope, expression: t.Expres
 									t.assignmentExpression(
 										'=',
 										t.identifier('oldElement'),
-										t.callExpression(t.identifier('fidan.conditionalElement'), [
-											t.identifier('element'),
-											t.identifier('oldElement'),
-											t.functionExpression(
-												null,
-												[],
-												t.blockStatement([ t.returnStatement(expression) ])
-											)
-										])
+										t.callExpression(
+											t.memberExpression(
+												t.identifier('fidan'),
+												t.identifier('conditionalElement')
+											),
+											[
+												t.identifier('element'),
+												t.identifier('oldElement'),
+												t.functionExpression(
+													null,
+													[],
+													t.blockStatement([ t.returnStatement(expression) ])
+												)
+											]
+										)
 									)
 								)
 							])
@@ -143,7 +149,7 @@ const arrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 		[ t.identifier('element') ],
 		t.blockStatement([
 			t.expressionStatement(
-				t.callExpression(t.identifier('fidan.arrayMap'), [
+				t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('arrayMap')), [
 					t.identifier(arrayName.reverse().join('.')),
 					t.identifier('element'),
 					expression.arguments[0]
