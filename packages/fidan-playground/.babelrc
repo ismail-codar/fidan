@@ -7,9 +7,7 @@
       }
     ],
     "@babel/preset-typescript",
-    ["@babel/preset-react",{
-      "pragma": "fd"
-    }]
+    "@babel/preset-react"
   ],
   "plugins": [
     "@babel/plugin-proposal-class-properties",

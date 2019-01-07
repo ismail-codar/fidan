@@ -41,10 +41,17 @@ export = function() {
 				enter(path) {
 					if (!this.opts) return;
 					doNotTraverse = false;
-					const pragma = found.filePluginOptions('transform-react-jsx', this.file.opts.plugins).pragma;
 					try {
-						if (pragma) {
-							modify.insertPragma(path.node.body, pragma);
+						if (!process.env.IS_TEST) {
+							const pragma = found.filePluginOptions('transform-react-jsx', this.file.opts.plugins)
+								.pragma;
+							const body: t.BaseNode[] = path.node.body;
+							if (!found.hasFidanImport(body)) {
+								modify.insertFidanImport(body, 0);
+							}
+							if (pragma && pragma !== 'React.createElement') {
+								modify.insertPragma(body, pragma, 1);
+							}
 						}
 						if (
 							(this.opts.include &&

@@ -1,2 +1,3 @@
 /// <reference path="types/JSX.d.ts" />
-export * from './libs';
+import * as fidanObj from './libs';
+export declare const fidan: typeof fidanObj;

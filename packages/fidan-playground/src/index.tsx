@@ -1,5 +1,4 @@
-import fidan from '@fidanjs/runtime';
-fidan;
+import '@fidanjs/runtime';
 
 var x$ = 0;
 const Main = () => {

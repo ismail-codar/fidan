@@ -118,6 +118,20 @@ const filePluginOptions = (pluginName: string, plugins: any) => {
 	return plugin ? plugin.options || {} : { options: {} };
 };
 
+const hasFidanImport = (body: t.BaseNode[]) => {
+	return (
+		body.find((node) => {
+			if (t.isImportDeclaration(node)) {
+				const fidanImport = node.specifiers.find(
+					(specifier) => t.isImportSpecifier(specifier) && specifier.imported.name === 'fidan'
+				);
+				if (fidanImport) return true;
+			}
+			return false;
+		}) != null
+	);
+};
+
 export const found = {
 	callExpressionFirstMember,
 	memberExpressionFirstMember,
@@ -126,5 +140,6 @@ export const found = {
 	callingMethodParams,
 	findContextChildIndex,
 	pathElementTagName,
-	filePluginOptions
+	filePluginOptions,
+	hasFidanImport
 };

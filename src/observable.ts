@@ -1,5 +1,5 @@
-import { FidanValue, value } from '.';
 import $$symbolObservable from 'symbol-observable';
+import { FidanValue, value } from './f';
 
 // https://medium.com/@fknussel/a-simple-observable-implementation-c9c809c89c69
 
