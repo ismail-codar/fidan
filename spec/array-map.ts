@@ -1,4 +1,4 @@
-import * as fidan from '../src/index';
+import { fidan } from '../src/index';
 import { insertToDom } from '../src/dom';
 import { FidanValue } from '../src/f';
 import { arrayMapWithClone } from '../src/experimental/array-map';

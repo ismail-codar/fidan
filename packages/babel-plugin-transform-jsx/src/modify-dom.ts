@@ -7,6 +7,7 @@ const attributeExpression = (scope: Scope, attributeName: string, expression: t.
 	if (fComputeParameters.length == 0) return expression;
 	// console.log(fComputeParameters.map(parameter => generate(parameter).code));
 
+	// TODO
 	if (attributeName.indexOf('-') !== -1) setAttr = true;
 
 	const statements: t.ExpressionStatement[] = [];

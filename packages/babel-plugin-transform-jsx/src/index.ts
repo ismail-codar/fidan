@@ -421,7 +421,6 @@ export = function() {
 					else if (
 						check.isValMemberProperty(path.node.expression) ||
 						check.isTrackedVariable(path.scope, path.node.expression) ||
-						t.isMemberExpression(path.node.expression) ||
 						t.isBinaryExpression(path.node.expression) ||
 						(t.isCallExpression(path.node.expression) &&
 							!check.isArrayMapExpression(path.scope, path.node.expression))
