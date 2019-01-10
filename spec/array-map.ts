@@ -46,7 +46,7 @@ var table2 = fidan.createElement('div', null, function(element) {
 	const updateList = [];
 	updateList.push({
 		path: [ 0 ],
-		fn: function(element, dataItem, i) {
+		update: function(element, dataItem, i) {
 			fidan.compute(function() {
 				element.textContent = dataItem.label$.$val;
 			}, dataItem.label$);

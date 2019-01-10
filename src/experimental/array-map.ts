@@ -17,7 +17,7 @@ export const arrayMapWithClone = (
 			while (path.length) {
 				itemNode = itemNode.childNodes[path.shift()];
 			}
-			item.fn(itemNode, data, i);
+			item.update(itemNode, data, i);
 		});
 	};
 	const createNewItemNode = (i: number) => {
