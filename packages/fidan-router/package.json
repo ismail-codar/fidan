@@ -5,14 +5,13 @@
 	"scripts": {
 		"build": "microbundle; rm -rf build/_demo",
 		"dev": "microbundle watch",
-		"start": "parcel src/_demo/index.html",
-		"postpublish": "rm -rf build/_demo"
+		"start": "parcel src/_demo/index.html"
 	},
 	"keywords": [],
 	"author": "ismail codar",
 	"license": "ISC",
 	"dependencies": {
-		"@fidanjs/runtime": "file:.yalc/@fidanjs/runtime",
+		"@fidanjs/runtime": "^0.0.1",
 		"route-recognizer": "^0.3.4"
 	},
 	"devDependencies": {
@@ -21,7 +20,6 @@
 		"@babel/preset-env": "^7.2.3",
 		"@babel/preset-react": "^7.0.0",
 		"@babel/preset-typescript": "^7.1.0",
-		"@fidanjs/babel-plugin-transform-jsx": "file:.yalc/@fidanjs/babel-plugin-transform-jsx",
 		"microbundle": "^0.9.0"
 	},
 	"main": "build/index.js",

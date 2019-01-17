@@ -14,6 +14,6 @@
       "strictFunctionTypes": false,
       "jsx": "preserve"
     },
-    "exclude": ["node_modules", "build", "spec"]
+    "exclude": ["node_modules", "build", "dist", "spec"]
   }
   

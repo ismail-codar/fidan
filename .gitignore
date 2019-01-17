@@ -4,4 +4,5 @@
 yalc.lock
 yarn.lock
 build
+dist
 node_modules
