@@ -271,48 +271,52 @@ export = function() {
 						}
 					}
 					const member = found.callExpressionFirstMember(path.node);
-					if (member && member.name && !check.isFidanName(member.name)) {
+					if (member && member.name) {
 						const contextArgumentIndex = found.findContextChildIndex(path.node.arguments);
 						if (contextArgumentIndex !== -1) {
 							modify.moveContextArguments(path.node.arguments, contextArgumentIndex);
-						} else if (!member.name.startsWith('React')) {
-							const methodParams = found.callingMethodParams(path, file.filename);
-							// if (!methodParams || path.node.arguments.length !== methodParams.length) {
-							// 	// debugger;
-							// 	// throw "callingMethodParams is not found";
-							// }
-							const methodCallIsTracked = check.isTrackedVariable(path.scope, path.node);
-							path.node.arguments.forEach((argument, index) => {
-								const paramIsTracked =
-									methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
-								const paramValueIsTracked = check.isTrackedVariable(path.scope, argument);
-								// methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
-								if (paramIsTracked) {
-									if (methodCallIsTracked) {
-										//condition-2
-										path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
-									} else if (!paramValueIsTracked) {
-										//call-2 call-3
-										path.node.arguments[index] = modify.fidanValueInit(path.node.arguments[index]);
+						} else if (!check.isFidanName(member.name)) {
+							if (!member.name.startsWith('React')) {
+								const methodParams = found.callingMethodParams(path, file.filename);
+								// if (!methodParams || path.node.arguments.length !== methodParams.length) {
+								// 	// debugger;
+								// 	// throw "callingMethodParams is not found";
+								// }
+								const methodCallIsTracked = check.isTrackedVariable(path.scope, path.node);
+								path.node.arguments.forEach((argument, index) => {
+									const paramIsTracked =
+										methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
+									const paramValueIsTracked = check.isTrackedVariable(path.scope, argument);
+									// methodParams && check.isTrackedVariable(path.scope, methodParams[index]);
+									if (paramIsTracked) {
+										if (methodCallIsTracked) {
+											//condition-2
+											path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
+										} else if (!paramValueIsTracked) {
+											//call-2 call-3
+											path.node.arguments[index] = modify.fidanValueInit(
+												path.node.arguments[index]
+											);
+										}
+									} else {
+										if (paramValueIsTracked) {
+											//array-map-4 sortBy
+											path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
+										}
 									}
-								} else {
-									if (paramValueIsTracked) {
-										//array-map-4 sortBy
-										path.node.arguments[index] = modify.memberVal(path.node.arguments[index]);
-									}
-								}
-							});
-						}
-					} else if (check.isComputeReturnExpression(path.node)) {
-						debugger;
-						const returnFunction = path.node.arguments[0] as t.FunctionExpression;
-						const list = [];
-						parameters.checkFunctionBody([], [], path.scope, returnFunction.body, list);
-						if (list.length) {
-							list.forEach((arg) => {
-								// TODO check if exists
-								path.node.arguments.push(arg);
-							});
+								});
+							}
+						} else if (check.isComputeReturnExpression(path.node)) {
+							debugger;
+							const returnFunction = path.node.arguments[0] as t.FunctionExpression;
+							const list = [];
+							parameters.checkFunctionBody([], [], path.scope, returnFunction.body, list);
+							if (list.length) {
+								list.forEach((arg) => {
+									// TODO check if exists
+									path.node.arguments.push(arg);
+								});
+							}
 						}
 					}
 				} catch (e) {
