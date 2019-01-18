@@ -12,7 +12,8 @@
       "allowUnreachableCode": true,
       "allowSyntheticDefaultImports": true,
       "strictFunctionTypes": false,
-      "jsx": "preserve"
+      "jsxFactory": "fidan.createElement",
+      "jsx": "react"
     },
     "exclude": ["node_modules", "build", "spec", "packages", "bench"]
   }

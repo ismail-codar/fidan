@@ -3,7 +3,7 @@
 	"version": "0.0.1",
 	"description": "Fidanjs router",
 	"scripts": {
-		"build": "microbundle; rm -rf build/_demo",
+		"build": "microbundle --format cjs; rm -rf build/_demo",
 		"dev": "microbundle watch",
 		"start": "parcel src/_demo/index.html"
 	},

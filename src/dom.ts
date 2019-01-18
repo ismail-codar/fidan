@@ -1,4 +1,4 @@
-import { FidanValue } from '.';
+import { FidanValue } from './f';
 import { EventedArray } from './evented-array';
 import { compute } from './f';
 import { activateContext, deactivateContext } from '../src/context';

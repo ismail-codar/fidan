@@ -1,4 +1,4 @@
-import '@fidanjs/runtime';
+import { fidan } from '@fidanjs/runtime';
 import { transitionTo } from './router';
 
 export const Link = (props: { to: string; children: any }) => {

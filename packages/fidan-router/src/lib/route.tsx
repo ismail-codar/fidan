@@ -17,7 +17,10 @@ export const Route = (props: { exact?: boolean; path: string; component: (props)
 		}
 	]);
 
-	const view = fidan.createElement(fidan.Fragment, null);
+	// const view = <></>
+	debugger;
+	console.log('xxxxx', fidan);
+	const view = fidan.createElement(fidan.Fragment, null, []);
 
 	props['didMount'] = (parent) => {
 		viewParent = parent;
