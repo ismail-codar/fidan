@@ -10,8 +10,6 @@ import { modifyDom } from './modify-dom';
 import generate from '@babel/generator';
 import { realpathSync } from 'fs';
 import { join } from 'path';
-import { exportRegistry } from './export-registry';
-import { allSvgElements, htmlAndSvgElements } from './svg';
 
 var micromatch = require('micromatch');
 
@@ -42,7 +40,10 @@ export = function() {
 					if (!this.opts) return;
 					doNotTraverse = false;
 					try {
-						if (!process.env.IS_TEST) {
+						if (
+							(this.file.opts.filename.endsWith('.tsx') || this.file.opts.filename.endsWith('.jsx')) &&
+							!process.env.IS_TEST
+						) {
 							const pragma = found.filePluginOptions('transform-react-jsx', this.file.opts.plugins)
 								.pragma;
 							const body: t.BaseNode[] = path.node.body;
