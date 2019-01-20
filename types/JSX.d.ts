@@ -76,8 +76,7 @@ declare namespace Fidan {
 	type FidanType<T> = <T>(props: T) => HTMLElement;
 
 	type Key = string | number;
-	// type Ref<T> = (elem: Element) => any;
-	type Ref<T> = Element | T;
+	type Ref<T> = (elem: Element) => any;
 
 	interface Attributes {
 		key?: Key;
