@@ -239,16 +239,12 @@ export = function() {
 					if (
 						t.isMemberExpression(path.node.callee) &&
 						path.node.callee.property.name == 'createElement' &&
-						t.isIdentifier(path.node.callee.object) &&
-						check.isFidanName(path.node.callee.object.name)
+						check.isFidanCall(path.node)
 					) {
 						const firstArgument = path.node.arguments[0];
 						const secondArgument: any = path.node.arguments.length > 1 ? path.node.arguments[1] : null;
 						if (t.isStringLiteral(firstArgument)) {
-							if (
-								t.isStringLiteral(firstArgument) &&
-								check.isSvgElementTagName(firstArgument.value, openedTags)
-							)
+							if (check.isSvgElementTagName(firstArgument.value, openedTags))
 								path.node.callee.property.name = 'createSvgElement';
 						}
 

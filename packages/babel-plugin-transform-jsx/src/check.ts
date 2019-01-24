@@ -5,10 +5,6 @@ import * as t from '@babel/types';
 import { found } from './found';
 import { allSvgElements, htmlAndSvgElements } from './svg';
 
-const COMMENT_TRACKED = '@tracked';
-const COMMENT_NON_TRACKED = '@untracked';
-const COMMENT_TRACK_KEYS = '@track_keys';
-
 const specialMemberAccessKeywords = [ '$val', 'freezed' ];
 
 export const checker = {

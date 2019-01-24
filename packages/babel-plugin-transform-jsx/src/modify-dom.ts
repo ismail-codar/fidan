@@ -2,13 +2,20 @@ import * as t from '@babel/types';
 import { parameters } from './parameters';
 import { Scope } from 'babel-traverse';
 
+const htmlProps = {
+	id: true,
+	nodeValue: true,
+	textContent: true,
+	className: true,
+	innerHTML: true,
+	innerText: true,
+	tabIndex: true,
+	value: true
+};
+
 const attributeExpression = (scope: Scope, attributeName: string, expression: t.Expression, setAttr: boolean) => {
 	const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(scope, expression);
 	if (fComputeParameters.length == 0) return expression;
-	// console.log(fComputeParameters.map(parameter => generate(parameter).code));
-
-	// TODO
-	if (attributeName.indexOf('-') !== -1) setAttr = true;
 
 	const statements: t.ExpressionStatement[] = [];
 	if (attributeName === 'textContent') {
@@ -45,6 +52,10 @@ const attributeExpression = (scope: Scope, attributeName: string, expression: t.
 };
 
 const assignSetAttributeExpression = (attributeName: string, expression: t.Expression, setAttr: boolean) => {
+	if (setAttr !== false && htmlProps[attributeName] !== true) {
+		// TODO gereksiz ?
+		setAttr = true;
+	}
 	if (setAttr)
 		//TODO setAttributeNS ?
 		return t.callExpression(t.memberExpression(t.identifier('element'), t.identifier('setAttribute')), [
