@@ -3,19 +3,29 @@ import { NodePath, Scope, Binding } from 'babel-traverse';
 import generate from 'babel-generator';
 import { exportRegistry } from './export-registry';
 
-const callExpressionFirstMember = (expression: t.CallExpression): t.Identifier => {
-	if (t.isIdentifier(expression.callee)) return expression.callee;
-	else if (t.isMemberExpression(expression.callee)) {
-		return memberExpressionFirstMember(expression.callee);
+const callMemberExpressionCheck = (
+	expression: t.CallExpression,
+	checkFn: (expression: t.MemberExpression) => boolean
+): t.Identifier => {
+	if (t.isMemberExpression(expression.callee)) {
+		return memberExpressionCheck(expression.callee, checkFn);
 	}
 };
 
-const memberExpressionFirstMember = (expression: t.MemberExpression) => {
+const memberExpressionCheck = (
+	expression: t.MemberExpression,
+	checkFn: (expression: t.MemberExpression) => boolean
+) => {
 	var member = expression;
 	while (true) {
-		if (t.isIdentifier(member.object)) return member.object;
-		else if (t.isMemberExpression(member.object)) member = member.object;
-		else if (t.isCallExpression(member.object)) return callExpressionFirstMember(member.object);
+		if (t.isIdentifier(member.object)) {
+			if (checkFn(member)) {
+				return member;
+			} else {
+				return null;
+			}
+		} else if (t.isMemberExpression(member.object)) member = member.object;
+		else if (t.isCallExpression(member.object)) return callMemberExpressionCheck(member.object, checkFn);
 		else if (t.isMemberExpression(member)) return member.property;
 	}
 };
@@ -133,8 +143,8 @@ const hasFidanImport = (body: t.BaseNode[]) => {
 };
 
 export const found = {
-	callExpressionFirstMember,
-	memberExpressionFirstMember,
+	callMemberExpressionCheck,
+	memberExpressionCheck,
 	parentPathFound,
 	variableBindingInScope,
 	callingMethodParams,

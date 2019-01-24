@@ -36,9 +36,11 @@ const isTrackedByNodeName = (node: t.BaseNode) => {
 	const nodeName =
 		t.isIdentifier(node) || t.isJSXIdentifier(node)
 			? node.name
-			: t.isMemberExpression(node)
-				? node.property.name
-				: t.isVariableDeclarator(node) && t.isIdentifier(node.id) ? node.id.name : null;
+			: t.isStringLiteral(node)
+				? node.value
+				: t.isMemberExpression(node)
+					? node.property.name
+					: t.isVariableDeclarator(node) && t.isIdentifier(node.id) ? node.id.name : null;
 	return nodeName && checker.literalTracked(nodeName) && specialMemberAccessKeywords.indexOf(nodeName) === -1;
 };
 
@@ -152,7 +154,10 @@ const isTrackedVariableDeclarator = (node: any) => {
 // 		return true;
 // };
 
-const isFidanName = (str: string) => str.indexOf('fidan') !== -1;
+const isFidanName = (node: any) => {
+	const str = t.isIdentifier(node) ? node.name : node.toString();
+	return str === 'React' || str.indexOf('fidan') !== -1;
+};
 
 const fidanValueBinaryInit = (
 	// fidan.value(a.$val + b.$val); gibi mi diye bak
@@ -269,8 +274,16 @@ export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression)
 
 export const isFidanCall = (node: any) => {
 	if (!t.isCallExpression(node)) return false;
-	const member = found.callExpressionFirstMember(node);
-	return member && isFidanName(member.name);
+
+	if (t.isIdentifier(node.callee)) return isFidanName(node.callee);
+
+	const member = found.callMemberExpressionCheck(node, (memberExpression) => {
+		return (
+			isFidanName(memberExpression.property) ||
+			(t.isIdentifier(memberExpression.object) && isFidanName(memberExpression.object.name))
+		);
+	});
+	return member != null;
 };
 
 export const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
