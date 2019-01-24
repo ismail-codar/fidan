@@ -18,7 +18,7 @@ const memberExpressionCheck = (
 ) => {
 	var member = expression;
 	while (true) {
-		if (t.isIdentifier(member.object)) {
+		if (t.isIdentifier(member.object) || t.isStringLiteral(member.object)) {
 			if (checkFn(member)) {
 				return member;
 			} else {
