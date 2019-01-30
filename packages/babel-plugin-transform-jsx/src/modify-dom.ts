@@ -31,6 +31,9 @@ const attributeExpression = (scope: Scope, attributeName: string, expression: t.
 			)
 		);
 	}
+	if (attributeName === 'dangerouslySetInnerHTML') {
+		attributeName = 'innerHTML';
+	}
 	statements.push(
 		t.expressionStatement(
 			t.callExpression(
