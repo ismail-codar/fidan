@@ -65,7 +65,9 @@ const fidanComputeParametersInExpression = (
 							variableBinding.path.node.init.body,
 							list
 						);
-					else throw 'ERROR: is not isFunctionExpression else ... not implemented ';
+					else
+						throw 'ERROR: is not isFunctionExpression else ... not implemented -> ' +
+							variableBinding.path.node.type;
 				} else if (t.isImportSpecifier(variableBinding.path.node)) {
 					// debugger;
 					// throw "ERROR: not implemented imported callExpression";

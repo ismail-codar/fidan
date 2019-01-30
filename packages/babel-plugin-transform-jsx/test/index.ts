@@ -16,7 +16,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
 // RUN_SINGLE_TEST = 'array-map-updatelist-1';
-// RUN_SINGLE_TEST = 'compute-return-1';
+RUN_SINGLE_TEST = 'attribute-call-1';
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve('../src');
