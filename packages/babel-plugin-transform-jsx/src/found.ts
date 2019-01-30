@@ -48,25 +48,33 @@ const variableBindingInScope = (scope: Scope, searchName: string): Binding => {
 };
 
 const callingMethodParamsInNode = (callee, node: t.BaseNode): t.BaseNode[] => {
-	var foundParams = [];
-	if (t.isVariableDeclarator(node)) {
-		if (t.isFunctionExpression(node.init)) {
+	let foundParams = [];
+	if (t.isFunctionDeclaration(node)) {
+		foundParams = node.params;
+	} else if (t.isVariableDeclarator(node)) {
+		if (t.isFunctionExpression(node.init) || t.isArrowFunctionExpression(node.init)) {
 			foundParams = node.init.params;
 		} else if (t.isObjectExpression(node.init)) {
-			//call-6
+			let calleName = null;
 			if (t.isMemberExpression(callee) && t.isIdentifier(callee.property)) {
-				node.init.properties.every((prop) => {
-					if (
-						t.isObjectProperty(prop) &&
-						t.isIdentifier(prop.key) &&
-						prop.key.name === callee.property.name &&
-						t.isFunctionExpression(prop.value)
-					) {
-						foundParams = prop.value.params;
-						return false;
-					} else return true;
-				});
-			} else throw 'ERROR: not implemented in callingMethodParams';
+				//call-6
+				calleName = callee.property.name;
+			} else if (t.isIdentifier(callee)) {
+				// attribute-call-1
+				calleName = callee.name;
+			} else throw 'ERROR: not implemented in callingMethodParams -> ' + callee.type;
+
+			node.init.properties.every((prop) => {
+				if (
+					t.isObjectProperty(prop) &&
+					t.isIdentifier(prop.key) &&
+					prop.key.name === calleName &&
+					t.isFunctionExpression(prop.value)
+				) {
+					foundParams = prop.value.params;
+					return false;
+				} else return true;
+			});
 		}
 	}
 	return foundParams;
@@ -82,21 +90,29 @@ const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string)
 		const foundPath = parentPathFound(path, (checkPath) => {
 			const variableBinding = checkPath.scope.bindings[searchName];
 			if (variableBinding) {
-				if (t.isVariableDeclarator(variableBinding.path.node)) {
+				if (
+					t.isVariableDeclarator(variableBinding.path.node) ||
+					t.isFunctionDeclaration(variableBinding.path.node)
+				) {
 					foundParams = callingMethodParamsInNode(callee, variableBinding.path.node);
 					if (foundParams) return true;
 				} else if (t.isImportSpecifier(variableBinding.path.node)) {
-					const exportedNodes = exportRegistry.loadImportedFileExports(
+					const exported = exportRegistry.loadImportedFileExports(
 						filename,
 						variableBinding.path.parent['source'].value
 					);
-					exportedNodes.find((node) => {
+					exported.nodes.find((node) => {
 						foundParams = callingMethodParamsInNode(callee, node);
 						return foundParams !== null;
 					});
 					if (foundParams) return true;
 					return true;
-				}
+				} else if (t.isIdentifier(variableBinding.path.node)) {
+					// do nothing
+					// svg-compute-1
+				} else
+					throw 'ERROR: unknown variableBinding type in callingMethodParams -> ' +
+						variableBinding.path.node.type;
 			}
 		});
 	}

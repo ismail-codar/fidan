@@ -4,6 +4,7 @@ import { Scope, NodePath } from 'babel-traverse';
 import generate from '@babel/generator';
 import traverse from '@babel/traverse';
 import { found } from './found';
+import { exportRegistry } from './export-registry';
 
 const listIncludes = (list: t.Expression[], item: t.Expression) => {
 	var itemCode: string = generate(item).code;
@@ -23,6 +24,7 @@ const listAddWithControl = (scope: Scope, expression: t.Expression, list: t.Expr
 };
 
 const fidanComputeParametersInExpression = (
+	fileName: string,
 	scope: Scope,
 	expression: t.Expression | t.PatternLike | t.JSXEmptyExpression,
 	list: t.Expression[]
@@ -42,40 +44,50 @@ const fidanComputeParametersInExpression = (
 			}
 		}
 		if (t.isIdentifier(expression.object)) {
-			fidanComputeParametersInExpression(scope, expression.object, list);
+			fidanComputeParametersInExpression(fileName, scope, expression.object, list);
 		}
-	} else if (t.isBinaryExpression(expression)) checkBinaryExpression(scope, expression, list);
-	else if (t.isLogicalExpression(expression)) checkLogicalExpression(scope, expression, list);
-	else if (t.isConditionalExpression(expression)) checkConditionalExpression(scope, expression, list);
-	else if (t.isUnaryExpression(expression)) fidanComputeParametersInExpression(scope, expression.argument, list);
+	} else if (t.isBinaryExpression(expression)) checkBinaryExpression(fileName, scope, expression, list);
+	else if (t.isLogicalExpression(expression)) checkLogicalExpression(fileName, scope, expression, list);
+	else if (t.isConditionalExpression(expression)) checkConditionalExpression(fileName, scope, expression, list);
+	else if (t.isUnaryExpression(expression))
+		fidanComputeParametersInExpression(fileName, scope, expression.argument, list);
 	else if (t.isCallExpression(expression)) {
 		const methodName = t.isIdentifier(expression.callee) ? expression.callee.name : null;
 		if (methodName) {
 			let variableBinding = found.variableBindingInScope(scope, methodName);
 			if (variableBinding) {
-				if (t.isVariableDeclarator(variableBinding.path.node)) {
+				if (
+					t.isVariableDeclarator(variableBinding.path.node) ||
+					t.isFunctionDeclaration(variableBinding.path.node)
+				) {
+					const nodeOrInit = t.isVariableDeclarator(variableBinding.path.node)
+						? variableBinding.path.node.init
+						: variableBinding.path.node;
 					if (
-						t.isFunctionExpression(variableBinding.path.node.init) ||
-						t.isArrowFunctionExpression(variableBinding.path.node.init)
+						t.isFunctionExpression(nodeOrInit) ||
+						t.isArrowFunctionExpression(nodeOrInit) ||
+						t.isFunctionDeclaration(nodeOrInit)
 					)
-						checkFunctionBody(
-							expression.arguments,
-							variableBinding.path.node.init.params,
-							scope,
-							variableBinding.path.node.init.body,
-							list
-						);
+						checkFunctionBody(expression.arguments, nodeOrInit.params, scope, nodeOrInit.body, list);
 					else
-						throw 'ERROR: is not isFunctionExpression else ... not implemented -> ' +
+						throw 'ERROR: is not isFunctionExpression || isArrowFunctionExpression else ... not implemented -> ' +
 							variableBinding.path.node.type;
 				} else if (t.isImportSpecifier(variableBinding.path.node)) {
-					// debugger;
-					// throw "ERROR: not implemented imported callExpression";
-				}
+					// TODO isImportSpecifier
+					const exported = exportRegistry.loadImportedFileExports(
+						fileName,
+						variableBinding.path.parent['source'].value
+					);
+					exported.nodes.forEach((node) => {
+						fidanComputeParametersInExpression(exported.fileName, scope, node as any, list);
+					});
+				} else
+					throw 'ERROR: t.isVariableDeclarator(variableBinding.path.node) else ... not implemented -> ' +
+						variableBinding.path.node.type;
 			}
 		}
-		checkExpressionList(scope, expression.arguments, list);
-	} else if (t.isObjectExpression(expression)) checkExpressionList(scope, expression.properties, list);
+		checkExpressionList(fileName, scope, expression.arguments, list);
+	} else if (t.isObjectExpression(expression)) checkExpressionList(fileName, scope, expression.properties, list);
 };
 
 const checkFunctionBody = (
@@ -115,40 +127,60 @@ const checkFunctionBody = (
 	);
 };
 
-const checkConditionalExpression = (scope: Scope, expression: t.ConditionalExpression, list: t.Expression[]) => {
-	fidanComputeParametersInExpression(scope, expression.test, list);
-	if (t.isExpression(expression.consequent)) fidanComputeParametersInExpression(scope, expression.consequent, list);
-	if (t.isExpression(expression.alternate)) fidanComputeParametersInExpression(scope, expression.alternate, list);
+const checkConditionalExpression = (
+	fileName: string,
+	scope: Scope,
+	expression: t.ConditionalExpression,
+	list: t.Expression[]
+) => {
+	fidanComputeParametersInExpression(fileName, scope, expression.test, list);
+	if (t.isExpression(expression.consequent))
+		fidanComputeParametersInExpression(fileName, scope, expression.consequent, list);
+	if (t.isExpression(expression.alternate))
+		fidanComputeParametersInExpression(fileName, scope, expression.alternate, list);
 };
 
-const checkBinaryExpression = (scope: Scope, expression: t.BinaryExpression, list: t.Expression[]) => {
-	fidanComputeParametersInExpression(scope, expression.left, list);
-	fidanComputeParametersInExpression(scope, expression.right, list);
+const checkBinaryExpression = (
+	fileName: string,
+	scope: Scope,
+	expression: t.BinaryExpression,
+	list: t.Expression[]
+) => {
+	fidanComputeParametersInExpression(fileName, scope, expression.left, list);
+	fidanComputeParametersInExpression(fileName, scope, expression.right, list);
 };
 
-const checkLogicalExpression = (scope: Scope, expression: t.LogicalExpression, list: t.Expression[]) => {
-	fidanComputeParametersInExpression(scope, expression.left, list);
-	fidanComputeParametersInExpression(scope, expression.right, list);
+const checkLogicalExpression = (
+	fileName: string,
+	scope: Scope,
+	expression: t.LogicalExpression,
+	list: t.Expression[]
+) => {
+	fidanComputeParametersInExpression(fileName, scope, expression.left, list);
+	fidanComputeParametersInExpression(fileName, scope, expression.right, list);
 };
 
 const checkExpressionList = (
+	fileName: string,
 	scope: Scope,
 	argumentList: Array<t.Expression | t.SpreadElement | t.JSXNamespacedName | t.ObjectMethod | t.ObjectProperty>,
 	list: t.Expression[]
 ) => {
 	argumentList.forEach((arg) => {
-		if (t.isExpression(arg)) fidanComputeParametersInExpression(scope, arg as t.Expression, list);
-		else if (t.isObjectProperty(arg)) fidanComputeParametersInExpression(scope, arg.value as t.Expression, list);
+		if (t.isExpression(arg)) fidanComputeParametersInExpression(fileName, scope, arg as t.Expression, list);
+		else if (t.isObjectProperty(arg))
+			fidanComputeParametersInExpression(fileName, scope, arg.value as t.Expression, list);
 		else throw 'ERROR: not implemented argument type in checkExpressionList';
 	});
 };
 
 export const fidanComputeParametersInExpressionWithScopeFilter = (
+	fileName: string,
 	scope: Scope,
 	expression: t.Expression | t.PatternLike | t.JSXEmptyExpression
 ) => {
 	const fComputeParameters = [];
-	fidanComputeParametersInExpression(scope, expression, fComputeParameters);
+	fidanComputeParametersInExpression(fileName, scope, expression, fComputeParameters);
 	return fComputeParameters;
 };
 

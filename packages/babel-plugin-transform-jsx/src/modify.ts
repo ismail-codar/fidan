@@ -60,7 +60,12 @@ const fidanAssignmentExpressionSetCompute = (expression: t.AssignmentExpression,
 	);
 };
 
-const expressionStatementGeneralProcess = (scope: Scope, propertyName: string, path: NodePath<any>) => {
+const expressionStatementGeneralProcess = (
+	fileName: string,
+	scope: Scope,
+	propertyName: string,
+	path: NodePath<any>
+) => {
 	const expression: t.Expression = path.node[propertyName];
 	if (t.isAssignmentExpression(expression)) {
 		// const code = generate(path.node).code;
@@ -77,6 +82,7 @@ const expressionStatementGeneralProcess = (scope: Scope, propertyName: string, p
 				else {
 					if (check.isDynamicExpression(expression.right)) {
 						const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+							fileName,
 							path.scope,
 							expression.right
 						);
@@ -103,6 +109,7 @@ const expressionStatementGeneralProcess = (scope: Scope, propertyName: string, p
 		if (check.isTrackedVariable(scope, expression.left) && t.isBinaryExpression(expression.right)) {
 			// variable-binary-call-1 setCompute
 			const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+				fileName,
 				path.scope,
 				expression.right
 			);

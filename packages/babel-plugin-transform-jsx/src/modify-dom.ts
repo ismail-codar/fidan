@@ -13,8 +13,18 @@ const htmlProps = {
 	value: true
 };
 
-const attributeExpression = (scope: Scope, attributeName: string, expression: t.Expression, setAttr: boolean) => {
-	const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(scope, expression);
+const attributeExpression = (
+	fileName: string,
+	scope: Scope,
+	attributeName: string,
+	expression: t.Expression,
+	setAttr: boolean
+) => {
+	const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+		fileName,
+		scope,
+		expression
+	);
 	if (fComputeParameters.length == 0) return expression;
 
 	const statements: t.ExpressionStatement[] = [];
@@ -73,16 +83,26 @@ const assignSetAttributeExpression = (attributeName: string, expression: t.Expre
 		);
 };
 
-const setupStyleAttributeExpression = (scope: Scope, expression: t.ObjectExpression) => {
+const setupStyleAttributeExpression = (fileName: string, scope: Scope, expression: t.ObjectExpression) => {
 	expression.properties.forEach((prop: t.ObjectProperty) => {
 		if (!t.isLiteral(prop.value)) {
-			prop.value = attributeExpression(scope, 'style.' + prop.key.name, prop.value as t.Expression, false);
+			prop.value = attributeExpression(
+				fileName,
+				scope,
+				'style.' + prop.key.name,
+				prop.value as t.Expression,
+				false
+			);
 		}
 	});
 };
 
-const appendReplaceConditionallyExpression = (scope: Scope, expression: t.Expression) => {
-	const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(scope, expression);
+const appendReplaceConditionallyExpression = (fileName: string, scope: Scope, expression: t.Expression) => {
+	const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+		fileName,
+		scope,
+		expression
+	);
 	if (fComputeParameters.length == 0) return expression;
 	return t.functionExpression(
 		t.identifier(''),
@@ -127,7 +147,7 @@ const appendReplaceConditionallyExpression = (scope: Scope, expression: t.Expres
 	);
 };
 
-const arrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
+const arrayMapExpression = (fileName: string, scope: Scope, expression: t.CallExpression) => {
 	const arrayName = [];
 	let callMember = expression.callee['object'];
 	while (true) {
@@ -152,10 +172,14 @@ const arrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 
 		if (t.isReturnStatement(returnStatement)) {
 			if (t.isConditionalExpression(returnStatement.argument)) {
-				returnStatement.argument = appendReplaceConditionallyExpression(scope, returnStatement.argument);
+				returnStatement.argument = appendReplaceConditionallyExpression(
+					fileName,
+					scope,
+					returnStatement.argument
+				);
 			}
 		} else if (t.isConditionalExpression(returnStatement)) {
-			returnFn.body = appendReplaceConditionallyExpression(scope, returnFn.body as t.Expression);
+			returnFn.body = appendReplaceConditionallyExpression(fileName, scope, returnFn.body as t.Expression);
 		}
 	}
 

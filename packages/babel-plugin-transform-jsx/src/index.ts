@@ -126,6 +126,7 @@ export = function() {
 					if (t.isVariableDeclaration(path.parent) && check.isTrackedVariable(path.scope, path.node)) {
 						if (path.node.init && check.isDynamicExpression(path.node.init)) {
 							const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+								file.filename,
 								path.scope,
 								path.node.init
 							);
@@ -149,6 +150,7 @@ export = function() {
 							) {
 								//variable-object-2
 								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+									file.filename,
 									path.scope,
 									path.node.init
 								);
@@ -183,6 +185,7 @@ export = function() {
 							if (!leftIsTracked) {
 								if (isFidanObjectProperty) {
 									property.value = modifyDom.attributeExpression(
+										file.finame,
 										path.scope,
 										property.key.name.toString(),
 										property.value as t.Expression,
@@ -196,6 +199,7 @@ export = function() {
 							const rightIsDynamic = check.isDynamicExpression(property.value);
 							if (rightIsDynamic) {
 								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+									file.filename,
 									path.scope,
 									property.value
 								);
@@ -345,7 +349,7 @@ export = function() {
 			ArrowFunctionExpression(path: NodePath<t.ArrowFunctionExpression>, file) {
 				if (doNotTraverse) return;
 				try {
-					modify.expressionStatementGeneralProcess(path.scope, 'body', path);
+					modify.expressionStatementGeneralProcess(file.filename, path.scope, 'body', path);
 				} catch (e) {
 					errorReport(e, path, file);
 				}
@@ -371,7 +375,7 @@ export = function() {
 			ExpressionStatement(path: NodePath<t.ExpressionStatement>, file) {
 				if (doNotTraverse) return;
 				try {
-					modify.expressionStatementGeneralProcess(path.scope, 'expression', path);
+					modify.expressionStatementGeneralProcess(file.filename, path.scope, 'expression', path);
 				} catch (e) {
 					errorReport(e, path, file);
 				}
@@ -396,7 +400,7 @@ export = function() {
 							path.container.name.name.toString() === 'style'
 						)
 							//style-member-access, style-conditional
-							modifyDom.setupStyleAttributeExpression(path.scope, path.node.expression);
+							modifyDom.setupStyleAttributeExpression(file.filename, path.scope, path.node.expression);
 						else {
 							const componentPropertyIsTracked =
 								check.isTrackedVariable(path.scope, path.container.name) &&
@@ -404,6 +408,7 @@ export = function() {
 							if (t.isCallExpression(path.node.expression) && componentPropertyIsTracked) {
 								//class-names-6
 								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+									file.filename,
 									path.scope,
 									path.node.expression
 								);
@@ -418,6 +423,7 @@ export = function() {
 								// bu hataya düşmemek için jsx içinde <div>{functionMethod(...)}</div> gibi kullanımdan kaçınılmalı
 								// onun yerine var view1 = functionMethod(...) .... <div>{view}</div> gibi kullanılabilir
 								path.node.expression = modifyDom.attributeExpression(
+									file.filename,
 									path.scope,
 									path.container.name.name.toString(),
 									path.node.expression as t.Expression,
@@ -434,6 +440,7 @@ export = function() {
 					) {
 						if (t.isJSXElement(path.parent) || t.isJSXFragment(path.parent)) {
 							path.node.expression = modifyDom.attributeExpression(
+								file.filename,
 								path.scope,
 								'textContent',
 								path.node.expression as t.Expression,
@@ -443,6 +450,7 @@ export = function() {
 					} else if (t.isConditionalExpression(path.node.expression)) {
 						//element-text-conditional
 						path.node.expression = modifyDom.appendReplaceConditionallyExpression(
+							file.filename,
 							path.scope,
 							path.node.expression
 						);
@@ -451,7 +459,11 @@ export = function() {
 						check.isArrayMapExpression(path.scope, path.node.expression)
 					) {
 						//array-map
-						path.node.expression = modifyDom.arrayMapExpression(path.scope, path.node.expression);
+						path.node.expression = modifyDom.arrayMapExpression(
+							file.filename,
+							path.scope,
+							path.node.expression
+						);
 					}
 				} catch (e) {
 					errorReport(e, path, file);
