@@ -96,7 +96,10 @@ const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string)
 				) {
 					foundParams = callingMethodParamsInNode(callee, variableBinding.path.node);
 					if (foundParams) return true;
-				} else if (t.isImportSpecifier(variableBinding.path.node)) {
+				} else if (
+					t.isImportSpecifier(variableBinding.path.node) ||
+					t.isImportDefaultSpecifier(variableBinding.path.node)
+				) {
 					const exported = exportRegistry.loadImportedFileExports(
 						filename,
 						variableBinding.path.parent['source'].value

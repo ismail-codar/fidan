@@ -72,8 +72,10 @@ const fidanComputeParametersInExpression = (
 					else
 						throw 'ERROR: is not isFunctionExpression || isArrowFunctionExpression else ... not implemented -> ' +
 							variableBinding.path.node.type;
-				} else if (t.isImportSpecifier(variableBinding.path.node)) {
-					// TODO isImportSpecifier
+				} else if (
+					t.isImportSpecifier(variableBinding.path.node) ||
+					t.isImportDefaultSpecifier(variableBinding.path.node)
+				) {
 					const exported = exportRegistry.loadImportedFileExports(
 						fileName,
 						variableBinding.path.parent['source'].value
