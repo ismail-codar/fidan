@@ -66,7 +66,7 @@ const callingMethodParamsInNode = (callee, node: t.BaseNode): t.BaseNode[] => {
 						return false;
 					} else return true;
 				});
-			} else throw 'not implemented in callingMethodParams';
+			} else throw 'ERROR: not implemented in callingMethodParams';
 		}
 	}
 	return foundParams;

@@ -28,7 +28,7 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "fidan-jsx",
+      "name": "fidan-jsx (test/index.ts)",
       "runtimeArgs": ["-r", "ts-node/register"],
       "cwd": "${workspaceFolder}/packages/babel-plugin-transform-jsx",
       "args": [

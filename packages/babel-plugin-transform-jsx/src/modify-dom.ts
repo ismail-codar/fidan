@@ -148,7 +148,7 @@ const arrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 			if (!t.isReturnStatement(returnStatement)) throw 'returnStatement must be last place in the block';
 		} else if (t.isJSXElement(returnFn.body)) returnStatement = returnFn.body;
 
-		if (returnStatement == null) throw 'returnStatement cannot be found in arrayMapExpression';
+		if (returnStatement == null) throw 'ERROR: returnStatement cannot be found in arrayMapExpression';
 
 		if (t.isReturnStatement(returnStatement)) {
 			if (t.isConditionalExpression(returnStatement.argument)) {

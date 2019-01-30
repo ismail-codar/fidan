@@ -54,7 +54,10 @@ const fidanComputeParametersInExpression = (
 			let variableBinding = found.variableBindingInScope(scope, methodName);
 			if (variableBinding) {
 				if (t.isVariableDeclarator(variableBinding.path.node)) {
-					if (t.isFunctionExpression(variableBinding.path.node.init))
+					if (
+						t.isFunctionExpression(variableBinding.path.node.init) ||
+						t.isArrowFunctionExpression(variableBinding.path.node.init)
+					)
 						checkFunctionBody(
 							expression.arguments,
 							variableBinding.path.node.init.params,
@@ -62,10 +65,10 @@ const fidanComputeParametersInExpression = (
 							variableBinding.path.node.init.body,
 							list
 						);
-					else throw 'is not isFunctionExpression else ... not implemented ';
+					else throw 'ERROR: is not isFunctionExpression else ... not implemented ';
 				} else if (t.isImportSpecifier(variableBinding.path.node)) {
 					// debugger;
-					// throw "not implemented imported callExpression";
+					// throw "ERROR: not implemented imported callExpression";
 				}
 			}
 		}
@@ -77,7 +80,7 @@ const checkFunctionBody = (
 	args: Array<t.Expression | t.SpreadElement | t.JSXNamespacedName>,
 	params: Array<t.LVal>,
 	scope: Scope,
-	body: t.BlockStatement,
+	body: t.BlockStatement | t.Expression,
 	list: t.Expression[]
 ) => {
 	traverse(
@@ -134,7 +137,7 @@ const checkExpressionList = (
 	argumentList.forEach((arg) => {
 		if (t.isExpression(arg)) fidanComputeParametersInExpression(scope, arg as t.Expression, list);
 		else if (t.isObjectProperty(arg)) fidanComputeParametersInExpression(scope, arg.value as t.Expression, list);
-		else throw 'not implemented argument type in checkExpressionList';
+		else throw 'ERROR: not implemented argument type in checkExpressionList';
 	});
 };
 
