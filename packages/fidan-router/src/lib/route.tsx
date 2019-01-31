@@ -1,7 +1,7 @@
 import { fidan } from '@fidanjs/runtime';
 import { instance } from './router';
 
-export const Route = (props: { exact?: boolean; path: string; component: (props) => Element }) => {
+export const Route = (props: { exact?: boolean; path: string; component: Element | ((props) => Element) }) => {
 	let viewParent: Element = null;
 
 	instance.add([
@@ -9,7 +9,7 @@ export const Route = (props: { exact?: boolean; path: string; component: (props)
 			path: props.path,
 			handler: () => {
 				fidan.activateContext(props['$context']);
-				const rendered = props.component(props);
+				const rendered = typeof props.component === 'function' ? props.component(props) : props.component;
 				fidan.deactivateContext(props['$context']);
 				if (viewParent.firstChild) viewParent.replaceChild(rendered, viewParent.firstChild);
 				else viewParent.appendChild(rendered);

@@ -4,6 +4,7 @@
 	"description": "Fidanjs router",
 	"scripts": {
 		"build": "microbundle --format cjs; rm -rf build/_demo",
+		"local": "yarn build && yalc publish && yalc push",
 		"dev": "microbundle watch",
 		"start": "parcel src/_demo/index.html"
 	},

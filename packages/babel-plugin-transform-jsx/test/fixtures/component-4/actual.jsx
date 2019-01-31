@@ -1,4 +1,4 @@
-import { ProgressCircular } from '../../components/vue/vuetify/VProgressCircular/ProgressCircular';
+import { ProgressCircular } from 'xxxx';
 
 export const Main = () => {
 	let value$ = 10;

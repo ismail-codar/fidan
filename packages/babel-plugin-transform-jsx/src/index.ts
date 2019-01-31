@@ -402,9 +402,8 @@ export = function() {
 							//style-member-access, style-conditional
 							modifyDom.setupStyleAttributeExpression(file.filename, path.scope, path.node.expression);
 						else {
-							const componentPropertyIsTracked =
-								check.isTrackedVariable(path.scope, path.container.name) &&
-								check.objectPropertyParentIsComponent(path);
+							const parentIsComponent = check.objectPropertyParentIsComponent(path);
+							const componentPropertyIsTracked = check.isTrackedVariable(path.scope, path.container.name);
 							if (t.isCallExpression(path.node.expression) && componentPropertyIsTracked) {
 								//class-names-6
 								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
@@ -418,7 +417,7 @@ export = function() {
 										fComputeParameters
 									);
 								else path.node.expression = modify.fidanValueInit(path.node.expression);
-							} else if (!componentPropertyIsTracked) {
+							} else if (!parentIsComponent && !componentPropertyIsTracked) {
 								// TODO bir yerde parent null olduğu için getProgramParent da hata oluşuyor
 								// bu hataya düşmemek için jsx içinde <div>{functionMethod(...)}</div> gibi kullanımdan kaçınılmalı
 								// onun yerine var view1 = functionMethod(...) .... <div>{view}</div> gibi kullanılabilir
