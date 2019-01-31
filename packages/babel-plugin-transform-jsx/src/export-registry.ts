@@ -2,6 +2,8 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as babel from '@babel/core';
 import * as t from '@babel/types';
+import { NodePath } from 'babel-traverse';
+import { found } from './found';
 
 const fileExtentions = [ '.js', '.ts', '.tsx' ];
 const registryData: { [key: string]: { fileName: string; nodes: t.BaseNode[] } } = {};
@@ -17,6 +19,23 @@ function buildBabelConfig(plugin) {
 	});
 }
 
+const getDeclationsFromExports = (path: NodePath<t.Identifier>) => {
+	let parentPath: NodePath<any> = path.parentPath;
+	while (!t.isAssignmentExpression(parentPath.node)) {
+		parentPath = parentPath.parentPath;
+		if (!parentPath) {
+			return [];
+		}
+	}
+	if (t.isAssignmentExpression(parentPath.node)) {
+		debugger;
+		if (t.isIdentifier(parentPath.node.right)) {
+			const variableBindings = found.variableBindingInScope(parentPath.scope, parentPath.node.right.name);
+			return [ variableBindings.path.node ];
+		}
+	}
+};
+
 const getExportPaths = (fileName: string): t.BaseNode[] => {
 	const localExports = [];
 	if (fs.existsSync(fileName)) {
@@ -26,7 +45,15 @@ const getExportPaths = (fileName: string): t.BaseNode[] => {
 				return {
 					visitor: {
 						ExportNamedDeclaration(p) {
-							localExports.push.apply(localExports, getDeclations(p.node));
+							localExports.push.apply(localExports, getDeclationsFromNamedExport(p.node));
+						},
+						Identifier(path: NodePath<t.Identifier>, file) {
+							const parentNode = path.parent;
+							if (path.node.name === 'exports') {
+								if (t.isMemberExpression(path.parent)) {
+									localExports.push.apply(localExports, getDeclationsFromExports(path));
+								}
+							}
 						}
 					}
 				};
@@ -36,7 +63,7 @@ const getExportPaths = (fileName: string): t.BaseNode[] => {
 	return localExports;
 };
 
-const getDeclations = (node: t.ExportNamedDeclaration) => {
+const getDeclationsFromNamedExport = (node: t.ExportNamedDeclaration) => {
 	if (t.isFunctionDeclaration(node.declaration)) return [ node.declaration ];
 	else if (t.isVariableDeclaration(node.declaration)) return node.declaration.declarations;
 	else if (t.isTypeAlias(node.declaration)) return [ node.declaration ];

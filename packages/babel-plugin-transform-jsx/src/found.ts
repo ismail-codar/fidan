@@ -83,9 +83,18 @@ const callingMethodParamsInNode = (callee, node: t.BaseNode): t.BaseNode[] => {
 const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string): t.LVal[] => {
 	var foundParams = null;
 	const callee = path.node.callee;
-	const searchName = t.isIdentifier(callee)
+	let searchName = t.isIdentifier(callee)
 		? callee.name
 		: t.isMemberExpression(callee) && t.isIdentifier(callee.object) ? callee.object.name : null;
+	// if (!searchName) {
+	// 	if (t.isStringLiteral(callee)) {
+	// 		searchName = callee.value;
+	// 	} else if (t.isMemberExpression(callee)) {
+	// 		if (t.isStringLiteral(callee.object)) {
+	// 			searchName = callee.object.value;
+	// 		}
+	// 	}
+	// }
 	if (searchName) {
 		const foundPath = parentPathFound(path, (checkPath) => {
 			const variableBinding = checkPath.scope.bindings[searchName];
@@ -119,6 +128,9 @@ const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string)
 			}
 		});
 	}
+	// else {
+	// 	throw 'ERROR: searchName not found in callingMethodParams -> ' + JSON.stringify(path.node.callee.loc);
+	// }
 	return foundParams;
 };
 

@@ -23,6 +23,7 @@ const listAddWithControl = (scope: Scope, expression: t.Expression, list: t.Expr
 	else if (check.isTrackedVariable(scope, expression)) list.push(expression);
 };
 
+// TODO use traverse
 const fidanComputeParametersInExpression = (
 	fileName: string,
 	scope: Scope,
@@ -31,8 +32,7 @@ const fidanComputeParametersInExpression = (
 ): void => {
 	if (t.isIdentifier(expression)) {
 		if (!listIncludes(list, expression)) listAddWithControl(scope, expression, list);
-	}
-	if (t.isMemberExpression(expression)) {
+	} else if (t.isMemberExpression(expression)) {
 		if (t.isIdentifier(expression.property)) {
 			if (expression.property.name === '$val') {
 				const objectValue = expression as t.MemberExpression;
@@ -76,22 +76,49 @@ const fidanComputeParametersInExpression = (
 					t.isImportSpecifier(variableBinding.path.node) ||
 					t.isImportDefaultSpecifier(variableBinding.path.node)
 				) {
-					const exported = exportRegistry.loadImportedFileExports(
-						fileName,
-						variableBinding.path.parent['source'].value
-					);
-					exported.nodes.forEach((node) => {
-						fidanComputeParametersInExpression(exported.fileName, scope, node as any, list);
-					});
+					// const exported = exportRegistry.loadImportedFileExports(
+					// 	fileName,
+					// 	variableBinding.path.parent['source'].value
+					// );
+					// exported.nodes.forEach((node) => {
+					// 	const exportedList = [];
+					// 	fidanComputeParametersInExpression(exported.fileName, scope, node as any, exportedList);
+					// 	debugger;
+					// });
 				} else
 					throw 'ERROR: t.isVariableDeclarator(variableBinding.path.node) else ... not implemented -> ' +
 						variableBinding.path.node.type;
 			}
 		}
 		checkExpressionList(fileName, scope, expression.arguments, list);
-	} else if (t.isObjectExpression(expression)) checkExpressionList(fileName, scope, expression.properties, list);
+	} else if (t.isObjectExpression(expression)) {
+		checkExpressionList(fileName, scope, expression.properties, list);
+	} else if (t.isFunctionExpression(expression)) {
+		checkFunctionExpression(fileName, scope, expression, list);
+	} else if (t.isVariableDeclarator(expression)) {
+		fidanComputeParametersInExpression(fileName, scope, expression.init, list);
+	}
+	// else if (!t.isLiteral(expression) && !t.isIdentifier(expression)) {
+	// 	throw 'ERROR: fidanComputeParametersInExpression -> ' + expression.type;
+	// }
 };
 
+const checkFunctionExpression = (
+	fileName: string,
+	scope: Scope,
+	expression: t.FunctionExpression,
+	list: t.Expression[]
+) => {
+	expression.body.body.forEach((statement) => {
+		if (t.isReturnStatement(statement))
+			fidanComputeParametersInExpression(fileName, scope, statement.argument, list);
+		else {
+			throw 'ERROR: checkFunctionExpression -> ' + expression.type;
+		}
+	});
+};
+
+// TODO make obsolete -> use checkFunctionExpression
 const checkFunctionBody = (
 	args: Array<t.Expression | t.SpreadElement | t.JSXNamespacedName>,
 	params: Array<t.LVal>,
@@ -103,6 +130,7 @@ const checkFunctionBody = (
 		body,
 		{
 			MemberExpression(path: NodePath<t.MemberExpression>, file) {
+				//props.xxx
 				if (t.isIdentifier(path.node.object)) {
 					const searchName = path.node.object.name;
 					const argument = args[params.findIndex((p) => t.isIdentifier(p) && p.name == searchName)];
@@ -176,6 +204,7 @@ const checkExpressionList = (
 	});
 };
 
+// TODO make obsolete
 export const fidanComputeParametersInExpressionWithScopeFilter = (
 	fileName: string,
 	scope: Scope,

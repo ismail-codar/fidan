@@ -248,7 +248,12 @@ export const isExportsMember = (expression: t.LVal) => {
 };
 
 export const isValMemberProperty = (node: t.BaseNode): node is t.MemberExpression => {
-	return t.isMemberExpression(node) && t.isIdentifier(node.property) && node.property.name === '$val';
+	if (t.isMemberExpression(node)) {
+		return t.isIdentifier(node.property)
+			? node.property.name === '$val'
+			: t.isStringLiteral(node.property) ? node.property.value === '$val' : false;
+	}
+	return false;
 };
 
 export const isComputeReturnExpression = (node: t.CallExpression) => {
