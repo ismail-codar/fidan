@@ -8,11 +8,13 @@ export const Route = (props: { exact?: boolean; path: string; component: Element
 		{
 			path: props.path,
 			handler: () => {
-				fidan.activateContext(props['$context']);
-				const rendered = typeof props.component === 'function' ? props.component(props) : props.component;
-				fidan.deactivateContext(props['$context']);
-				if (viewParent.firstChild) viewParent.replaceChild(rendered, viewParent.firstChild);
-				else viewParent.appendChild(rendered);
+				if (viewParent) {
+					fidan.activateContext(props['$context']);
+					const rendered = typeof props.component === 'function' ? props.component(props) : props.component;
+					fidan.deactivateContext(props['$context']);
+					if (viewParent.firstChild) viewParent.replaceChild(rendered, viewParent.firstChild);
+					else viewParent.appendChild(rendered);
+				}
 			}
 		}
 	]);

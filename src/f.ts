@@ -66,6 +66,7 @@ export const initCompute = (fn: () => any, ...args: any[]) => {
 	return cValue;
 };
 
+// TODO typedCompute, typedValue ...
 export const computeReturn = <T>(fn: () => T, ...args: any[]): T => initCompute(fn, ...args) as any;
 
 export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
