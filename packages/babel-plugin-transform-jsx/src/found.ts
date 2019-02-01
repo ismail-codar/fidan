@@ -62,19 +62,21 @@ const callingMethodParamsInNode = (callee, node: t.BaseNode): t.BaseNode[] => {
 			} else if (t.isIdentifier(callee)) {
 				// attribute-call-1
 				calleName = callee.name;
-			} else throw 'ERROR: not implemented in callingMethodParams -> ' + callee.type;
+			}
+			// else throw 'ERROR: not implemented in callingMethodParams -> ' + callee.type;
 
-			node.init.properties.every((prop) => {
-				if (
-					t.isObjectProperty(prop) &&
-					t.isIdentifier(prop.key) &&
-					prop.key.name === calleName &&
-					t.isFunctionExpression(prop.value)
-				) {
-					foundParams = prop.value.params;
-					return false;
-				} else return true;
-			});
+			calleName &&
+				node.init.properties.every((prop) => {
+					if (
+						t.isObjectProperty(prop) &&
+						t.isIdentifier(prop.key) &&
+						prop.key.name === calleName &&
+						t.isFunctionExpression(prop.value)
+					) {
+						foundParams = prop.value.params;
+						return false;
+					} else return true;
+				});
 		}
 	}
 	return foundParams;
