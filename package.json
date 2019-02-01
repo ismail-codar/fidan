@@ -1,6 +1,6 @@
 {
 	"name": "@fidanjs/runtime",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "High performance and easy way for building web user interfaces.",
 	"scripts": {
 		"build": "copyfiles ./types/** ./build & microbundle --format cjs",

@@ -1,6 +1,6 @@
 {
 	"name": "@fidanjs/router",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Fidanjs router",
 	"scripts": {
 		"build": "microbundle --format cjs; rm -rf build/_demo",
@@ -12,7 +12,7 @@
 	"author": "ismail codar",
 	"license": "ISC",
 	"dependencies": {
-		"@fidanjs/runtime": "^0.0.1",
+		"@fidanjs/runtime": "^0.0.2",
 		"route-recognizer": "^0.3.4"
 	},
 	"devDependencies": {
