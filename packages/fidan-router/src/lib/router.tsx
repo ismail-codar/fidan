@@ -15,9 +15,6 @@ export const transitionTo = (path: string) => {
 };
 
 export const Router = (props: any) => {
-	setTimeout(() => {
-		transitionTo(window.location.pathname);
-	}, 0);
 	return <div className="fidan-router-root">{props.children}</div>;
 	// fidan.createElement(fidan.Fragment, null, props.children);
 };
