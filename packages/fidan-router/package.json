@@ -1,29 +1,29 @@
 {
-	"name": "@fidanjs/router",
-	"version": "0.0.2",
-	"description": "Fidanjs router",
-	"scripts": {
-		"build": "microbundle --format cjs; rm -rf build/_demo",
-		"local": "yarn build && yalc publish && yalc push",
-		"dev": "microbundle watch",
-		"start": "parcel src/_demo/index.html"
-	},
-	"keywords": [],
-	"author": "ismail codar",
-	"license": "ISC",
-	"dependencies": {
-		"@fidanjs/runtime": "^0.0.2",
-		"route-recognizer": "^0.3.4"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.2.2",
-		"@babel/plugin-proposal-export-default-from": "^7.2.0",
-		"@babel/preset-env": "^7.2.3",
-		"@babel/preset-react": "^7.0.0",
-		"@babel/preset-typescript": "^7.1.0",
-		"microbundle": "^0.9.0"
-	},
-	"main": "build/index.js",
-	"types": "build/index.d.ts",
-	"source": "src/index.ts"
+  "name": "@fidanjs/router",
+  "version": "0.0.2",
+  "description": "Fidanjs router",
+  "scripts": {
+    "build": "microbundle --format cjs; rm -rf build/_demo",
+    "local": "yarn build && yalc publish && yalc push",
+    "dev": "microbundle watch",
+    "start": "parcel src/_demo/index.html"
+  },
+  "keywords": [],
+  "author": "ismail codar",
+  "license": "ISC",
+  "dependencies": {
+    "@fidanjs/runtime": "file:.yalc/@fidanjs/runtime",
+    "route-recognizer": "^0.3.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-export-default-from": "^7.2.0",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.1.0",
+    "microbundle": "^0.9.0"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "source": "src/index.ts"
 }
