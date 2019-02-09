@@ -73,7 +73,7 @@ function runTest(dir) {
 
 	function normalizeLines(str: string) {
 		str = format(str, {
-			parser: testFile.endsWith('.tsx') ? 'typescript' : 'babylon'
+			parser: testFile.endsWith('.tsx') ? 'typescript' : 'babel'
 		});
 		str = str.replace(/\r\n/g, '\n');
 		str = str.replace(/; \/\//g, ';\n\\');

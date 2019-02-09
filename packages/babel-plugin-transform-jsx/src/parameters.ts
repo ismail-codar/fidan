@@ -93,9 +93,10 @@ const fidanComputeParametersInExpression = (
 		checkExpressionList(fileName, scope, expression.arguments, list);
 	} else if (t.isObjectExpression(expression)) {
 		checkExpressionList(fileName, scope, expression.properties, list);
-	} else if (t.isFunctionExpression(expression)) {
-		checkFunctionExpression(fileName, scope, expression, list);
 	} else if (t.isVariableDeclarator(expression)) {
+		// else if (t.isFunctionExpression(expression)) {
+		// 	checkFunctionExpression(fileName, scope, expression, list);
+		// }
 		fidanComputeParametersInExpression(fileName, scope, expression.init, list);
 	}
 	// else if (!t.isLiteral(expression) && !t.isIdentifier(expression)) {
