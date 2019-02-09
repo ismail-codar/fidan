@@ -32,7 +32,7 @@ function getRealpath(n) {
 var doNotTraverse = false;
 const openedTags: string[] = [];
 
-export = function() {
+export default function() {
 	return {
 		visitor: {
 			Program: {
@@ -470,4 +470,4 @@ export = function() {
 			}
 		}
 	};
-};
+}
