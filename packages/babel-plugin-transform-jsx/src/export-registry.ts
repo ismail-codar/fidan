@@ -71,6 +71,13 @@ const getDeclationsFromNamedExport = (node: t.ExportNamedDeclaration) => {
 };
 
 const loadImportedFileExports = (fileName: string, importedFile: string) => {
+	if (
+		importedFile.startsWith('.') === false &&
+		importedFile.startsWith('/') == false &&
+		importedFile.startsWith('~/') == false
+	) {
+		return { nodes: [] };
+	}
 	if (registryData[fileName]) return registryData[fileName];
 	else {
 		importedFile = path.resolve(path.dirname(fileName), importedFile);
