@@ -7,7 +7,7 @@ import { allSvgElements, htmlAndSvgElements } from './svg';
 
 const specialMemberAccessKeywords = [ '$val', 'freezed' ];
 
-export const checker = {
+const checker = {
 	literalTracked: (name: string) => {
 		return name.endsWith('$');
 	}
@@ -242,12 +242,12 @@ const objectPropertyParentIsComponent = (path: NodePath<any>) => {
 	return false;
 };
 
-export const isExportsMember = (expression: t.LVal) => {
+const isExportsMember = (expression: t.LVal) => {
 	if (t.isMemberExpression(expression) && t.isIdentifier(expression.object) && expression.object.name === 'exports')
 		return true;
 };
 
-export const isValMemberProperty = (node: t.BaseNode): node is t.MemberExpression => {
+const isValMemberProperty = (node: t.BaseNode): node is t.MemberExpression => {
 	if (t.isMemberExpression(node)) {
 		return t.isIdentifier(node.property)
 			? node.property.name === '$val'
@@ -256,7 +256,7 @@ export const isValMemberProperty = (node: t.BaseNode): node is t.MemberExpressio
 	return false;
 };
 
-export const isComputeReturnExpression = (node: t.CallExpression) => {
+const isComputeReturnExpression = (node: t.CallExpression) => {
 	return (
 		t.isMemberExpression(node.callee) &&
 		t.isIdentifier(node.callee.property) &&
@@ -264,7 +264,7 @@ export const isComputeReturnExpression = (node: t.CallExpression) => {
 	);
 };
 
-export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
+const isArrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 	return (
 		t.isMemberExpression(expression.callee) &&
 		expression.callee.property.name == 'map' &&
@@ -273,7 +273,7 @@ export const isArrayMapExpression = (scope: Scope, expression: t.CallExpression)
 	);
 };
 
-export const isFidanCall = (node: any) => {
+const isFidanCall = (node: any) => {
 	if (!t.isCallExpression(node)) return false;
 
 	if (t.isIdentifier(node.callee)) return isFidanName(node.callee);
@@ -287,7 +287,7 @@ export const isFidanCall = (node: any) => {
 	return member != null;
 };
 
-export const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
+const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
 	t.isBinaryExpression(expression) ||
 	t.isLogicalExpression(expression) ||
 	t.isConditionalExpression(expression) ||
@@ -298,11 +298,22 @@ export const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
 			isFidanName(expression.callee.object.name)
 		));
 
-export const isSvgElementTagName = (tagName, openedTags: string[]) => {
+const isSvgElementTagName = (tagName, openedTags: string[]) => {
 	return (
 		(tagName != null && allSvgElements.indexOf(tagName) !== -1) ||
 		(htmlAndSvgElements.indexOf(tagName) !== -1 && allSvgElements.indexOf(openedTags[openedTags.length - 1]) !== -1)
 	);
+};
+
+const isClassPropertyLike = (path: NodePath<any>, expression: t.AssignmentExpression) => {
+	if (t.isMemberExpression(expression.left)) {
+		if (expression.left.object.type === 'ThisExpression') {
+			const isObjectProperty =
+				path.parentPath.parentPath && t.isObjectProperty(path.parentPath.parentPath.parentPath.node);
+			return !isObjectProperty;
+		}
+	}
+	return false;
 };
 
 export const check = {
@@ -325,5 +336,6 @@ export const check = {
 	isArrayMapExpression,
 	isDynamicExpression,
 	isSvgElementTagName,
-	isFidanElementFunction
+	isFidanElementFunction,
+	isClassPropertyLike
 };

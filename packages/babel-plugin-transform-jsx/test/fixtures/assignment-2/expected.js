@@ -4,3 +4,4 @@ var data = {
 	id$: fidan.value(null)
 };
 var id = data.id$.$val;
+a$(2);
