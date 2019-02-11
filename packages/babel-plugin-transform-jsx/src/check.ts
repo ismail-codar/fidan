@@ -7,7 +7,7 @@ import { allSvgElements, htmlAndSvgElements } from './svg';
 
 const specialMemberAccessKeywords = [ '$val', 'freezed' ];
 
-const checker = {
+export const checker = {
 	literalTracked: (name: string) => {
 		return name.endsWith('$');
 	}
