@@ -1,7 +1,7 @@
 # fidan
 High performance and easy way for building web user interfaces.
 
-##A counter example:
+## A counter example:
 
 ```jsx
 var counter$ = 0; // An option: If a variable ends with $ then it is observable.
