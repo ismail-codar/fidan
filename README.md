@@ -17,6 +17,11 @@ var view = (
 document.body.appendChild(view);
 ```
 
+
+
+The above example can work because our [compiler](./packages/babel-plugin-transform-jsx) compiles to knockout style observable functions.
+
+
 ## API
 
 TODO
