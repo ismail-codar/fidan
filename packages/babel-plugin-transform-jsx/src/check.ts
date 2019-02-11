@@ -308,12 +308,27 @@ const isSvgElementTagName = (tagName, openedTags: string[]) => {
 const isClassPropertyLike = (path: NodePath<any>, expression: t.AssignmentExpression) => {
 	if (t.isMemberExpression(expression.left)) {
 		if (expression.left.object.type === 'ThisExpression') {
-			const isObjectProperty =
-				path.parentPath.parentPath && t.isObjectProperty(path.parentPath.parentPath.parentPath.node);
-			return !isObjectProperty;
+			if (path.parentPath.parentPath) {
+				const parentPropPath = path.parentPath.parentPath.parentPath;
+				if (parentPropPath && t.isObjectProperty(parentPropPath.node)) {
+					const parentParentPropPath =
+						parentPropPath.parentPath &&
+						parentPropPath.parentPath.parentPath &&
+						parentPropPath.parentPath.parentPath.parentPath;
+					if (
+						parentParentPropPath &&
+						t.isCallExpression(parentParentPropPath.node) &&
+						t.isIdentifier(parentParentPropPath.node.callee)
+					) {
+						return parentParentPropPath.node.callee.name === '_createClass';
+					}
+				} else {
+					return false;
+				}
+			}
 		}
 	}
-	return false;
+	return true;
 };
 
 export const check = {

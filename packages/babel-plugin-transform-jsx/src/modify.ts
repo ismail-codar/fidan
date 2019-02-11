@@ -76,8 +76,8 @@ const expressionStatementGeneralProcess = (
 
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
 			const rightIsTracked = check.isTrackedVariable(path.scope, expression.right);
-			if (leftIsTracked && check.isClassPropertyLike(path, expression)) {
-				// class-property-1 !assignment-3
+			if (leftIsTracked && check.isClassPropertyLike(path, expression) === false) {
+				// class-property-1
 				if (rightIsTracked) return;
 				else {
 					if (check.isDynamicExpression(expression.right)) {
