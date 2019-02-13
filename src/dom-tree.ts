@@ -77,7 +77,7 @@ export const addChildElements = (element, childs) => {
 		if (Array.isArray(childs[i])) addChildElements(element, childs[i]);
 		else if (childs[i] instanceof Function) childs[i](element);
 		else {
-			if (childs[i]) {
+			if (childs[i] !== undefined) {
 				props = childs[i]['$props'];
 				element.appendChild(childs[i] instanceof Node ? childs[i] : document.createTextNode(childs[i]));
 				props && props.didMount && props.didMount(element, childs[i]);
