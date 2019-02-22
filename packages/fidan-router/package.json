@@ -1,6 +1,6 @@
 {
 	"name": "@fidanjs/router",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"description": "Fidanjs router",
 	"scripts": {
 		"build": "microbundle --format cjs; rm -rf build/_demo",
