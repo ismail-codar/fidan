@@ -115,7 +115,7 @@ const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string)
 						filename,
 						variableBinding.path.parent['source'].value
 					);
-					exported.nodes.find((node) => {
+					(exported.nodes as any).find((node) => {
 						foundParams = callingMethodParamsInNode(callee, node);
 						return foundParams !== null;
 					});
@@ -126,7 +126,7 @@ const callingMethodParams = (path: NodePath<t.CallExpression>, filename: string)
 					// svg-compute-1
 				} else
 					throw 'ERROR: unknown variableBinding type in callingMethodParams -> ' +
-						variableBinding.path.node.type;
+					variableBinding.path.node.type;
 			}
 		});
 	}

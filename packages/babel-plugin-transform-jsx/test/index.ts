@@ -20,6 +20,7 @@ var RUN_SINGLE_TEST = null;
 
 // RUN_SINGLE_TEST = 'assignment-3';
 // RUN_SINGLE_TEST = 'class-property-1';
+RUN_SINGLE_TEST = "class-name-fn-call-2"
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve('../src');
@@ -32,13 +33,13 @@ function runTests() {
 	if (!RUN_SINGLE_TEST) {
 		testList = fs
 			.readdirSync(testsPath)
-			.map(function(item) {
+			.map(function (item) {
 				return {
 					path: path.join(testsPath, item),
 					name: item
 				};
 			})
-			.filter(function(item) {
+			.filter(function (item) {
 				return fs.statSync(item.path).isDirectory();
 			});
 	} else
@@ -63,10 +64,10 @@ function runTest(dir) {
 		plugins: [
 			pluginPath,
 			'@babel/plugin-syntax-dynamic-import',
-			[ '@babel/plugin-proposal-decorators', { legacy: true } ],
-			[ '@babel/plugin-proposal-class-properties', { loose: true } ]
+			['@babel/plugin-proposal-decorators', { legacy: true }],
+			['@babel/plugin-proposal-class-properties', { loose: true }]
 		],
-		presets: [ '@babel/preset-typescript' ]
+		presets: ['@babel/preset-typescript']
 	});
 
 	var expected = fs.readFileSync(dir.path + '/expected.js', 'utf-8');
@@ -101,7 +102,7 @@ function runTest(dir) {
 	} else {
 		if (diffParts.length == 1) process.stdout.write('√');
 		else
-			diffParts.forEach(function(part) {
+			diffParts.forEach(function (part) {
 				var value = part.value;
 				if (part.added) {
 					value = chalk.green(value);
@@ -119,7 +120,7 @@ function runTest(dir) {
 }
 
 if (process.argv.indexOf('--watch') >= 0) {
-	require('watch').watchTree(__dirname + '/..', function() {
+	require('watch').watchTree(__dirname + '/..', function () {
 		delete require.cache[pluginPath];
 		clear();
 		console.log('Press Ctrl+C to stop watching...');
