@@ -5,7 +5,7 @@ import * as t from '@babel/types';
 import { found } from './found';
 import { allSvgElements, htmlAndSvgElements } from './svg';
 
-const specialMemberAccessKeywords = [ '$val', 'freezed' ];
+const specialMemberAccessKeywords = ['$val', 'freezed'];
 
 export const checker = {
 	literalTracked: (name: string) => {
@@ -273,7 +273,7 @@ const isArrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 	);
 };
 
-const isFidanCall = (node: any) => {
+const isFidanCallExpression = (node) => {
 	if (!t.isCallExpression(node)) return false;
 
 	if (t.isIdentifier(node.callee)) return isFidanName(node.callee);
@@ -286,6 +286,23 @@ const isFidanCall = (node: any) => {
 	});
 	return member != null;
 };
+
+
+const getFidanCall = (path: NodePath) => {
+	while (true) {
+		if (isFidanCallExpression(path.node)) {
+			return path.node;
+		}
+		if (!path.parentPath) {
+			return null;
+		}
+		path = path.parentPath;
+	}
+};
+
+const isFidanCall = (path: NodePath<any>) => {
+	return getFidanCall(path) !== null;
+}
 
 const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
 	t.isBinaryExpression(expression) ||
@@ -333,6 +350,8 @@ const isClassPropertyLike = (path: NodePath<any>, expression: t.AssignmentExpres
 
 export const check = {
 	isFidanName,
+	isFidanCallExpression,
+	getFidanCall,
 	isFidanCall,
 	isValMemberProperty,
 	isTrackedVariableDeclarator,

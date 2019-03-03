@@ -32,7 +32,7 @@ function getRealpath(n) {
 var doNotTraverse = false;
 const openedTags: string[] = [];
 
-export default function() {
+export default function () {
 	return {
 		visitor: {
 			Program: {
@@ -91,7 +91,7 @@ export default function() {
 							check.isTrackedVariable(path.scope, path.node) &&
 							t.isIdentifier(path.node.object) &&
 							!check.isTrackedVariable(path.parentPath.scope, path.parentPath.node) &&
-							!check.isFidanCall(path.parentPath.node) &&
+							!check.isFidanCall(path.parentPath) &&
 							!t.isAssignmentExpression(path.parentPath.node) // object-property-3
 						) {
 							path.node.object = t.memberExpression(
@@ -176,7 +176,7 @@ export default function() {
 				if (doNotTraverse) return;
 				try {
 					path.node.properties.forEach((property: t.ObjectProperty) => {
-						const isFidanObjectProperty = check.isFidanCall(path.parentPath.node);
+						const isFidanObjectProperty = check.isFidanCall(path.parentPath);
 						const leftIsTracked =
 							check.isTrackedVariable(path.scope, property.key) ||
 							check.isTrackedVariable(path.scope, property);
@@ -184,8 +184,11 @@ export default function() {
 						if (rightIsTracked) {
 							if (!leftIsTracked) {
 								if (isFidanObjectProperty) {
+									if (!check.isFidanCallExpression(path.parentPath.node)) {
+										property = found.parentFidanProperty(path);
+									}
 									property.value = modifyDom.attributeExpression(
-										file.finame,
+										file.filename,
 										path.scope,
 										property.key.name.toString(),
 										property.value as t.Expression,
@@ -208,10 +211,10 @@ export default function() {
 										property.value,
 										fComputeParameters
 									);
-								} else if (!check.isFidanCall(property.value))
+								} else if (!check.isFidanCallExpression(property.value))
 									property.value = modify.fidanValueInit(property.value);
 							} else if (
-								!check.isFidanCall(property.value) &&
+								!check.isFidanCallExpression(property.value) &&
 								!check.isFidanElementFunction(property.value)
 							)
 								property.value = modify.fidanValueInit(property.value);
@@ -243,7 +246,7 @@ export default function() {
 					if (
 						t.isMemberExpression(path.node.callee) &&
 						path.node.callee.property.name == 'createElement' &&
-						check.isFidanCall(path.node)
+						check.isFidanCall(path)
 					) {
 						const firstArgument = path.node.arguments[0];
 						const secondArgument: any = path.node.arguments.length > 1 ? path.node.arguments[1] : null;
@@ -287,7 +290,7 @@ export default function() {
 					const contextArgumentIndex = found.findContextChildIndex(path.node.arguments);
 					if (contextArgumentIndex !== -1) {
 						modify.moveContextArguments(path.node.arguments, contextArgumentIndex);
-					} else if (!check.isFidanCall(path.node)) {
+					} else if (!check.isFidanCall(path)) {
 						const methodParams = found.callingMethodParams(path, file.filename);
 						// if (!methodParams || path.node.arguments.length !== methodParams.length) {
 						// 	// debugger;
