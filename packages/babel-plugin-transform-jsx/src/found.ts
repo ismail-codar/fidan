@@ -2,7 +2,6 @@ import * as t from '@babel/types';
 import { NodePath, Scope, Binding } from 'babel-traverse';
 import generate from 'babel-generator';
 import { exportRegistry } from './export-registry';
-import { check } from './check';
 
 const callMemberExpressionCheck = (
 	expression: t.CallExpression,
@@ -176,29 +175,6 @@ const hasFidanImport = (body: t.BaseNode[]) => {
 	);
 };
 
-/** aşağıdaki gibi durumda className property si bulunmalı
- runtime_1.fidan.createElement("div", {
-  className: classnames_1.default({
-	color: colorX$
-  })
-})
- */
-const parentFidanProperty = (path: NodePath<any>) => {
-	let prevPath = path;
-	while (true) {
-		if (check.isFidanCallExpression(path.parentPath.node)) {
-			return prevPath.node;
-		}
-		if (!path.parentPath) {
-			return null;
-		}
-		prevPath = path;
-		path = path.parentPath;
-	}
-	return null;
-};
-
-
 export const found = {
 	callMemberExpressionCheck,
 	memberExpressionCheck,
@@ -208,6 +184,5 @@ export const found = {
 	findContextChildIndex,
 	pathElementTagName,
 	filePluginOptions,
-	hasFidanImport,
-	parentFidanProperty
+	hasFidanImport
 };

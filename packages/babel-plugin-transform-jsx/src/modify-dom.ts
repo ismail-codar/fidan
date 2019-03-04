@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import { parameters } from './parameters';
-import { Scope } from 'babel-traverse';
+import { Scope, NodePath } from 'babel-traverse';
+import { check } from './check';
 
 const htmlProps = {
 	id: true,
@@ -61,7 +62,7 @@ const attributeExpression = (
 		)
 	);
 
-	return t.functionExpression(t.identifier(''), [ t.identifier('element') ], t.blockStatement(statements));
+	return t.functionExpression(t.identifier(''), [t.identifier('element')], t.blockStatement(statements));
 };
 
 const assignSetAttributeExpression = (attributeName: string, expression: t.Expression, setAttr: boolean) => {
@@ -106,9 +107,9 @@ const appendReplaceConditionallyExpression = (fileName: string, scope: Scope, ex
 	if (fComputeParameters.length == 0) return expression;
 	return t.functionExpression(
 		t.identifier(''),
-		[ t.identifier('element') ],
+		[t.identifier('element')],
 		t.blockStatement([
-			t.variableDeclaration('let', [ t.variableDeclarator(t.identifier('oldElement')) ]),
+			t.variableDeclaration('let', [t.variableDeclarator(t.identifier('oldElement'))]),
 			t.expressionStatement(
 				t.callExpression(
 					t.memberExpression(t.identifier('fidan'), t.identifier('compute')),
@@ -132,7 +133,7 @@ const appendReplaceConditionallyExpression = (fileName: string, scope: Scope, ex
 												t.functionExpression(
 													null,
 													[],
-													t.blockStatement([ t.returnStatement(expression) ])
+													t.blockStatement([t.returnStatement(expression)])
 												)
 											]
 										)
@@ -185,7 +186,7 @@ const arrayMapExpression = (fileName: string, scope: Scope, expression: t.CallEx
 
 	return t.functionExpression(
 		t.identifier(''),
-		[ t.identifier('element') ],
+		[t.identifier('element')],
 		t.blockStatement([
 			t.expressionStatement(
 				t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('arrayMap')), [
@@ -198,9 +199,32 @@ const arrayMapExpression = (fileName: string, scope: Scope, expression: t.CallEx
 	);
 };
 
+
+export const fidanObjectExpression = (path: NodePath<t.CallExpression>, node: t.ObjectExpression, file) => {
+	node.properties.forEach((property: t.ObjectProperty) => {
+		const leftIsTracked =
+			check.isTrackedVariable(path.scope, property.key) ||
+			check.isTrackedVariable(path.scope, property);
+		const rightIsTracked = check.isTrackedVariable(path.scope, property.value);
+		const rightIsDynamic = check.isDynamicExpression(property.value);
+		if (rightIsTracked || rightIsDynamic) { // TODO component controlü: class-names-4
+			if (!leftIsTracked) {
+				property.value = modifyDom.attributeExpression(
+					file.finame,
+					path.scope,
+					property.key.name.toString(),
+					property.value as t.Expression,
+					false
+				);
+			}
+		}
+	});
+}
+
 export const modifyDom = {
 	attributeExpression,
 	setupStyleAttributeExpression,
 	appendReplaceConditionallyExpression,
-	arrayMapExpression
+	arrayMapExpression,
+	fidanObjectExpression
 };

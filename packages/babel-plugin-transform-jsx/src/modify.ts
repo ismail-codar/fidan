@@ -8,15 +8,15 @@ import { parameters } from './parameters';
 const fidanValueInit = (init: t.Expression | t.PatternLike | t.SpreadElement | t.JSXNamespacedName) => {
 	return t.callExpression(
 		t.memberExpression(t.identifier('fidan'), t.identifier(t.isArrayExpression(init) ? 'array' : 'value')),
-		[init == null ? t.nullLiteral() : init as any]
+		[ init == null ? t.nullLiteral() : init as any ]
 	);
 };
 
 const fidanCall = (left: t.Expression | t.RestElement | t.LVal, right: t.Expression, operator: string) => {
-	if (operator === '=') return t.callExpression(left as any, [right]);
+	if (operator === '=') return t.callExpression(left as any, [ right ]);
 	else {
 		operator = operator.substr(0, 1);
-		return t.callExpression(left as any, [t.binaryExpression(operator as any, left as any, right)]);
+		return t.callExpression(left as any, [ t.binaryExpression(operator as any, left as any, right) ]);
 	}
 };
 
@@ -33,7 +33,7 @@ const assignmentExpressionToCallCompute = (expression: t.AssignmentExpression, f
 					t.identifier(''),
 					[],
 					t.blockStatement([
-						t.expressionStatement(t.callExpression(expression.left.object, [expression.right]))
+						t.expressionStatement(t.callExpression(expression.left.object, [ expression.right ]))
 					])
 				)
 			].concat(fComputeParameters)
@@ -44,7 +44,7 @@ const dynamicExpressionInitComputeValues = (expression: t.Expression | t.Pattern
 	return t.callExpression(
 		t.memberExpression(t.identifier('fidan'), t.identifier('initCompute')),
 		[
-			t.functionExpression(t.identifier(''), [], t.blockStatement([t.returnStatement(expression as any)]))
+			t.functionExpression(t.identifier(''), [], t.blockStatement([ t.returnStatement(expression as any) ]))
 		].concat(fComputeParameters)
 	);
 };
@@ -55,7 +55,7 @@ const fidanAssignmentExpressionSetCompute = (expression: t.AssignmentExpression,
 		t.memberExpression(t.identifier('fidan'), t.identifier('setCompute')),
 		[
 			t.identifier(leftName),
-			t.functionExpression(t.identifier(''), [], t.blockStatement([t.returnStatement(expression.right)]))
+			t.functionExpression(t.identifier(''), [], t.blockStatement([ t.returnStatement(expression.right) ]))
 		].concat(fComputeParameters)
 	);
 };
@@ -71,7 +71,7 @@ const expressionStatementGeneralProcess = (
 		// const code = generate(path.node).code;
 		const isExport = check.isExportsMember(expression.left);
 		if (t.isMemberExpression(expression.left) && !isExport) {
-			const rightIsFidanCall = check.isFidanCallExpression(expression.right);
+			const rightIsFidanCall = check.isFidanCall(expression.right);
 			if (rightIsFidanCall) return;
 
 			const leftIsTracked = check.isTrackedVariable(path.scope, expression.left);
@@ -172,7 +172,7 @@ export const moveContextArguments = (args: any[], contextArgIndex: number) => {
 		contextArgProps[0].value,
 		contextArgProps[1].value
 	]);
-	args.splice.apply(args, [contextArgIndex + 1, 0].concat(contextArgs));
+	args.splice.apply(args, [ contextArgIndex + 1, 0 ].concat(contextArgs));
 };
 
 export const pathNodeLeftRight = (path: NodePath<t.LogicalExpression | t.BinaryExpression>) => {
@@ -214,7 +214,7 @@ export const insertFidanImport = (body: t.BaseNode[], start: number) => {
 		start,
 		0,
 		t.importDeclaration(
-			[t.importSpecifier(t.identifier('fidan'), t.identifier('fidan'))],
+			[ t.importSpecifier(t.identifier('fidan'), t.identifier('fidan')) ],
 			t.stringLiteral('@fidanjs/runtime')
 		)
 	);

@@ -192,6 +192,8 @@ const isFidanElementFunction = (node: t.BaseNode) => {
 	return false;
 };
 
+const nameIsComponent = (name: string) => name !== null && name.substr(0, 1).toUpperCase() == name.substr(0, 1) && !name.endsWith('_')
+
 const expressionContainerParentIsComponent = (path: NodePath<t.JSXExpressionContainer>) => {
 	if (
 		path.parentPath &&
@@ -200,7 +202,7 @@ const expressionContainerParentIsComponent = (path: NodePath<t.JSXExpressionCont
 		t.isJSXIdentifier(path.parentPath.parentPath.node.name)
 	) {
 		const name = path.parentPath.parentPath.node.name.name;
-		return name.substr(0, 1).toUpperCase() == name.substr(0, 1) && !name.endsWith('_');
+		return nameIsComponent(name);
 	}
 };
 
@@ -211,10 +213,10 @@ const objectPropertyParentIsComponent = (path: NodePath<any>) => {
 		);
 		if (t.isJSXIdentifier(foundPath.node.name)) {
 			const name = foundPath.node.name.name;
-			return name !== null && name.substr(0, 1).toUpperCase() == name.substr(0, 1) && !name.endsWith('_');
+			return nameIsComponent(name);
 		} else if (t.isJSXMemberExpression(foundPath.node.name)) {
 			const name = foundPath.node.name.property.name;
-			return name !== null && name.substr(0, 1).toUpperCase() == name.substr(0, 1) && !name.endsWith('_');
+			return nameIsComponent(name);
 		} else return false;
 		// let name: string = null;
 		// const container = path.parentPath.container[0];
@@ -273,7 +275,7 @@ const isArrayMapExpression = (scope: Scope, expression: t.CallExpression) => {
 	);
 };
 
-const isFidanCallExpression = (node) => {
+const isFidanCall = (node: any) => {
 	if (!t.isCallExpression(node)) return false;
 
 	if (t.isIdentifier(node.callee)) return isFidanName(node.callee);
@@ -286,23 +288,6 @@ const isFidanCallExpression = (node) => {
 	});
 	return member != null;
 };
-
-
-const getFidanCall = (path: NodePath) => {
-	while (true) {
-		if (isFidanCallExpression(path.node)) {
-			return path.node;
-		}
-		if (!path.parentPath) {
-			return null;
-		}
-		path = path.parentPath;
-	}
-};
-
-const isFidanCall = (path: NodePath<any>) => {
-	return getFidanCall(path) !== null;
-}
 
 const isDynamicExpression = (expression: t.Expression | t.PatternLike) =>
 	t.isBinaryExpression(expression) ||
@@ -350,8 +335,6 @@ const isClassPropertyLike = (path: NodePath<any>, expression: t.AssignmentExpres
 
 export const check = {
 	isFidanName,
-	isFidanCallExpression,
-	getFidanCall,
 	isFidanCall,
 	isValMemberProperty,
 	isTrackedVariableDeclarator,
@@ -364,6 +347,7 @@ export const check = {
 	specialMemberAccessKeywords,
 	fidanValueBinaryInit,
 	parentPathComputeCallee,
+	nameIsComponent,
 	expressionContainerParentIsComponent,
 	objectPropertyParentIsComponent,
 	isExportsMember,

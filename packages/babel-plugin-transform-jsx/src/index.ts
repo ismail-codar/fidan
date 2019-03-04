@@ -91,7 +91,7 @@ export default function () {
 							check.isTrackedVariable(path.scope, path.node) &&
 							t.isIdentifier(path.node.object) &&
 							!check.isTrackedVariable(path.parentPath.scope, path.parentPath.node) &&
-							!check.isFidanCall(path.parentPath) &&
+							!check.isFidanCall(path.parentPath.node) &&
 							!t.isAssignmentExpression(path.parentPath.node) // object-property-3
 						) {
 							path.node.object = t.memberExpression(
@@ -172,71 +172,6 @@ export default function () {
 					errorReport(e, path, file);
 				}
 			},
-			ObjectExpression(path: NodePath<t.ObjectExpression>, file) {
-				if (doNotTraverse) return;
-				try {
-					path.node.properties.forEach((property: t.ObjectProperty) => {
-						const isFidanObjectProperty = check.isFidanCall(path.parentPath);
-						const leftIsTracked =
-							check.isTrackedVariable(path.scope, property.key) ||
-							check.isTrackedVariable(path.scope, property);
-						const rightIsTracked = check.isTrackedVariable(path.scope, property.value);
-						if (rightIsTracked) {
-							if (!leftIsTracked) {
-								if (isFidanObjectProperty) {
-									if (!check.isFidanCallExpression(path.parentPath.node)) {
-										if (rightIsTracked) {
-											property.value = modify.memberVal(property.value);
-										}
-										property = found.parentFidanProperty(path);
-										if (t.isObjectProperty(property)) {
-											property.value = modifyDom.attributeExpression(
-												file.filename,
-												path.scope,
-												property.key.name.toString(),
-												property.value as t.Expression,
-												false
-											);
-										}
-									} else {
-										property.value = modifyDom.attributeExpression(
-											file.filename,
-											path.scope,
-											property.key.name.toString(),
-											property.value as t.Expression,
-											false
-										);
-									}
-								} else {
-									property.value = modify.memberVal(property.value);
-								}
-							}
-						} else if (leftIsTracked) {
-							const rightIsDynamic = check.isDynamicExpression(property.value);
-							if (rightIsDynamic) {
-								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
-									file.filename,
-									path.scope,
-									property.value
-								);
-								if (fComputeParameters.length > 0) {
-									property.value = modify.dynamicExpressionInitComputeValues(
-										property.value,
-										fComputeParameters
-									);
-								} else if (!check.isFidanCallExpression(property.value))
-									property.value = modify.fidanValueInit(property.value);
-							} else if (
-								!check.isFidanCallExpression(property.value) &&
-								!check.isFidanElementFunction(property.value)
-							)
-								property.value = modify.fidanValueInit(property.value);
-						}
-					});
-				} catch (e) {
-					errorReport(e, path, file);
-				}
-			},
 			LogicalExpression(path: NodePath<t.LogicalExpression>, file) {
 				if (doNotTraverse) return;
 				try {
@@ -253,13 +188,52 @@ export default function () {
 					errorReport(e, path, file);
 				}
 			},
+			ObjectExpression(path: NodePath<t.ObjectExpression>, file) {
+				if (doNotTraverse) return;
+				try {
+					const isFidanObjectProperty = check.isFidanCall(path.node);
+					path.node.properties.forEach((property: t.ObjectProperty) => {
+						const leftIsTracked =
+							check.isTrackedVariable(path.scope, property.key) ||
+							check.isTrackedVariable(path.scope, property);
+						const rightIsTracked = check.isTrackedVariable(path.scope, property.value);
+						if (rightIsTracked) {
+							if (!leftIsTracked && !isFidanObjectProperty) {
+								property.value = modify.memberVal(property.value);
+							}
+						} else if (leftIsTracked) {
+							const rightIsDynamic = check.isDynamicExpression(property.value);
+							if (rightIsDynamic) {
+								const fComputeParameters = parameters.fidanComputeParametersInExpressionWithScopeFilter(
+									file.filename,
+									path.scope,
+									property.value
+								);
+								if (fComputeParameters.length > 0) {
+									property.value = modify.dynamicExpressionInitComputeValues(
+										property.value,
+										fComputeParameters
+									);
+								} else if (!check.isFidanCall(property.value))
+									property.value = modify.fidanValueInit(property.value);
+							} else if (
+								!check.isFidanCall(property.value) &&
+								!check.isFidanElementFunction(property.value)
+							)
+								property.value = modify.fidanValueInit(property.value);
+						}
+					});
+				} catch (e) {
+					errorReport(e, path, file);
+				}
+			},
 			CallExpression(path: NodePath<t.CallExpression>, file) {
 				if (doNotTraverse) return;
 				try {
 					if (
 						t.isMemberExpression(path.node.callee) &&
 						path.node.callee.property.name == 'createElement' &&
-						check.isFidanCall(path)
+						check.isFidanCall(path.node)
 					) {
 						const firstArgument = path.node.arguments[0];
 						const secondArgument: any = path.node.arguments.length > 1 ? path.node.arguments[1] : null;
@@ -298,12 +272,16 @@ export default function () {
 							path.node.callee.property.name =
 								'createElementBy' + jsxFactoryName[0].toUpperCase() + jsxFactoryName.substr(1);
 						}
+						const firstArgumentName = t.isIdentifier(firstArgument) ? firstArgument.name : t.isStringLiteral(firstArgument) ? firstArgument.value : null;
+						if (t.isObjectExpression(secondArgument) && !check.nameIsComponent(firstArgumentName)) {
+							modifyDom.fidanObjectExpression(path, secondArgument, file)
+						}
 					}
 
 					const contextArgumentIndex = found.findContextChildIndex(path.node.arguments);
 					if (contextArgumentIndex !== -1) {
 						modify.moveContextArguments(path.node.arguments, contextArgumentIndex);
-					} else if (!check.isFidanCall(path)) {
+					} else if (!check.isFidanCall(path.node)) {
 						const methodParams = found.callingMethodParams(path, file.filename);
 						// if (!methodParams || path.node.arguments.length !== methodParams.length) {
 						// 	// debugger;

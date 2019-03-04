@@ -22,7 +22,7 @@ var RUN_SINGLE_TEST = null;
 // RUN_SINGLE_TEST = 'class-property-1';
 // RUN_SINGLE_TEST = "class-name-fn-call-2"
 // RUN_SINGLE_TEST = "class-names-1"
-RUN_SINGLE_TEST = "attribute-call-import-2"
+// RUN_SINGLE_TEST = "attribute-call-import-2"
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve('../src');
