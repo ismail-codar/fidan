@@ -185,15 +185,28 @@ export default function () {
 							if (!leftIsTracked) {
 								if (isFidanObjectProperty) {
 									if (!check.isFidanCallExpression(path.parentPath.node)) {
+										if (rightIsTracked) {
+											property.value = modify.memberVal(property.value);
+										}
 										property = found.parentFidanProperty(path);
+										if (t.isObjectProperty(property)) {
+											property.value = modifyDom.attributeExpression(
+												file.filename,
+												path.scope,
+												property.key.name.toString(),
+												property.value as t.Expression,
+												false
+											);
+										}
+									} else {
+										property.value = modifyDom.attributeExpression(
+											file.filename,
+											path.scope,
+											property.key.name.toString(),
+											property.value as t.Expression,
+											false
+										);
 									}
-									property.value = modifyDom.attributeExpression(
-										file.filename,
-										path.scope,
-										property.key.name.toString(),
-										property.value as t.Expression,
-										false
-									);
 								} else {
 									property.value = modify.memberVal(property.value);
 								}
