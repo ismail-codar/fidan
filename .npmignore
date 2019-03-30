@@ -5,3 +5,4 @@ src
 spec
 packages
 node_modules
+tsconfig.json
