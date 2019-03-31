@@ -1,24 +1,6 @@
 import { FidanValue } from "./f";
 import { EventedArray } from "./evented-array";
 import { compute } from "./f";
-import { activateContext, deactivateContext } from "../src/context";
-
-export const conditionalElement = (
-  parentElement,
-  oldElement,
-  newElementFn: () => any
-) => {
-  parentElement["$props"] &&
-    activateContext(parentElement["$props"]["$context"]);
-  let newElement = newElementFn();
-  parentElement["$props"] &&
-    deactivateContext(parentElement["$props"]["$context"]);
-  if (newElement instanceof Node === false)
-    newElement = document.createTextNode(newElement || "");
-  if (oldElement) parentElement.replaceChild(newElement, oldElement);
-  else parentElement.appendChild(newElement);
-  return newElement;
-};
 
 export const insertToDom = (parentElement, index, itemElement) => {
   if (itemElement instanceof Function) itemElement(parentElement);

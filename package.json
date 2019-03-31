@@ -1,37 +1,38 @@
 {
-	"name": "@fidanjs/runtime",
-	"version": "0.0.3",
-	"description": "High performance and easy way for building web user interfaces.",
-	"scripts": {
-		"build": "copyfiles ./types/** ./build & microbundle --format cjs",
-		"local": "yarn build && yalc publish && yalc push",
-		"test": "jasmine-ts",
-		"dev": "microbundle watch"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "ISC",
-	"dependencies": {
-		"symbol-observable": "^1.2.0"
-	},
-	"devDependencies": {
-		"@babel/core": "^7.2.2",
-		"@starptech/prettyhtml": "^0.8.16",
-		"@types/babel-traverse": "^6.25.4",
-		"@types/jasmine": "^3.3.8",
-		"@types/node": "^10.12.24",
-		"babel-plugin-jsx-dom-expressions": "^0.3.12",
-		"babel-plugin-transform-react-jsx": "^6.24.1",
-		"basichtml": "^0.21.1",
-		"copyfiles": "^2.1.0",
-		"jasmine": "^3.3.1",
-		"jasmine-spec-reporter": "^4.2.1",
-		"jasmine-ts": "^0.3.0",
-		"microbundle": "^0.9.0",
-		"ts-node": "^8.0.2",
-		"typescript": "^3.3.3"
-	},
-	"main": "build/index.js",
-	"types": "build/index.d.ts",
-	"source": "src/index.ts"
+  "name": "@fidanjs/runtime",
+  "version": "0.0.3",
+  "description": "High performance and easy way for building web user interfaces.",
+  "scripts": {
+    "build-browser": "copyfiles ./types/** ./build & microbundle --format iife --name fidan --output build/browser.js --sourcemap false",
+    "build": "copyfiles ./types/** ./build & microbundle --format cjs",
+    "local": "yarn build && yarn build-browser && yalc publish && yalc push",
+    "test": "jasmine-ts",
+    "dev": "microbundle watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "symbol-observable": "^1.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@starptech/prettyhtml": "^0.8.16",
+    "@types/babel-traverse": "^6.25.4",
+    "@types/jasmine": "^3.3.8",
+    "@types/node": "^10.12.24",
+    "babel-plugin-jsx-dom-expressions": "^0.3.12",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "basichtml": "^0.21.1",
+    "copyfiles": "^2.1.0",
+    "jasmine": "^3.3.1",
+    "jasmine-spec-reporter": "^4.2.1",
+    "jasmine-ts": "^0.3.0",
+    "microbundle": "^0.9.0",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.3"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "source": "src/index.ts"
 }
