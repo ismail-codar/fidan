@@ -1,3 +1,4 @@
-import * as fidanObj from "./libs-browser";
-export const fidan = fidanObj;
-fidan["VERSION"] = "0.0.4";
+export * from "./f";
+export * from "./dom";
+export * from "./util";
+export * from "./html";
