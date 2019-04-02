@@ -30,7 +30,11 @@ const putCommentToTagStart = (
     let item = htm[i];
     let p = item.lastIndexOf("<");
     if (p !== -1) {
-      htm[i] = item.substr(0, p) + comment + item.substr(p);
+      htm[i] =
+        item.substr(0, p) + comment + item.substr(p, item.lastIndexOf(" ") - p);
+      if (htm[index + 1].substr(0, 1) === '"') {
+        htm[index + 1] = htm[index + 1].substr(1);
+      }
       break;
     }
   }
@@ -99,12 +103,20 @@ const updateNodesByCommentNodes = (element: Element, params: any[]) => {
 
   for (var i = 0; i < commentNodes.length; i++) {
     const commentNode = commentNodes[i];
-    const commentValue: string[] = commentNode.nodeValue.trim().split("_"); // TODO avoid split
+    var commentValue = commentNode.nodeValue;
     let element = null;
     let attributeName: string = null;
-    let paramIndex = parseInt(commentValue[2]);
+
+    let i1 = commentValue.indexOf("_") + 1;
+    var i2 = commentValue.indexOf("_", i1);
+    const commentType = parseInt(commentValue.substr(i1, i2 - i1));
+    i1 = commentValue.indexOf("_", i2) + 1;
+    i2 = commentValue.indexOf("_", i1);
+    if (i2 === -1) {
+      i2 = commentValue.indexOf(" ", i1);
+    }
+    let paramIndex = parseInt(commentValue.substr(i1, i2 - i1));
     let param = params[paramIndex];
-    const commentType = parseInt(commentValue[1]);
 
     if (commentType & COMMENT_TEXT_OR_DOM) {
       if (commentType === COMMENT_TEXT) {
@@ -122,7 +134,10 @@ const updateNodesByCommentNodes = (element: Element, params: any[]) => {
           }
         }
       } else if (commentType === COMMENT_DOM) {
-        attributeName = commentValue[3];
+        attributeName = commentValue.substr(
+          i2 + 1,
+          commentValue.length - i2 - 2
+        );
         element = commentNode.nextElementSibling;
       }
       if (attributeName.startsWith("on")) {
