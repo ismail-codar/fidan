@@ -9,6 +9,8 @@ export type ArrayMutableMethods =
   | "splice"
   | "unshift";
 
+// TODO concat vs..
+
 export function EventedArray(items) {
   var _self = this,
     _array = [],

@@ -26,7 +26,10 @@ export const arrayMap = (
   let parentRef: { parent: Node & ParentNode; next: Node } = null;
   oArr.on("beforemulti", function() {
     if (parentDom.parentNode) {
-      parentRef = { parent: parentDom, next: parentDom.nextSibling };
+      parentRef = {
+        parent: parentDom,
+        next: (parentDom as Element).nextElementSibling
+      };
       parentDom = document.createDocumentFragment();
     }
   });
