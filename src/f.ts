@@ -12,9 +12,9 @@ export const value = <T>(value?: T, freezed?: boolean): FidanValue<T> => {
   if (value && value["$val"] != undefined)
     throw "Fidan: Higher ordered signals is not supported.";
   const innerFn: any = (val?) => {
-    if (Array.isArray(val)) {
-      // TODO arrayler için compile time x.$val = y şeklinde tanımlama olmuş olmalı o zaman yukardaki innerFn gereksiz olur
-      // TODO https://github.com/WebReflection/majinbuu
+    if (val === undefined) {
+      return innerFn["$val"];
+    } else if (Array.isArray(val)) {
       innerFn["$val"].innerArray = val;
     } else innerFn["$val"] = val;
     const depends = innerFn["depends"];

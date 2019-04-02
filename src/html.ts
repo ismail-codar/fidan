@@ -1,6 +1,12 @@
 import { FidanValue, array, compute } from "./f";
 import { arrayMap } from "./dom";
 
+const COMMENT_TEXT = 1;
+const COMMENT_DOM = 2;
+const COMMENT_FN = 4;
+const COMMENT_HTM = 8;
+const COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
+
 const htmlProps = {
   id: true,
   nodeValue: true,
@@ -13,6 +19,7 @@ const htmlProps = {
 };
 
 let _templateMode = false;
+let template = document.createElement("template");
 
 const putCommentToTagStart = (
   htm: string[],
@@ -35,10 +42,11 @@ export const html = (...args) => {
   let attributeName: string = null;
   let i = 0;
 
-  htm.forEach((item, index) => {
+  for (var index = 0; index < htm.length; index++) {
+    let item = htm[index];
     const param = params[index];
     if (param === undefined) {
-      return item;
+      break;
     }
     const isDynamic = param.hasOwnProperty("$val");
     if (isDynamic) {
@@ -50,20 +58,19 @@ export const html = (...args) => {
       putCommentToTagStart(
         htm,
         index,
-        `<!-- cmt_dom_${index}_${attributeName} -->`
+        `<!-- cmt_${COMMENT_DOM}_${index}_${attributeName} -->`
       );
     } else {
       let commentType =
         typeof param === "function" && !isDynamic
-          ? "fn"
-          : param instanceof Node
-          ? "htm"
-          : "text";
+          ? COMMENT_FN
+          : typeof param === "object"
+          ? COMMENT_HTM
+          : COMMENT_TEXT;
       htm[index] = item + `<!-- cmt_${commentType}_${index} -->`;
     }
-  });
-
-  var template = document.createElement("template");
+  }
+  template = template.cloneNode(false) as HTMLTemplateElement;
   template.innerHTML = htm.join("");
   const element = template.content.firstElementChild;
   element["$params"] = params;
@@ -90,65 +97,64 @@ const updateNodesByCommentNodes = (element: Element, params: any[]) => {
   var commentNodes = [];
   while (treeWalker.nextNode()) commentNodes.push(treeWalker.currentNode);
 
-  commentNodes.forEach((commentNode: Element) => {
-    const commentValue: string[] = commentNode.nodeValue.trim().split("_");
-    if (commentValue[0] !== "cmt") {
-      return;
-    }
+  for (var i = 0; i < commentNodes.length; i++) {
+    const commentNode = commentNodes[i];
+    const commentValue: string[] = commentNode.nodeValue.trim().split("_"); // TODO avoid split
     let element = null;
     let attributeName: string = null;
-    let index = Number(commentValue[2]);
-    let param = params[index];
-    const commentType = commentValue[1];
-    if (commentType === "text") {
-      attributeName = "textContent";
-      element = document.createTextNode(param.$val);
-      commentNode.parentElement.insertBefore(element, commentNode.nextSibling);
-      if (!param.hasOwnProperty("$val")) {
-        if (Array.isArray(param)) {
-          param.forEach(item => {
-            commentNode.parentElement.appendChild(item);
-          });
-          return;
+    let paramIndex = parseInt(commentValue[2]);
+    let param = params[paramIndex];
+    const commentType = parseInt(commentValue[1]);
+
+    if (commentType & COMMENT_TEXT_OR_DOM) {
+      if (commentType === COMMENT_TEXT) {
+        attributeName = "textContent";
+        element = document.createTextNode(param.$val);
+        commentNode.parentElement.insertBefore(
+          element,
+          commentNode.nextSibling
+        );
+        if (!param.hasOwnProperty("$val")) {
+          if (Array.isArray(param)) {
+            for (var p = 0; p < param.length; p++) {
+              commentNode.parentElement.appendChild(param[p]);
+            }
+          }
+        }
+      } else if (commentType === COMMENT_DOM) {
+        attributeName = commentValue[3];
+        element = commentNode.nextElementSibling;
+      }
+      if (attributeName.startsWith("on")) {
+        (element as Element).addEventListener(attributeName.substr(2), param);
+      } else if (param.hasOwnProperty("$val")) {
+        if (htmlProps[attributeName]) {
+          compute(() => {
+            element[attributeName] = param.$val;
+          }, param);
+        } else {
+          compute(() => {
+            element.setAttribute(attributeName, param.$val);
+          }, param);
+        }
+      } else {
+        if (htmlProps[attributeName]) {
+          element[attributeName] = param;
+        } else {
+          element.setAttribute(attributeName, param);
         }
       }
-    } else if (commentType === "dom") {
-      attributeName = commentValue[3];
-      element = commentNode.nextElementSibling;
-    } else if (commentType === "fn") {
+    } else if (commentType === COMMENT_FN) {
       param(commentNode);
-      return;
-    } else if (commentType === "htm") {
+    } else if (commentType === COMMENT_HTM) {
       commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
-      return;
     }
-
-    if (attributeName.startsWith("on")) {
-      (element as Element).addEventListener(attributeName.substr(2), param);
-    } else if (param.hasOwnProperty("$val")) {
-      compute(
-        htmlProps[attributeName]
-          ? () => {
-              element[attributeName] = param.$val;
-            }
-          : () => {
-              element.setAttribute(attributeName, param.$val);
-            },
-        param
-      );
-    } else {
-      if (htmlProps[attributeName]) {
-        element[attributeName] = param;
-      } else {
-        element.setAttribute(attributeName, param);
-      }
-    }
-  });
+  }
 };
 
 export const htmlArrayMap = (
   arr: any[] | FidanValue<any[]>,
-  renderCallback: (data, rowIndex?: number) => any
+  renderCallback: (data: number) => any
 ) => {
   if (Array.isArray(arr)) {
     const oArray = array(arr);
@@ -170,11 +176,11 @@ export const htmlArrayMap = (
     let clonedNode = null;
     let params = null;
     let dataParamIndexes = {};
-    arrayMap(arr as any, element, (data, rowIndex) => {
+    const arrayMapFn = (data, rowIndex) => {
       let renderNode = null;
       if (clonedNode === null) {
         _templateMode = true;
-        renderNode = renderCallback(data, rowIndex);
+        renderNode = renderCallback(data);
         _templateMode = false;
         params = renderNode["$params"];
         for (var key in data) {
@@ -190,6 +196,7 @@ export const htmlArrayMap = (
       // TODO rowIndex in params
       updateNodesByCommentNodes(renderNode, params);
       return renderNode;
-    });
+    };
+    arrayMap(arr as any, element, arrayMapFn);
   };
 };

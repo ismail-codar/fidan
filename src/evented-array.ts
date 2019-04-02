@@ -217,7 +217,7 @@ export function EventedArray(items) {
     return _array;
   };
 
-  if (items instanceof Array) {
+  if (Array.isArray(items)) {
     _self.push.apply(_self, items);
   }
 }

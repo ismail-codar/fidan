@@ -3,23 +3,27 @@ import { EventedArray } from "./evented-array";
 import { compute } from "./f";
 
 export const insertToDom = (parentElement, index, itemElement) => {
-  if (itemElement instanceof Function) itemElement(parentElement);
-  else {
-    if (itemElement instanceof Node === false)
+  const typeOf = typeof itemElement;
+  if (typeOf === "function") {
+    itemElement(parentElement);
+  } else {
+    if (typeOf !== "object") {
       itemElement = document.createTextNode(itemElement);
+    }
     parentElement.insertBefore(itemElement, parentElement.children[index]);
   }
 };
 
 export const arrayMap = (
   arr: FidanValue<any[]>,
-  parentDom: Node,
+  parentDom: Node & ParentNode,
   renderReturn: (item: any, idx?: number, isInsert?: boolean) => void
 ) => {
   const oArr =
     arr.$val instanceof EventedArray ? arr.$val : new EventedArray(arr.$val);
+  const arrVal = arr.$val;
 
-  let parentRef: { parent: Node; next: Node } = null;
+  let parentRef: { parent: Node & ParentNode; next: Node } = null;
   oArr.on("beforemulti", function() {
     if (parentDom.parentNode) {
       parentRef = { parent: parentDom, next: parentDom.nextSibling };
@@ -49,19 +53,17 @@ export const arrayMap = (
   });
   arr(oArr);
 
-  const renderAll = () => {
-    if (arr.$val.length === 0) parentDom.textContent = "";
+  const arrayComputeRenderAll = () => {
+    if (arrVal.length === 0) parentDom.textContent = "";
     else {
       const parentFragment = document.createDocumentFragment();
       parentDom.textContent = "";
-      for (
-        var i = (parentDom as Element).childElementCount;
-        i < arr.$val.length;
-        i++
-      )
-        insertToDom(parentFragment, i, renderReturn(arr.$val[i], i));
+      for (var i = parentDom.childElementCount; i < arrVal.length; i++) {
+        insertToDom(parentFragment, i, renderReturn(arrVal[i], i));
+      }
       parentDom.appendChild(parentFragment);
     }
   };
-  compute(renderAll, arr);
+
+  compute(arrayComputeRenderAll, arr);
 };
