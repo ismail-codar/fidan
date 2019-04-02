@@ -56,10 +56,15 @@ export const arrayMap = (
   const arrayComputeRenderAll = () => {
     if (arrVal.length === 0) parentDom.textContent = "";
     else {
+      let itemElement = null;
       const parentFragment = document.createDocumentFragment();
       parentDom.textContent = "";
       for (var i = parentDom.childElementCount; i < arrVal.length; i++) {
-        insertToDom(parentFragment, i, renderReturn(arrVal[i], i));
+        itemElement = renderReturn(arrVal[i], i);
+        if (typeof itemElement !== "object") {
+          itemElement = document.createTextNode(itemElement);
+        }
+        parentFragment.insertBefore(itemElement, parentDom.children[i]);
       }
       parentDom.appendChild(parentFragment);
     }
