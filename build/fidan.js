@@ -385,10 +385,27 @@ var fidan = (function (exports) {
       },
       set: value$
     }); }else {
-      descr.set['depends'].push(value(function () {
+      descr.set["depends"].push(value(function () {
         value$(obj[propertyKey]);
       }));
     }
+  };
+  var jsRoot = function () {
+    var root;
+
+    if (typeof self !== "undefined") {
+      root = self;
+    } else if (typeof window !== "undefined") {
+      root = window;
+    } else if (typeof global !== "undefined") {
+      root = global;
+    } else if (typeof module !== "undefined") {
+      root = module;
+    } else {
+      root = Function("return this")();
+    }
+
+    return root;
   };
 
   var COMMENT_TEXT = 1;
@@ -625,6 +642,7 @@ var fidan = (function (exports) {
   exports.arrayMap = arrayMap;
   exports.setDefaults = setDefaults;
   exports.mapProperty = mapProperty;
+  exports.jsRoot = jsRoot;
   exports.html = html;
   exports.htmlArrayMap = htmlArrayMap;
 

@@ -13,9 +13,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "symbol-observable": "^1.2.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.2.2",
     "@starptech/prettyhtml": "^0.8.16",
