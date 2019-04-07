@@ -47,12 +47,12 @@ export const arrayMap = (
   oArr.on("itemset", function(e) {
     parentDom.replaceChild(
       renderReturn(e.item, e.index) as any,
-      parentDom.childNodes.item(e.index)
+      parentDom.children.item(e.index)
     );
   });
 
   oArr.on("itemremoved", function(e) {
-    parentDom.removeChild(parentDom.childNodes.item(e.index));
+    parentDom.removeChild(parentDom.children.item(e.index));
   });
   arr(oArr);
 

@@ -4,6 +4,5 @@
 yalc.lock
 yarn.lock
 TODO.md
-build
 dist
 node_modules

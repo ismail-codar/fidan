@@ -18,7 +18,7 @@ const htmlProps = {
   value: true
 };
 
-let _templateMode = false;
+let _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 let template = document.createElement("template");
 
 const putCommentToTagStart = (
@@ -30,11 +30,12 @@ const putCommentToTagStart = (
     let item = htm[i];
     let p = item.lastIndexOf("<");
     if (p !== -1) {
-      htm[i] =
-        item.substr(0, p) + comment + item.substr(p, item.lastIndexOf(" ") - p);
-      if (htm[index + 1].substr(0, 1) === '"') {
-        htm[index + 1] = htm[index + 1].substr(1);
-      }
+      htm[i] = item.substr(0, p) + comment + item.substr(p);
+      // htm[i] =
+      //   item.substr(0, p) + comment + item.substr(p, item.lastIndexOf(" ") - p);
+      // if (htm[index + 1].substr(0, 1) === '"') {
+      //   htm[index + 1] = htm[index + 1].substr(1);
+      // }
       break;
     }
   }
@@ -54,7 +55,10 @@ export const html = (...args) => {
     }
     const isDynamic = param.hasOwnProperty("$val");
     if (isDynamic) {
-      param["$index"] = index;
+      if (param["$indexes"] === undefined) {
+        param["$indexes"] = [];
+      }
+      param["$indexes"].push(index);
     }
     if (item.endsWith('="')) {
       i = item.lastIndexOf(" ") + 1;
@@ -76,7 +80,7 @@ export const html = (...args) => {
   }
   template = template.cloneNode(false) as HTMLTemplateElement;
   template.innerHTML = htm.join("");
-  const element = template.content.firstElementChild;
+  const element = template.content;
   element["$params"] = params;
   if (!_templateMode) {
     updateNodesByCommentNodes(element, params);
@@ -84,13 +88,13 @@ export const html = (...args) => {
   return element;
 };
 
-const updateNodesByCommentNodes = (element: Element, params: any[]) => {
+const walkForCommentNodes = (element, commentNodes) => {
   var treeWalker = document.createTreeWalker(
     element,
     NodeFilter.SHOW_COMMENT,
     {
       acceptNode: function(node) {
-        const nodeValue = node.nodeValue.trim();
+        var nodeValue = node.nodeValue.trim();
         return nodeValue.startsWith("cmt_")
           ? NodeFilter.FILTER_ACCEPT
           : NodeFilter.FILTER_REJECT;
@@ -98,8 +102,15 @@ const updateNodesByCommentNodes = (element: Element, params: any[]) => {
     },
     false
   );
+
+  while (treeWalker.nextNode()) {
+    commentNodes.push(treeWalker.currentNode);
+  }
+};
+
+const updateNodesByCommentNodes = (element: Node, params: any[]) => {
   var commentNodes = [];
-  while (treeWalker.nextNode()) commentNodes.push(treeWalker.currentNode);
+  walkForCommentNodes(element, commentNodes);
 
   for (var i = 0; i < commentNodes.length; i++) {
     const commentNode = commentNodes[i];
@@ -169,7 +180,8 @@ const updateNodesByCommentNodes = (element: Element, params: any[]) => {
 
 export const htmlArrayMap = (
   arr: any[] | FidanValue<any[]>,
-  renderCallback: (data: number) => any
+  renderCallback: (data: number) => any,
+  useCloneNode?: boolean
 ) => {
   if (Array.isArray(arr)) {
     const oArray = array(arr);
@@ -186,32 +198,41 @@ export const htmlArrayMap = (
     ].forEach(method => (arr[method] = oArray.$val[method]));
     arr = oArray;
   }
-  return (commentNode: Node) => {
-    const element = commentNode.parentElement;
-    let clonedNode = null;
-    let params = null;
-    let dataParamIndexes = {};
-    const arrayMapFn = (data, rowIndex) => {
-      let renderNode = null;
-      if (clonedNode === null) {
-        _templateMode = true;
-        renderNode = renderCallback(data);
-        _templateMode = false;
-        params = renderNode["$params"];
-        for (var key in data) {
-          dataParamIndexes[key] = data[key]["$index"];
+  if (useCloneNode) {
+    return (commentNode: Node) => {
+      const element = commentNode.parentElement;
+      let clonedNode = null;
+      let params = null;
+      let dataParamIndexes = [];
+      const arrayMapFn = (data, rowIndex) => {
+        let renderNode = null;
+        if (clonedNode === null) {
+          _templateMode = true;
+          renderNode = renderCallback(data);
+          _templateMode = false;
+          params = renderNode["$params"];
+          for (var key in data) {
+            const indexes = data[key]["$indexes"];
+            for (var i = 0; i < indexes.length; i++) {
+              dataParamIndexes.push(indexes[i], key);
+            }
+          }
+          clonedNode = renderNode.cloneNode(true);
+        } else {
+          renderNode = clonedNode.cloneNode(true);
         }
-        clonedNode = renderNode.cloneNode(true);
-      } else {
-        renderNode = clonedNode.cloneNode(true);
-      }
-      for (var key in dataParamIndexes) {
-        params[dataParamIndexes[key]] = data[key];
-      }
-      // TODO rowIndex in params
-      updateNodesByCommentNodes(renderNode, params);
-      return renderNode;
+        for (var i = 0; i < dataParamIndexes.length; i += 2) {
+          params[dataParamIndexes[i]] = data[dataParamIndexes[i + 1]];
+        }
+        updateNodesByCommentNodes(renderNode, params);
+        return renderNode;
+      };
+      arrayMap(arr as any, element, arrayMapFn);
     };
-    arrayMap(arr as any, element, arrayMapFn);
-  };
+  } else {
+    return function(commentNode) {
+      var element = commentNode.parentElement;
+      arrayMap(arr as any, element, renderCallback);
+    };
+  }
 };
