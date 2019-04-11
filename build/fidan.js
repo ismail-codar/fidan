@@ -227,21 +227,23 @@ var fidan = (function (exports) {
     }
   }
 
-  var value = function (value, freezed) {
-    if (value && value["$val"] != undefined) { throw "Fidan: Higher ordered signals is not supported."; }
+  var value = function (val, freezed) {
+    if (val && val["$val"] != undefined) { throw "Fidan: Higher ordered signals is not supported."; }
 
     var innerFn = function (val) {
       if (val === undefined) {
         return innerFn["$val"];
-      } else if (Array.isArray(val)) {
-        innerFn["$val"].innerArray = val;
-      } else { innerFn["$val"] = val; }
+      } else {
+        var depends = innerFn["depends"];
+        if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn["$val"])); } }
 
-      var depends = innerFn["depends"];
-      if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute()); } }
+        if (Array.isArray(val)) {
+          innerFn["$val"].innerArray = val;
+        } else { innerFn["$val"] = val; }
+      }
     };
 
-    innerFn["$val"] = value;
+    innerFn["$val"] = val;
     innerFn["freezed"] = freezed;
     innerFn["depends"] = [];
 
@@ -264,23 +266,24 @@ var fidan = (function (exports) {
   var off = function (arr, type, callback) {
     arr["$val"].off(type, callback);
   };
-  var compute = function (fn) {
-    var args = [], len = arguments.length - 1;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+  var compute = function (initial, fn) {
+    var args = [], len = arguments.length - 2;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
 
-    var compute = value();
-    compute["compute"] = fn;
+    var cmp = value();
+    cmp["compute"] = fn;
+    args.splice(0, 0, initial);
 
-    for (var i = 0; i < args.length; i++) { args[i]["depends"].push(compute); }
+    for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
 
-    fn();
+    fn(initial.$val);
   };
   var initCompute = function (fn) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
     var cValue = value(fn());
-    compute.apply(void 0, [ function () {
+    compute.apply(void 0, [ null, function () {
       cValue(fn());
     } ].concat( args ));
     return cValue;
@@ -302,6 +305,60 @@ var fidan = (function (exports) {
   var destroy = function (item) {
     delete item["compute"];
     delete item["depends"];
+  };
+
+  // https://github.com/Freak613/stage0/blob/master/reuseNodes.js
+  var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeNode, afterNode) {
+    if (data.length === 0) {
+      if (beforeNode !== undefined || afterNode !== undefined) {
+        var node = beforeNode !== undefined ? beforeNode.nextSibling : parent.firstChild,
+            tmp;
+        if (afterNode === undefined) { afterNode = null; }
+
+        while (node !== afterNode) {
+          tmp = node.nextSibling;
+          parent.removeChild(node);
+          node = tmp;
+        }
+      } else {
+        parent.textContent = "";
+      }
+
+      return;
+    }
+
+    if (renderedValues.length > data.length) {
+      var i = renderedValues.length,
+          tail = afterNode !== undefined ? afterNode.previousSibling : parent.lastChild,
+          tmp$1;
+
+      while (i > data.length) {
+        tmp$1 = tail.previousSibling;
+        parent.removeChild(tail);
+        tail = tmp$1;
+        i--;
+      }
+    }
+
+    var _head = beforeNode ? beforeNode.nextSibling : parent.firstChild;
+
+    if (_head === afterNode) { _head = undefined; }
+
+    var _mode = afterNode ? 1 : 0;
+
+    for (var i$1 = 0, item = (void 0), head = _head, mode = _mode; i$1 < data.length; i$1++) {
+      item = data[i$1];
+
+      if (head) {
+        noOp(item, renderedValues[i$1]);
+      } else {
+        head = createFn(item);
+        mode ? parent.insertBefore(head, afterNode) : parent.appendChild(head);
+      }
+
+      head = head.nextSibling;
+      if (head === afterNode) { head = null; }
+    }
   };
 
   var insertToDom = function (parentElement, index, itemElement) {
@@ -346,28 +403,28 @@ var fidan = (function (exports) {
       parentDom.removeChild(parentDom.children.item(e.index));
     });
     arr(oArr);
+    var firstRenderOnFragment = undefined;
 
-    var arrayComputeRenderAll = function () {
-      if (arrVal.length === 0) { parentDom.textContent = ""; }else {
-        var itemElement = null;
-        var parentFragment = document.createDocumentFragment();
-        parentDom.textContent = "";
-
-        for (var i = parentDom.childElementCount; i < arrVal.length; i++) {
-          itemElement = renderReturn(arrVal[i], i);
-
-          if (typeof itemElement !== "object") {
-            itemElement = document.createTextNode(itemElement);
+    var arrayComputeRenderAll = function (nextVal) {
+      if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0) { firstRenderOnFragment = document.createDocumentFragment(); }
+      reuseNodes(firstRenderOnFragment || parentDom, arrVal["innerArray"], nextVal || [], function (nextItem) {
+        return renderReturn(nextItem);
+      }, function (nextItem, prevItem) {
+        for (var key in nextItem) {
+          if (prevItem[key].hasOwnProperty("$val")) {
+            nextItem[key].depends = prevItem[key].depends;
+            prevItem[key](nextItem[key]());
           }
-
-          parentFragment.insertBefore(itemElement, parentDom.children[i]);
         }
+      });
 
-        parentDom.appendChild(parentFragment);
+      if (firstRenderOnFragment) {
+        parentDom.appendChild(firstRenderOnFragment);
+        firstRenderOnFragment = null;
       }
     };
 
-    compute(arrayComputeRenderAll, arr);
+    compute(arr, arrayComputeRenderAll);
   };
 
   var setDefaults = function (obj, defaults) {
@@ -550,13 +607,13 @@ var fidan = (function (exports) {
           element$1.addEventListener(attributeName.substr(2), param);
         } else if (param.hasOwnProperty("$val")) {
           if (htmlProps[attributeName]) {
-            compute(function () {
-              element$1[attributeName] = param.$val;
-            }, param);
+            compute(param, function (val) {
+              element$1[attributeName] = val;
+            });
           } else {
-            compute(function () {
-              element$1.setAttribute(attributeName, param.$val);
-            }, param);
+            compute(param, function (val) {
+              element$1.setAttribute(attributeName, val);
+            });
           }
         } else {
           if (htmlProps[attributeName]) {

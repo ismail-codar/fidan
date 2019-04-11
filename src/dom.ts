@@ -1,6 +1,7 @@
 import { FidanValue } from "./f";
 import { EventedArray } from "./evented-array";
 import { compute } from "./f";
+import { reuseNodes } from "./reuse-nodes";
 
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;
@@ -56,22 +57,31 @@ export const arrayMap = (
   });
   arr(oArr);
 
-  const arrayComputeRenderAll = () => {
-    if (arrVal.length === 0) parentDom.textContent = "";
-    else {
-      let itemElement = null;
-      const parentFragment = document.createDocumentFragment();
-      parentDom.textContent = "";
-      for (var i = parentDom.childElementCount; i < arrVal.length; i++) {
-        itemElement = renderReturn(arrVal[i], i);
-        if (typeof itemElement !== "object") {
-          itemElement = document.createTextNode(itemElement);
+  let firstRenderOnFragment = undefined;
+  const arrayComputeRenderAll = function(nextVal) {
+    if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0)
+      firstRenderOnFragment = document.createDocumentFragment();
+    reuseNodes(
+      firstRenderOnFragment || parentDom,
+      arrVal["innerArray"],
+      nextVal || [],
+      nextItem => {
+        return renderReturn(nextItem);
+      },
+      (nextItem, prevItem) => {
+        for (var key in nextItem) {
+          if (prevItem[key].hasOwnProperty("$val")) {
+            nextItem[key].depends = prevItem[key].depends;
+            prevItem[key](nextItem[key]());
+          }
         }
-        parentFragment.insertBefore(itemElement, parentDom.children[i]);
       }
-      parentDom.appendChild(parentFragment);
+    );
+    if (firstRenderOnFragment) {
+      parentDom.appendChild(firstRenderOnFragment);
+      firstRenderOnFragment = null;
     }
   };
 
-  compute(arrayComputeRenderAll, arr);
+  compute(arr, arrayComputeRenderAll);
 };
