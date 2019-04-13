@@ -1,6 +1,6 @@
 import { FidanValue } from "./f";
 import { EventedArray } from "./evented-array";
-import { compute } from "./f";
+import { computeBy } from "./f";
 import { reuseNodes } from "./reuse-nodes";
 
 export const insertToDom = (parentElement, index, itemElement) => {
@@ -83,5 +83,5 @@ export const arrayMap = (
     }
   };
 
-  compute(arr, arrayComputeRenderAll);
+  computeBy(arr, arrayComputeRenderAll);
 };

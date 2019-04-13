@@ -266,7 +266,7 @@ var fidan = (function (exports) {
   var off = function (arr, type, callback) {
     arr["$val"].off(type, callback);
   };
-  var compute = function (initial, fn) {
+  var computeBy = function (initial, fn) {
     var args = [], len = arguments.length - 2;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
 
@@ -277,31 +277,37 @@ var fidan = (function (exports) {
     for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
 
     fn(initial.$val);
+    return cmp;
   };
-  var initCompute = function (fn) {
+  var compute = function (fn) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
-    var cValue = value(fn());
-    compute.apply(void 0, [ null, function () {
-      cValue(fn());
-    } ].concat( args ));
-    return cValue;
-  }; // TODO typedCompute, typedValue ...
+    var cmp = value();
+    cmp["compute"] = fn;
 
-  var computeReturn = function (fn) {
-    var args = [], len = arguments.length - 1;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+    for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
 
-    return initCompute.apply(void 0, [ fn ].concat( args ));
-  };
-  var setCompute = function (prev, fn) {
-    var args = [], len = arguments.length - 2;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
+    fn();
+  }; // export const initCompute = (fn: () => any, ...args: any[]) => {
+  //   const cValue = value(fn());
+  //   compute(
+  //     null,
+  //     () => {
+  //       cValue(fn());
+  //     },
+  //     ...args
+  //   );
+  //   return cValue;
+  // };
+  // TODO typedCompute, typedValue ...
+  // export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>
+  //   initCompute(fn, ...args) as any;
+  // export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
+  //   destroy(prev);
+  //   return initCompute(prev, fn, ...args);
+  // };
 
-    destroy(prev);
-    return initCompute.apply(void 0, [ prev, fn ].concat( args ));
-  };
   var destroy = function (item) {
     delete item["compute"];
     delete item["depends"];
@@ -424,7 +430,7 @@ var fidan = (function (exports) {
       }
     };
 
-    compute(arr, arrayComputeRenderAll);
+    computeBy(arr, arrayComputeRenderAll);
   };
 
   var setDefaults = function (obj, defaults) {
@@ -607,11 +613,11 @@ var fidan = (function (exports) {
           element$1.addEventListener(attributeName.substr(2), param);
         } else if (param.hasOwnProperty("$val")) {
           if (htmlProps[attributeName]) {
-            compute(param, function (val) {
+            computeBy(param, function (val) {
               element$1[attributeName] = val;
             });
           } else {
-            compute(param, function (val) {
+            computeBy(param, function (val) {
               element$1.setAttribute(attributeName, val);
             });
           }
@@ -690,10 +696,8 @@ var fidan = (function (exports) {
   exports.array = array;
   exports.on = on;
   exports.off = off;
+  exports.computeBy = computeBy;
   exports.compute = compute;
-  exports.initCompute = initCompute;
-  exports.computeReturn = computeReturn;
-  exports.setCompute = setCompute;
   exports.destroy = destroy;
   exports.insertToDom = insertToDom;
   exports.arrayMap = arrayMap;

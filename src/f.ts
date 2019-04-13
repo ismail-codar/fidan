@@ -67,7 +67,7 @@ export const off = (
   arr["$val"].off(type, callback);
 };
 
-export const compute = <T>(
+export const computeBy = <T>(
   initial: FidanValue<T>,
   fn: (current, prev?) => void,
   ...args: any[]
@@ -77,28 +77,36 @@ export const compute = <T>(
   args.splice(0, 0, initial);
   for (var i = 0; i < args.length; i++) args[i]["depends"].push(cmp);
   fn(initial.$val);
+  return cmp;
 };
 
-export const initCompute = (fn: () => any, ...args: any[]) => {
-  const cValue = value(fn());
-  compute(
-    null,
-    () => {
-      cValue(fn());
-    },
-    ...args
-  );
-  return cValue;
+export const compute = <T>(fn: () => void, ...args: any[]) => {
+  var cmp = value();
+  cmp["compute"] = fn;
+  for (var i = 0; i < args.length; i++) args[i]["depends"].push(cmp);
+  fn();
 };
+
+// export const initCompute = (fn: () => any, ...args: any[]) => {
+//   const cValue = value(fn());
+//   compute(
+//     null,
+//     () => {
+//       cValue(fn());
+//     },
+//     ...args
+//   );
+//   return cValue;
+// };
 
 // TODO typedCompute, typedValue ...
-export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>
-  initCompute(fn, ...args) as any;
+// export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>
+//   initCompute(fn, ...args) as any;
 
-export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
-  destroy(prev);
-  return initCompute(prev, fn, ...args);
-};
+// export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
+//   destroy(prev);
+//   return initCompute(prev, fn, ...args);
+// };
 
 export const destroy = (item: any) => {
   delete item["compute"];
