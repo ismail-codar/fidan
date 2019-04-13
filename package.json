@@ -19,8 +19,7 @@
     "@starptech/prettyhtml": "^0.8.17",
     "@types/babel-traverse": "^6.25.5",
     "@types/jasmine": "^3.3.12",
-    "@types/node": "^11.13.0",
-    "babel-plugin-jsx-dom-expressions": "^0.6.0",
+    "@types/node": "^11.13.4",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "basichtml": "^0.22.0",
     "copyfiles": "^2.1.0",
@@ -29,7 +28,7 @@
     "jasmine-ts": "^0.3.0",
     "microbundle": "^0.11.0",
     "ts-node": "^8.0.3",
-    "typescript": "^3.4.2"
+    "typescript": "^3.4.3"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",

@@ -1,11 +1,11 @@
 fidan.createElement(
-	'div',
-	{
-		className: function(element) {
-			fidan.compute(function() {
-				element.className = d.id === state.selected.$val ? 'danger' : '';
-			}, state.selected);
-		}
-	},
-	'test'
+  "div",
+  {
+    className: function _(element) {
+      fidan.compute(function _2() {
+        element.className = d.id === state.selected.$val ? "danger" : "";
+      }, state.selected);
+    }
+  },
+  "test"
 );

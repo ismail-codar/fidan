@@ -21,7 +21,7 @@ export declare const off: (arr: any[], type: FidanArrayEventType, callback: (e: 
     item: any;
     index: number;
 }) => void) => void;
-export declare const compute: <T>(initial: FidanValue<T>, fn: (nextVal: any, prevVal?: any) => void, ...args: any[]) => void;
+export declare const compute: <T>(initial: FidanValue<T>, fn: (current: any, prev?: any) => void, ...args: any[]) => void;
 export declare const initCompute: (fn: () => any, ...args: any[]) => FidanValue<any>;
 export declare const computeReturn: <T>(fn: () => T, ...args: any[]) => T;
 export declare const setCompute: (prev: any, fn: () => void, ...args: any[]) => FidanValue<any>;

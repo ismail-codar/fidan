@@ -1,12 +1,12 @@
-var selectedClass$ = fidan.value('danger');
+var selectedClass$ = fidan.value("danger");
 fidan.createElement(
-	'div',
-	{
-		className: function(element) {
-			fidan.compute(function() {
-				element.className = 'none' === selectedClass$.$val ? 'danger' : '';
-			}, selectedClass$);
-		}
-	},
-	'test'
+  "div",
+  {
+    className: function _(element) {
+      fidan.compute(function _2() {
+        element.className = "none" === selectedClass$.$val ? "danger" : "";
+      }, selectedClass$);
+    }
+  },
+  "test"
 );

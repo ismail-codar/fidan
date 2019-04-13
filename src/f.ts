@@ -69,7 +69,7 @@ export const off = (
 
 export const compute = <T>(
   initial: FidanValue<T>,
-  fn: (nextVal, prevVal?) => void,
+  fn: (current, prev?) => void,
   ...args: any[]
 ) => {
   var cmp = value();
