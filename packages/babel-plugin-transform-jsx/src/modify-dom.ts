@@ -49,26 +49,55 @@ const attributeExpression = (
   if (attributeName === "dangerouslySetInnerHTML") {
     attributeName = "innerHTML";
   }
-  const fdCurrVal = t.identifier("fd_curr_val");
-  statements.push(
-    t.expressionStatement(
-      t.callExpression(
-        t.memberExpression(t.identifier("fidan"), t.identifier("computeBy")),
-        [
-          expression,
-          t.functionExpression(
-            t.identifier(""),
-            [fdCurrVal, t.identifier("fd_prev_val")],
-            t.blockStatement([
-              t.expressionStatement(
-                assignSetAttributeExpression(attributeName, fdCurrVal, setAttr)
-              )
-            ])
-          )
-        ].concat(fComputeParameters)
+  if (check.isFidanName(expression)) {
+    const fdCurrVal = t.identifier("fd_curr_val");
+    statements.push(
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier("fidan"), t.identifier("computeBy")),
+          [
+            expression,
+            t.functionExpression(
+              t.identifier(""),
+              [fdCurrVal, t.identifier("fd_prev_val")],
+              t.blockStatement([
+                t.expressionStatement(
+                  assignSetAttributeExpression(
+                    attributeName,
+                    fdCurrVal,
+                    setAttr
+                  )
+                )
+              ])
+            )
+          ].concat(fComputeParameters)
+        )
       )
-    )
-  );
+    );
+  } else {
+    statements.push(
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier("fidan"), t.identifier("compute")),
+          [
+            t.functionExpression(
+              t.identifier(""),
+              [],
+              t.blockStatement([
+                t.expressionStatement(
+                  assignSetAttributeExpression(
+                    attributeName,
+                    expression,
+                    setAttr
+                  )
+                )
+              ])
+            )
+          ].concat(fComputeParameters)
+        )
+      )
+    );
+  }
 
   return t.functionExpression(
     t.identifier(""),

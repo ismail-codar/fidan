@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/babel-plugin-transform-jsx",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "fidan jsx compiler",
   "main": "build/index.js",
   "scripts": {

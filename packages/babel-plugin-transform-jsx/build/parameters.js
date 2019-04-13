@@ -7,11 +7,11 @@ const traverse_1 = require("@babel/traverse");
 const found_1 = require("./found");
 const listIncludes = (list, item) => {
     var itemCode = generator_1.default(item).code;
-    if (itemCode.endsWith('.$val'))
+    if (itemCode.endsWith(".$val"))
         itemCode = itemCode.substr(0, itemCode.length - 5);
-    return (list.find((listItem) => {
+    return (list.find(listItem => {
         var listItemCode = generator_1.default(listItem).code;
-        if (listItemCode.endsWith('.$val'))
+        if (listItemCode.endsWith(".$val"))
             listItemCode = listItemCode.substr(0, listItemCode.length - 5);
         return itemCode === listItemCode;
     }) != undefined);
@@ -30,7 +30,7 @@ const fidanComputeParametersInExpression = (fileName, scope, expression, list) =
     }
     else if (t.isMemberExpression(expression)) {
         if (t.isIdentifier(expression.property)) {
-            if (expression.property.name === '$val') {
+            if (expression.property.name === "$val") {
                 const objectValue = expression;
                 if (!listIncludes(list, objectValue))
                     listAddWithControl(scope, objectValue, list);
@@ -54,7 +54,9 @@ const fidanComputeParametersInExpression = (fileName, scope, expression, list) =
     else if (t.isUnaryExpression(expression))
         fidanComputeParametersInExpression(fileName, scope, expression.argument, list);
     else if (t.isCallExpression(expression)) {
-        const methodName = t.isIdentifier(expression.callee) ? expression.callee.name : null;
+        const methodName = t.isIdentifier(expression.callee)
+            ? expression.callee.name
+            : null;
         if (methodName) {
             let variableBinding = found_1.found.variableBindingInScope(scope, methodName);
             if (variableBinding) {
@@ -68,7 +70,7 @@ const fidanComputeParametersInExpression = (fileName, scope, expression, list) =
                         t.isFunctionDeclaration(nodeOrInit))
                         checkFunctionBody(expression.arguments, nodeOrInit.params, scope, nodeOrInit.body, list);
                     else
-                        throw 'ERROR: is not isFunctionExpression || isArrowFunctionExpression else ... not implemented -> ' +
+                        throw "ERROR: is not isFunctionExpression || isArrowFunctionExpression else ... not implemented -> " +
                             variableBinding.path.node.type;
                 }
                 else if (t.isImportSpecifier(variableBinding.path.node) ||
@@ -84,7 +86,7 @@ const fidanComputeParametersInExpression = (fileName, scope, expression, list) =
                     // });
                 }
                 else
-                    throw 'ERROR: t.isVariableDeclarator(variableBinding.path.node) else ... not implemented -> ' +
+                    throw "ERROR: t.isVariableDeclarator(variableBinding.path.node) else ... not implemented -> " +
                         variableBinding.path.node.type;
             }
         }
@@ -104,11 +106,11 @@ const fidanComputeParametersInExpression = (fileName, scope, expression, list) =
     // }
 };
 const checkFunctionExpression = (fileName, scope, expression, list) => {
-    expression.body.body.forEach((statement) => {
+    expression.body.body.forEach(statement => {
         if (t.isReturnStatement(statement))
             fidanComputeParametersInExpression(fileName, scope, statement.argument, list);
         else {
-            throw 'ERROR: checkFunctionExpression -> ' + expression.type;
+            throw "ERROR: checkFunctionExpression -> " + expression.type;
         }
     });
 };
@@ -119,9 +121,11 @@ const checkFunctionBody = (args, params, scope, body, list) => {
             //props.xxx
             if (t.isIdentifier(path.node.object)) {
                 const searchName = path.node.object.name;
-                const argument = args[params.findIndex((p) => t.isIdentifier(p) && p.name == searchName)];
+                const argument = args[params.findIndex(p => t.isIdentifier(p) && p.name == searchName)];
                 let listItem = null;
-                if (argument && t.isIdentifier(argument) && check_1.check.isTrackedVariable(scope, path.node.property)) {
+                if (argument &&
+                    t.isIdentifier(argument) &&
+                    check_1.check.isTrackedVariable(scope, path.node.property)) {
                     listItem = t.memberExpression(argument, path.node.property);
                 }
                 else if (check_1.check.isTrackedVariable(scope, path.node.object)) {
@@ -158,13 +162,13 @@ const checkLogicalExpression = (fileName, scope, expression, list) => {
     fidanComputeParametersInExpression(fileName, scope, expression.right, list);
 };
 const checkExpressionList = (fileName, scope, argumentList, list) => {
-    argumentList.forEach((arg) => {
+    argumentList.forEach(arg => {
         if (t.isExpression(arg))
             fidanComputeParametersInExpression(fileName, scope, arg, list);
         else if (t.isObjectProperty(arg))
             fidanComputeParametersInExpression(fileName, scope, arg.value, list);
         else
-            throw 'ERROR: not implemented argument type in checkExpressionList';
+            throw "ERROR: not implemented argument type in checkExpressionList";
     });
 };
 // TODO make obsolete
