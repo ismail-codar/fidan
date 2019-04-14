@@ -48,8 +48,8 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
     if (val === undefined) {
       return innerFn["$next"];
     } else {
-      if (Array.isArray(val)) {
-        innerFn["$next"].innerArray = val;
+      if (Array.isArray(val) || innerFn["$next"] instanceof EventedArray) {
+        innerFn["$next"].innerArray = val["slice"](0);
       } else {
         innerFn["$next"] = val;
       }
@@ -59,13 +59,19 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
         for (var i = 0; i < depends.length; i++)
           !depends[i]["freezed"] &&
             depends[i](depends[i].compute(val, innerFn));
-      if (Array.isArray(val)) {
-        innerFn["$val"].innerArray = val;
+      if (Array.isArray(val) || val instanceof EventedArray) {
+        innerFn["$val"].innerArray = val["slice"](0);
       } else innerFn["$val"] = val;
     }
   };
-  innerFn["$next"] = val;
-  innerFn["$val"] = val;
+
+  if (Array.isArray(val) || innerFn["$val"] instanceof EventedArray) {
+    innerFn["$next"] = val["slice"](0);
+    innerFn["$val"] = val["slice"](0);
+  } else {
+    innerFn["$next"] = val;
+    innerFn["$val"] = val;
+  }
   innerFn["freezed"] = freezed;
 
   innerFn["depends"] = [];

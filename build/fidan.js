@@ -169,6 +169,10 @@ var fidan = (function (exports) {
       return removed;
     };
 
+    _self.slice = function (start, end) {
+      return new EventedArray(_array.slice(start, end));
+    };
+
     Object.defineProperty(_self, "length", {
       configurable: false,
       enumerable: false,
@@ -247,8 +251,8 @@ var fidan = (function (exports) {
       if (val === undefined) {
         return innerFn["$next"];
       } else {
-        if (Array.isArray(val)) {
-          innerFn["$next"].innerArray = val;
+        if (Array.isArray(val) || innerFn["$next"] instanceof EventedArray) {
+          innerFn["$next"].innerArray = val["slice"](0);
         } else {
           innerFn["$next"] = val;
         }
@@ -256,14 +260,20 @@ var fidan = (function (exports) {
         var depends = innerFn["depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn)); } }
 
-        if (Array.isArray(val)) {
-          innerFn["$val"].innerArray = val;
+        if (Array.isArray(val) || val instanceof EventedArray) {
+          innerFn["$val"].innerArray = val["slice"](0);
         } else { innerFn["$val"] = val; }
       }
     };
 
-    innerFn["$next"] = val;
-    innerFn["$val"] = val;
+    if (Array.isArray(val) || innerFn["$val"] instanceof EventedArray) {
+      innerFn["$next"] = val["slice"](0);
+      innerFn["$val"] = val["slice"](0);
+    } else {
+      innerFn["$next"] = val;
+      innerFn["$val"] = val;
+    }
+
     innerFn["freezed"] = freezed;
     innerFn["depends"] = [];
 
@@ -362,6 +372,293 @@ var fidan = (function (exports) {
     }
   };
 
+  // https://github.com/Freak613/stage0/blob/master/reconcile.js
+  var reconcile = function (parent, renderedValues, data, createFn, noOp, beforeNode, afterNode) {
+    // Fast path for clear
+    if (data.length === 0) {
+      if (beforeNode !== undefined || afterNode !== undefined) {
+        var node = beforeNode !== undefined ? beforeNode.nextSibling : parent.firstChild,
+            tmp;
+        if (afterNode === undefined) { afterNode = null; }
+
+        while (node !== afterNode) {
+          tmp = node.nextSibling;
+          parent.removeChild(node);
+          node = tmp;
+        }
+      } else {
+        parent.textContent = "";
+      }
+
+      return;
+    }
+
+    debugger; // Fast path for create
+
+    if (renderedValues.length === 0) {
+      var node$1,
+          mode = afterNode !== undefined ? 1 : 0;
+
+      for (var i = 0, len = data.length; i < len; i++) {
+        node$1 = createFn(data[i]);
+        mode ? parent.insertBefore(node$1, afterNode) : parent.appendChild(node$1);
+      }
+
+      return;
+    }
+
+    var prevStart = 0,
+        newStart = 0,
+        loop = true,
+        prevEnd = renderedValues.length - 1,
+        newEnd = data.length - 1,
+        a,
+        b,
+        prevStartNode = beforeNode ? beforeNode.nextSibling : parent.firstChild,
+        newStartNode = prevStartNode,
+        prevEndNode = afterNode ? afterNode.previousSibling : parent.lastChild,
+        newEndNode = prevEndNode;
+
+    fixes: while (loop) {
+      loop = false;
+
+      var _node = (void 0); // Skip prefix
+
+
+      a = renderedValues[prevStart], b = data[newStart];
+
+      while (a === b) {
+        noOp(b, a);
+        prevStart++;
+        newStart++;
+        newStartNode = prevStartNode = prevStartNode.nextSibling;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevStart];
+        b = data[newStart];
+      } // Skip suffix
+
+
+      a = renderedValues[prevEnd], b = data[newEnd];
+
+      while (a === b) {
+        noOp(b, a);
+        prevEnd--;
+        newEnd--;
+        afterNode = prevEndNode;
+        newEndNode = prevEndNode = prevEndNode.previousSibling;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevEnd];
+        b = data[newEnd];
+      } // Fast path to swap backward
+
+
+      a = renderedValues[prevEnd], b = data[newStart];
+
+      while (a === b) {
+        loop = true;
+        noOp(b, a);
+        _node = prevEndNode.previousSibling;
+        parent.insertBefore(prevEndNode, newStartNode);
+        newEndNode = prevEndNode = _node;
+        newStart++;
+        prevEnd--;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevEnd];
+        b = data[newStart];
+      } // Fast path to swap forward
+
+
+      a = renderedValues[prevStart], b = data[newEnd];
+
+      while (a === b) {
+        loop = true;
+        noOp(b, a);
+        _node = prevStartNode.nextSibling;
+        parent.insertBefore(prevStartNode, afterNode);
+        prevStart++;
+        afterNode = newEndNode = prevStartNode;
+        prevStartNode = _node;
+        newEnd--;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevStart];
+        b = data[newEnd];
+      }
+    } // Fast path for shrink
+
+
+    if (newEnd < newStart) {
+      if (prevStart <= prevEnd) {
+        var next;
+
+        while (prevStart <= prevEnd) {
+          if (prevEnd === 0) {
+            parent.removeChild(prevEndNode);
+          } else {
+            next = prevEndNode.previousSibling;
+            parent.removeChild(prevEndNode);
+            prevEndNode = next;
+          }
+
+          prevEnd--;
+        }
+      }
+
+      return;
+    } // Fast path for add
+
+
+    if (prevEnd < prevStart) {
+      if (newStart <= newEnd) {
+        var node$2,
+            mode$1 = afterNode ? 1 : 0;
+
+        while (newStart <= newEnd) {
+          node$2 = createFn(data[newStart]);
+          mode$1 ? parent.insertBefore(node$2, afterNode) : parent.appendChild(node$2);
+          newStart++;
+        }
+      }
+
+      return;
+    } // Positions for reusing nodes from current DOM state
+
+
+    var P = new Array(newEnd + 1 - newStart);
+
+    for (var i$1 = newStart; i$1 <= newEnd; i$1++) { P[i$1] = -1; } // Index to resolve position from current to new
+
+
+    var I = new Map();
+
+    for (var i$2 = newStart; i$2 <= newEnd; i$2++) { I.set(data[i$2], i$2); }
+
+    var reusingNodes = newStart + data.length - 1 - newEnd,
+        toRemove = [];
+
+    for (var i$3 = prevStart; i$3 <= prevEnd; i$3++) {
+      if (I.has(renderedValues[i$3])) {
+        P[I.get(renderedValues[i$3])] = i$3;
+        reusingNodes++;
+      } else {
+        toRemove.push(i$3);
+      }
+    } // Fast path for full replace
+
+
+    if (reusingNodes === 0) {
+      if (beforeNode !== undefined || afterNode !== undefined) {
+        var node$3 = beforeNode !== undefined ? beforeNode.nextSibling : parent.firstChild,
+            tmp$1;
+        if (afterNode === undefined) { afterNode = null; }
+
+        while (node$3 !== afterNode) {
+          tmp$1 = node$3.nextSibling;
+          parent.removeChild(node$3);
+          node$3 = tmp$1;
+          prevStart++;
+        }
+      } else {
+        parent.textContent = "";
+      }
+
+      var node$4,
+          mode$2 = afterNode ? 1 : 0;
+
+      for (var i$4 = newStart; i$4 <= newEnd; i$4++) {
+        node$4 = createFn(data[i$4]);
+        mode$2 ? parent.insertBefore(node$4, afterNode) : parent.appendChild(node$4);
+      }
+
+      return;
+    } // What else?
+
+
+    var longestSeq = longestPositiveIncreasingSubsequence(P, newStart); // Collect nodes to work with them
+
+    var nodes = [];
+    var tmpC = prevStartNode;
+
+    for (var i$5 = prevStart; i$5 <= prevEnd; i$5++) {
+      nodes[i$5] = tmpC;
+      tmpC = tmpC.nextSibling;
+    }
+
+    for (var i$6 = 0; i$6 < toRemove.length; i$6++) { parent.removeChild(nodes[toRemove[i$6]]); }
+
+    var lisIdx = longestSeq.length - 1,
+        tmpD;
+
+    for (var i$7 = newEnd; i$7 >= newStart; i$7--) {
+      if (longestSeq[lisIdx] === i$7) {
+        afterNode = nodes[P[longestSeq[lisIdx]]];
+        noOp(data[i$7], renderedValues[i$7]);
+        lisIdx--;
+      } else {
+        if (P[i$7] === -1) {
+          tmpD = createFn(data[i$7]);
+        } else {
+          tmpD = nodes[P[i$7]];
+          noOp(data[i$7], renderedValues[i$7]);
+        }
+
+        parent.insertBefore(tmpD, afterNode);
+        afterNode = tmpD;
+      }
+    }
+  };
+  // https://github.com/adamhaile/surplus/blob/master/src/runtime/content.ts#L368
+  // return an array of the indices of ns that comprise the longest increasing subsequence within ns
+
+  function longestPositiveIncreasingSubsequence(ns, newStart) {
+    var seq = [],
+        is = [],
+        l = -1,
+        pre = new Array(ns.length);
+
+    for (var i = newStart, len = ns.length; i < len; i++) {
+      var n = ns[i];
+      if (n < 0) { continue; }
+      var j = findGreatestIndexLEQ(seq, n);
+      if (j !== -1) { pre[i] = is[j]; }
+
+      if (j === l) {
+        l++;
+        seq[l] = n;
+        is[l] = i;
+      } else if (n < seq[j + 1]) {
+        seq[j + 1] = n;
+        is[j + 1] = i;
+      }
+    }
+
+    for (i = is[l]; l >= 0; i = pre[i], l--) {
+      seq[l] = i;
+    }
+
+    return seq;
+  }
+
+  function findGreatestIndexLEQ(seq, n) {
+    // invariant: lo is guaranteed to be index of a value <= n, hi to be >
+    // therefore, they actually start out of range: (-1, last + 1)
+    var lo = -1,
+        hi = seq.length; // fast path for simple increasing sequences
+
+    if (hi > 0 && seq[hi - 1] <= n) { return hi - 1; }
+
+    while (hi - lo > 1) {
+      var mid = Math.floor((lo + hi) / 2);
+
+      if (seq[mid] > n) {
+        hi = mid;
+      } else {
+        lo = mid;
+      }
+    }
+
+    return lo;
+  }
+
   var insertToDom = function (parentElement, index, itemElement) {
     var typeOf = typeof itemElement;
 
@@ -375,7 +672,7 @@ var fidan = (function (exports) {
       parentElement.insertBefore(itemElement, parentElement.children[index]);
     }
   };
-  var arrayMap = function (arr, parentDom, renderReturn) {
+  var arrayMap = function (arr, parentDom, renderReturn, renderMode) {
     var oArr = arr.$val instanceof EventedArray ? arr.$val : new EventedArray(arr.$val);
     var arrVal = arr.$val;
     var parentRef = null;
@@ -407,21 +704,35 @@ var fidan = (function (exports) {
     var firstRenderOnFragment = undefined;
 
     var arrayComputeRenderAll = function (nextVal) {
-      if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0) { firstRenderOnFragment = document.createDocumentFragment(); }
-      reuseNodes(firstRenderOnFragment || parentDom, arrVal["innerArray"], nextVal || [], function (nextItem) {
-        return renderReturn(nextItem);
-      }, function (nextItem, prevItem) {
-        for (var key in nextItem) {
-          if (prevItem[key].hasOwnProperty("$val")) {
-            nextItem[key].depends = prevItem[key].depends;
-            prevItem[key](nextItem[key]());
-          }
-        }
-      });
+      if (!renderMode) {
+        var parentFragment = document.createDocumentFragment();
+        parentDom.textContent = "";
 
-      if (firstRenderOnFragment) {
-        parentDom.appendChild(firstRenderOnFragment);
-        firstRenderOnFragment = null;
+        for (var i = 0; i < arr.$val.length; i++) {
+          insertToDom(parentFragment, i, renderReturn(arr.$val[i], i));
+        }
+
+        parentDom.appendChild(parentFragment);
+      } else {
+        if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0) { firstRenderOnFragment = document.createDocumentFragment(); }
+        var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
+        debugger;
+        renderFunction(parentDom, // firstRenderOnFragment || parentDom
+        arrVal["innerArray"], nextVal || [], function (nextItem) {
+          return renderReturn(nextItem);
+        }, function (nextItem, prevItem) {
+          for (var key in nextItem) {
+            if (prevItem[key].hasOwnProperty("$val")) {
+              nextItem[key].depends = prevItem[key].depends;
+              prevItem[key](nextItem[key]());
+            }
+          }
+        });
+
+        if (firstRenderOnFragment) {
+          parentDom.appendChild(firstRenderOnFragment);
+          firstRenderOnFragment = null;
+        }
       }
     };
 
@@ -633,7 +944,12 @@ var fidan = (function (exports) {
     for (var i = 0; i < commentNodes.length; i++) loop( i );
   };
 
-  var htmlArrayMap = function (arr, renderCallback, useCloneNode) {
+  var htmlArrayMap = function (arr, renderCallback, options) {
+    if ( options === void 0 ) options = {
+    useCloneNode: true,
+    renderMode: "reuse"
+  };
+
     // if (Array.isArray(arr)) {
     //   const oArray = array(arr);
     //   [
@@ -649,7 +965,7 @@ var fidan = (function (exports) {
     //   ].forEach(method => (arr[method] = oArray.$val[method]));
     //   arr = oArray;
     // }
-    if (useCloneNode) {
+    if (options.useCloneNode) {
       return function (commentNode) {
         var element = commentNode.parentElement;
         var clonedNode = null;
@@ -686,7 +1002,7 @@ var fidan = (function (exports) {
           return renderNode;
         };
 
-        arrayMap(arr, element, arrayMapFn);
+        arrayMap(arr, element, arrayMapFn, options.renderMode);
       };
     } else {
       return function (commentNode) {

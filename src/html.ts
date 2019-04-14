@@ -181,7 +181,13 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
 export const htmlArrayMap = <T>(
   arr: FidanValue<T[]>,
   renderCallback: (data: T) => DocumentFragment,
-  useCloneNode?: boolean
+  options: {
+    useCloneNode: true;
+    renderMode?: "reuse" | "reconcile";
+  } = {
+    useCloneNode: true,
+    renderMode: "reuse"
+  }
 ) => {
   // if (Array.isArray(arr)) {
   //   const oArray = array(arr);
@@ -198,7 +204,7 @@ export const htmlArrayMap = <T>(
   //   ].forEach(method => (arr[method] = oArray.$val[method]));
   //   arr = oArray;
   // }
-  if (useCloneNode) {
+  if (options.useCloneNode) {
     return (commentNode: Node) => {
       const element = commentNode.parentElement;
       let clonedNode = null;
@@ -227,7 +233,7 @@ export const htmlArrayMap = <T>(
         updateNodesByCommentNodes(renderNode, params);
         return renderNode;
       };
-      arrayMap(arr, element, arrayMapFn);
+      arrayMap(arr, element, arrayMapFn, options.renderMode);
     };
   } else {
     return function(commentNode) {

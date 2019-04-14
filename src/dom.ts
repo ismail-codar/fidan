@@ -2,6 +2,7 @@ import { FidanValue } from "./f";
 import { EventedArray } from "./evented-array";
 import { computeBy } from "./f";
 import { reuseNodes } from "./reuse-nodes";
+import reconcile from "./reconcile";
 
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;
@@ -18,7 +19,8 @@ export const insertToDom = (parentElement, index, itemElement) => {
 export const arrayMap = <T>(
   arr: FidanValue<T[]>,
   parentDom: Node & ParentNode,
-  renderReturn: (item: any, idx?: number, isInsert?: boolean) => void
+  renderReturn: (item: any, idx?: number, isInsert?: boolean) => void,
+  renderMode?: "reuse" | "reconcile"
 ) => {
   const oArr =
     arr.$val instanceof EventedArray ? arr.$val : new EventedArray(arr.$val);
@@ -59,27 +61,46 @@ export const arrayMap = <T>(
 
   let firstRenderOnFragment = undefined;
   const arrayComputeRenderAll = function(nextVal) {
-    if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0)
-      firstRenderOnFragment = document.createDocumentFragment();
-    reuseNodes(
-      firstRenderOnFragment || parentDom,
-      arrVal["innerArray"],
-      nextVal || [],
-      nextItem => {
-        return renderReturn(nextItem);
-      },
-      (nextItem, prevItem) => {
-        for (var key in nextItem) {
-          if (prevItem[key].hasOwnProperty("$val")) {
-            nextItem[key].depends = prevItem[key].depends;
-            prevItem[key](nextItem[key]());
+    if (!renderMode) {
+      const parentFragment = document.createDocumentFragment();
+      parentDom.textContent = "";
+      for (var i = 0; i < arr.$val.length; i++) {
+        insertToDom(parentFragment, i, renderReturn(arr.$val[i], i));
+      }
+      parentDom.appendChild(parentFragment);
+    } else {
+      if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0)
+        firstRenderOnFragment = document.createDocumentFragment();
+      let renderFunction: (
+        parent,
+        renderedValues,
+        data,
+        createFn,
+        noOp,
+        beforeNode?,
+        afterNode?
+      ) => void = renderMode === "reconcile" ? reconcile : reuseNodes;
+      debugger;
+      renderFunction(
+        parentDom, // firstRenderOnFragment || parentDom
+        arrVal["innerArray"],
+        nextVal || [],
+        nextItem => {
+          return renderReturn(nextItem);
+        },
+        (nextItem, prevItem) => {
+          for (var key in nextItem) {
+            if (prevItem[key].hasOwnProperty("$val")) {
+              nextItem[key].depends = prevItem[key].depends;
+              prevItem[key](nextItem[key]());
+            }
           }
         }
+      );
+      if (firstRenderOnFragment) {
+        parentDom.appendChild(firstRenderOnFragment);
+        firstRenderOnFragment = null;
       }
-    );
-    if (firstRenderOnFragment) {
-      parentDom.appendChild(firstRenderOnFragment);
-      firstRenderOnFragment = null;
     }
   };
 

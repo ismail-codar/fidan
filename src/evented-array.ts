@@ -167,6 +167,10 @@ export function EventedArray(items) {
     return removed;
   };
 
+  _self.slice = (start?, end?) => {
+    return new EventedArray(_array.slice(start, end));
+  };
+
   Object.defineProperty(_self, "length", {
     configurable: false,
     enumerable: false,
