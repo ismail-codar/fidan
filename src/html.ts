@@ -182,11 +182,11 @@ export const htmlArrayMap = <T>(
   arr: FidanValue<T[]>,
   renderCallback: (data: T) => DocumentFragment,
   options: {
-    useCloneNode: true;
+    useCloneNode: boolean;
     renderMode?: "reuse" | "reconcile";
   } = {
-    useCloneNode: true,
-    renderMode: "reuse"
+    useCloneNode: false,
+    renderMode: undefined
   }
 ) => {
   // if (Array.isArray(arr)) {
@@ -210,7 +210,7 @@ export const htmlArrayMap = <T>(
       let clonedNode = null;
       let params = null;
       let dataParamIndexes = [];
-      const arrayMapFn = (data, rowIndex) => {
+      const arrayMapFn = data => {
         let renderNode = null;
         if (clonedNode === null) {
           _templateMode = true;
@@ -219,9 +219,10 @@ export const htmlArrayMap = <T>(
           params = renderNode["$params"];
           for (var key in data) {
             const indexes = data[key]["$indexes"];
-            for (var i = 0; i < indexes.length; i++) {
-              dataParamIndexes.push(indexes[i], key);
-            }
+            if (indexes)
+              for (var i = 0; i < indexes.length; i++) {
+                dataParamIndexes.push(indexes[i], key);
+              }
           }
           clonedNode = renderNode.cloneNode(true);
         } else {

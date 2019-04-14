@@ -946,8 +946,8 @@ var fidan = (function (exports) {
 
   var htmlArrayMap = function (arr, renderCallback, options) {
     if ( options === void 0 ) options = {
-    useCloneNode: true,
-    renderMode: "reuse"
+    useCloneNode: false,
+    renderMode: undefined
   };
 
     // if (Array.isArray(arr)) {
@@ -972,7 +972,7 @@ var fidan = (function (exports) {
         var params = null;
         var dataParamIndexes = [];
 
-        var arrayMapFn = function (data, rowIndex) {
+        var arrayMapFn = function (data) {
           var renderNode = null;
 
           if (clonedNode === null) {
@@ -983,10 +983,9 @@ var fidan = (function (exports) {
 
             for (var key in data) {
               var indexes = data[key]["$indexes"];
-
-              for (var i = 0; i < indexes.length; i++) {
+              if (indexes) { for (var i = 0; i < indexes.length; i++) {
                 dataParamIndexes.push(indexes[i], key);
-              }
+              } }
             }
 
             clonedNode = renderNode.cloneNode(true);
