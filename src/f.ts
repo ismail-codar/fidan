@@ -8,31 +8,6 @@ export interface FidanValue<T> {
 
 export type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved";
 
-export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
-  if (val && val["$val"] != undefined)
-    throw "Fidan: Higher ordered signals is not supported.";
-  const innerFn: any = (val?) => {
-    if (val === undefined) {
-      return innerFn["$val"];
-    } else {
-      const depends = innerFn["depends"];
-      if (depends.length)
-        for (var i = 0; i < depends.length; i++)
-          !depends[i]["freezed"] &&
-            depends[i](depends[i].compute(val, innerFn["$val"]));
-      if (Array.isArray(val)) {
-        innerFn["$val"].innerArray = val;
-      } else innerFn["$val"] = val;
-    }
-  };
-  innerFn["$val"] = val;
-  innerFn["freezed"] = freezed;
-
-  innerFn["depends"] = [];
-  innerFn.toString = innerFn.toJSON = () => innerFn["$val"].toString();
-  return innerFn;
-};
-
 export const array = <T>(
   items: T[]
 ): {
@@ -67,37 +42,61 @@ export const off = (
   arr["$val"].off(type, callback);
 };
 
+export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
+  if (val && val["$val"] != undefined)
+    throw "Fidan: Higher ordered signals is not supported.";
+  const innerFn: any = (val?) => {
+    if (val === undefined) {
+      return innerFn["$next"];
+    } else {
+      if (Array.isArray(val)) {
+        innerFn["$next"].innerArray = val;
+      } else {
+        innerFn["$next"] = val;
+      }
+
+      const depends = innerFn["depends"];
+      if (depends.length)
+        for (var i = 0; i < depends.length; i++)
+          !depends[i]["freezed"] &&
+            depends[i](depends[i].compute(val, innerFn));
+      if (Array.isArray(val)) {
+        innerFn["$val"].innerArray = val;
+      } else innerFn["$val"] = val;
+    }
+  };
+  innerFn["$next"] = val;
+  innerFn["$val"] = val;
+  innerFn["freezed"] = freezed;
+
+  innerFn["depends"] = [];
+  innerFn.toString = innerFn.toJSON = () => innerFn["$val"].toString();
+  return innerFn;
+};
+
 export const computeBy = <T>(
   initial: FidanValue<T>,
-  fn: (current, prev?) => void,
+  fn: (nextValue?, changedItem?) => void,
   ...args: any[]
 ) => {
-  var cmp = value();
+  var cmp = value(undefined);
   cmp["compute"] = fn;
+  cmp(fn(initial.$val, cmp));
   args.splice(0, 0, initial);
   for (var i = 0; i < args.length; i++) args[i]["depends"].push(cmp);
-  fn(initial.$val);
   return cmp;
 };
 
-export const compute = <T>(fn: () => void, ...args: any[]) => {
-  var cmp = value();
+export const compute = <T>(
+  fn: (nextValue?, changedItem?) => void,
+  ...args: any[]
+) => {
+  const cmp = value(undefined);
   cmp["compute"] = fn;
+  cmp(fn(undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["depends"].push(cmp);
-  fn();
+  return cmp;
 };
-
-// export const initCompute = (fn: () => any, ...args: any[]) => {
-//   const cValue = value(fn());
-//   compute(
-//     null,
-//     () => {
-//       cValue(fn());
-//     },
-//     ...args
-//   );
-//   return cValue;
-// };
 
 // TODO typedCompute, typedValue ...
 // export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>

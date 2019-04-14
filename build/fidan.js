@@ -227,30 +227,6 @@ var fidan = (function (exports) {
     }
   }
 
-  var value = function (val, freezed) {
-    if (val && val["$val"] != undefined) { throw "Fidan: Higher ordered signals is not supported."; }
-
-    var innerFn = function (val) {
-      if (val === undefined) {
-        return innerFn["$val"];
-      } else {
-        var depends = innerFn["depends"];
-        if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn["$val"])); } }
-
-        if (Array.isArray(val)) {
-          innerFn["$val"].innerArray = val;
-        } else { innerFn["$val"] = val; }
-      }
-    };
-
-    innerFn["$val"] = val;
-    innerFn["freezed"] = freezed;
-    innerFn["depends"] = [];
-
-    innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toString(); };
-
-    return innerFn;
-  };
   var array = function (items) {
     var arr = value(new EventedArray(items));
     arr.on = arr.$val.on;
@@ -266,41 +242,62 @@ var fidan = (function (exports) {
   var off = function (arr, type, callback) {
     arr["$val"].off(type, callback);
   };
+  var value = function (val, freezed) {
+    if (val && val["$val"] != undefined) { throw "Fidan: Higher ordered signals is not supported."; }
+
+    var innerFn = function (val) {
+      if (val === undefined) {
+        return innerFn["$next"];
+      } else {
+        if (Array.isArray(val)) {
+          innerFn["$next"].innerArray = val;
+        } else {
+          innerFn["$next"] = val;
+        }
+
+        var depends = innerFn["depends"];
+        if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn)); } }
+
+        if (Array.isArray(val)) {
+          innerFn["$val"].innerArray = val;
+        } else { innerFn["$val"] = val; }
+      }
+    };
+
+    innerFn["$next"] = val;
+    innerFn["$val"] = val;
+    innerFn["freezed"] = freezed;
+    innerFn["depends"] = [];
+
+    innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toString(); };
+
+    return innerFn;
+  };
   var computeBy = function (initial, fn) {
     var args = [], len = arguments.length - 2;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
 
-    var cmp = value();
+    var cmp = value(undefined);
     cmp["compute"] = fn;
+    cmp(fn(initial.$val, cmp));
     args.splice(0, 0, initial);
 
     for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
 
-    fn(initial.$val);
     return cmp;
   };
   var compute = function (fn) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
-    var cmp = value();
+    var cmp = value(undefined);
     cmp["compute"] = fn;
+    cmp(fn(undefined, cmp));
 
     for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
 
-    fn();
-  }; // export const initCompute = (fn: () => any, ...args: any[]) => {
-  //   const cValue = value(fn());
-  //   compute(
-  //     null,
-  //     () => {
-  //       cValue(fn());
-  //     },
-  //     ...args
-  //   );
-  //   return cValue;
-  // };
-  // TODO typedCompute, typedValue ...
+    return cmp;
+  }; // TODO typedCompute, typedValue ...
   // export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>
   //   initCompute(fn, ...args) as any;
   // export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
@@ -615,11 +612,11 @@ var fidan = (function (exports) {
           if (htmlProps[attributeName]) {
             computeBy(param, function (val) {
               element$1[attributeName] = val;
-            });
+            })["name$"] = "[" + attributeName + "]";
           } else {
             computeBy(param, function (val) {
               element$1.setAttribute(attributeName, val);
-            });
+            })["name$"] = "attr(" + attributeName + ")";
           }
         } else {
           if (htmlProps[attributeName]) {
@@ -692,10 +689,10 @@ var fidan = (function (exports) {
     }
   };
 
-  exports.value = value;
   exports.array = array;
   exports.on = on;
   exports.off = off;
+  exports.value = value;
   exports.computeBy = computeBy;
   exports.compute = compute;
   exports.destroy = destroy;

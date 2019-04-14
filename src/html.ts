@@ -157,11 +157,11 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         if (htmlProps[attributeName]) {
           computeBy(param, val => {
             element[attributeName] = val;
-          });
+          })["name$"] = "[" + attributeName + "]";
         } else {
           computeBy(param, val => {
             element.setAttribute(attributeName, val);
-          });
+          })["name$"] = "attr(" + attributeName + ")";
         }
       } else {
         if (htmlProps[attributeName]) {

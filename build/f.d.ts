@@ -4,7 +4,6 @@ export interface FidanValue<T> {
     freezed: boolean;
 }
 export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved";
-export declare const value: <T>(val?: T, freezed?: boolean) => FidanValue<T>;
 export declare const array: <T>(items: T[]) => {
     on?: (type: FidanArrayEventType, callback: (e: {
         item: T;
@@ -21,6 +20,7 @@ export declare const off: (arr: any[], type: FidanArrayEventType, callback: (e: 
     item: any;
     index: number;
 }) => void) => void;
-export declare const computeBy: <T>(initial: FidanValue<T>, fn: (current: any, prev?: any) => void, ...args: any[]) => FidanValue<{}>;
-export declare const compute: <T>(fn: () => void, ...args: any[]) => void;
+export declare const value: <T>(val?: T, freezed?: boolean) => FidanValue<T>;
+export declare const computeBy: <T>(initial: FidanValue<T>, fn: (nextValue?: any, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;
+export declare const compute: <T>(fn: (nextValue?: any, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;
 export declare const destroy: (item: any) => void;
