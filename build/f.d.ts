@@ -1,6 +1,7 @@
 export interface FidanValue<T> {
-    (val: T): void;
+    (val?: T): T;
     readonly $val: T;
+    readonly $next: T;
     freezed: boolean;
 }
 export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved";

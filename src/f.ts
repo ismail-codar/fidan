@@ -1,8 +1,9 @@
 import { EventedArray } from "./evented-array";
 
 export interface FidanValue<T> {
-  (val: T): void;
+  (val?: T): T;
   readonly $val: T;
+  readonly $next: T;
   freezed: boolean;
 }
 
@@ -43,8 +44,6 @@ export const off = (
 };
 
 export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
-  if (val && val["$val"] != undefined)
-    throw "Fidan: Higher ordered signals is not supported.";
   const innerFn: any = (val?) => {
     if (val === undefined) {
       return innerFn["$next"];

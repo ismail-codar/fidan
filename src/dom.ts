@@ -15,8 +15,8 @@ export const insertToDom = (parentElement, index, itemElement) => {
   }
 };
 
-export const arrayMap = (
-  arr: FidanValue<any[]>,
+export const arrayMap = <T>(
+  arr: FidanValue<T[]>,
   parentDom: Node & ParentNode,
   renderReturn: (item: any, idx?: number, isInsert?: boolean) => void
 ) => {

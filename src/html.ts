@@ -178,26 +178,26 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
   }
 };
 
-export const htmlArrayMap = (
-  arr: any[] | FidanValue<any[]>,
-  renderCallback: (data: number) => any,
+export const htmlArrayMap = <T>(
+  arr: FidanValue<T[]>,
+  renderCallback: (data: T) => DocumentFragment,
   useCloneNode?: boolean
 ) => {
-  if (Array.isArray(arr)) {
-    const oArray = array(arr);
-    [
-      "copyWithin",
-      "fill",
-      "pop",
-      "push",
-      "reverse",
-      "shift",
-      "sort",
-      "splice",
-      "unshift"
-    ].forEach(method => (arr[method] = oArray.$val[method]));
-    arr = oArray;
-  }
+  // if (Array.isArray(arr)) {
+  //   const oArray = array(arr);
+  //   [
+  //     "copyWithin",
+  //     "fill",
+  //     "pop",
+  //     "push",
+  //     "reverse",
+  //     "shift",
+  //     "sort",
+  //     "splice",
+  //     "unshift"
+  //   ].forEach(method => (arr[method] = oArray.$val[method]));
+  //   arr = oArray;
+  // }
   if (useCloneNode) {
     return (commentNode: Node) => {
       const element = commentNode.parentElement;
@@ -227,7 +227,7 @@ export const htmlArrayMap = (
         updateNodesByCommentNodes(renderNode, params);
         return renderNode;
       };
-      arrayMap(arr as any, element, arrayMapFn);
+      arrayMap(arr, element, arrayMapFn);
     };
   } else {
     return function(commentNode) {

@@ -243,8 +243,6 @@ var fidan = (function (exports) {
     arr["$val"].off(type, callback);
   };
   var value = function (val, freezed) {
-    if (val && val["$val"] != undefined) { throw "Fidan: Higher ordered signals is not supported."; }
-
     var innerFn = function (val) {
       if (val === undefined) {
         return innerFn["$next"];
@@ -636,12 +634,21 @@ var fidan = (function (exports) {
   };
 
   var htmlArrayMap = function (arr, renderCallback, useCloneNode) {
-    if (Array.isArray(arr)) {
-      var oArray = array(arr);
-      ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) { return arr[method] = oArray.$val[method]; });
-      arr = oArray;
-    }
-
+    // if (Array.isArray(arr)) {
+    //   const oArray = array(arr);
+    //   [
+    //     "copyWithin",
+    //     "fill",
+    //     "pop",
+    //     "push",
+    //     "reverse",
+    //     "shift",
+    //     "sort",
+    //     "splice",
+    //     "unshift"
+    //   ].forEach(method => (arr[method] = oArray.$val[method]));
+    //   arr = oArray;
+    // }
     if (useCloneNode) {
       return function (commentNode) {
         var element = commentNode.parentElement;
