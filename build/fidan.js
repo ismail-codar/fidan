@@ -247,13 +247,23 @@ var fidan = (function (exports) {
     arr["$val"].off(type, callback);
   };
 
-  var cloneObject = function (val) {
-    if (val === null) { return null; }
+  var setClonedValue = function (innerFn, prop, val) {
+    debugger;
 
-    if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
-      return val["slice"](0);
+    if (typeof val === "object") {
+      if (val === null) {
+        innerFn[prop] = null;
+      } else if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
+        if (!innerFn[prop]) {
+          innerFn[prop] = val.slice(0);
+        } else {
+          innerFn[prop].innerArray = val.slice(0);
+        }
+      } else {
+        innerFn[prop] = Object.assign({}, val);
+      }
     } else {
-      return Object.assign({}, val);
+      innerFn[prop] = val;
     }
   };
 
@@ -262,29 +272,21 @@ var fidan = (function (exports) {
       if (val === undefined) {
         return innerFn["$next"];
       } else {
-        if (typeof val === "object") {
-          innerFn["$next"].innerArray = cloneObject(val);
-        } else {
-          innerFn["$next"] = val;
+        setClonedValue(innerFn, "$next", val);
+        var depends = innerFn["depends"];
+
+        if (depends.length) {
+          for (var i = 0; i < depends.length; i++) {
+            !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn));
+          }
         }
 
-        var depends = innerFn["depends"];
-        if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn)); } }
-
-        if (typeof val === "object") {
-          innerFn["$val"].innerArray = cloneObject(val);
-        } else { innerFn["$val"] = val; }
+        setClonedValue(innerFn, "$val", val);
       }
     };
 
-    if (typeof val === "object") {
-      innerFn["$next"] = cloneObject(val);
-      innerFn["$val"] = cloneObject(val);
-    } else {
-      innerFn["$next"] = val;
-      innerFn["$val"] = val;
-    }
-
+    setClonedValue(innerFn, "$next", val);
+    setClonedValue(innerFn, "$val", val);
     innerFn["freezed"] = freezed;
     innerFn["depends"] = [];
 
