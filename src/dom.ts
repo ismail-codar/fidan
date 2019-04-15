@@ -1,4 +1,4 @@
-import { FidanValue } from "./f";
+import { FidanValue, FidanArray } from "./f";
 import { EventedArray } from "./evented-array";
 import { computeBy } from "./f";
 import { reuseNodes } from "./reuse-nodes";
@@ -17,17 +17,13 @@ export const insertToDom = (parentElement, index, itemElement) => {
 };
 
 export const arrayMap = <T>(
-  arr: FidanValue<T[]>,
+  arr: FidanArray<T[]>,
   parentDom: Node & ParentNode,
   renderReturn: (item: any, idx?: number, isInsert?: boolean) => void,
   renderMode?: "reuse" | "reconcile"
 ) => {
-  const oArr =
-    arr.$val instanceof EventedArray ? arr.$val : new EventedArray(arr.$val);
-  const arrVal = arr.$val;
-
   let parentRef: { parent: Node & ParentNode; next: Node } = null;
-  oArr.on("beforemulti", function() {
+  arr.$val.on("beforemulti", function() {
     if (parentDom.parentNode) {
       parentRef = {
         parent: parentDom,
@@ -36,28 +32,27 @@ export const arrayMap = <T>(
       parentDom = document.createDocumentFragment();
     }
   });
-  oArr.on("aftermulti", function() {
+  arr.$val.on("aftermulti", function() {
     if (parentRef) {
       parentRef.parent.insertBefore(parentDom, parentRef.next);
       parentDom = parentRef.parent;
     }
   });
 
-  oArr.on("itemadded", function(e) {
+  arr.$val.on("itemadded", function(e) {
     insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
   });
 
-  oArr.on("itemset", function(e) {
+  arr.$val.on("itemset", function(e) {
     parentDom.replaceChild(
       renderReturn(e.item, e.index) as any,
       parentDom.children.item(e.index)
     );
   });
 
-  oArr.on("itemremoved", function(e) {
+  arr.$val.on("itemremoved", function(e) {
     parentDom.removeChild(parentDom.children.item(e.index));
   });
-  arr(oArr);
 
   let firstRenderOnFragment = undefined;
   const arrayComputeRenderAll = function(nextVal) {
@@ -83,7 +78,7 @@ export const arrayMap = <T>(
       debugger;
       renderFunction(
         parentDom, // firstRenderOnFragment || parentDom
-        arrVal["innerArray"],
+        arr.$val.innerArray,
         nextVal || [],
         nextItem => {
           return renderReturn(nextItem);

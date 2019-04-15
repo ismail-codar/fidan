@@ -7,21 +7,29 @@ export interface FidanValue<T> {
   freezed: boolean;
 }
 
-export type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved";
+export type FidanArrayEventType =
+  | "itemadded"
+  | "itemset"
+  | "itemremoved"
+  | "beforemulti"
+  | "aftermulti";
 
-export const array = <T>(
-  items: T[]
-): {
-  on?: (
-    type: FidanArrayEventType,
-    callback: (e: { item: T; index: number }) => void
-  ) => void;
-  removeEventListener?: (type: FidanArrayEventType) => void;
-  $val: T[];
-} & FidanValue<T[]> => {
+export interface EventedArrayReturnType<T> {
+  on: any;
+  off: any;
+  innerArray: T[];
+  setEventsFrom: (val: EventedArrayReturnType<T>) => void;
+}
+
+export interface FidanArray<T> {
+  (val?: T[]): T[] & EventedArrayReturnType<T>;
+  readonly $val: T[] & EventedArrayReturnType<T>;
+  readonly $next: T[] & EventedArrayReturnType<T>;
+  freezed: boolean;
+}
+
+export const array = <T>(items: T[]): FidanArray<T[]> => {
   const arr = value(new EventedArray(items)) as any;
-  arr.on = arr.$val.on;
-  arr.off = arr.$val.off;
   arr.toJSON = () => arr.$val.innerArray;
 
   return arr;
@@ -43,22 +51,32 @@ export const off = (
   arr["$val"].off(type, callback);
 };
 
-const setClonedValue = (innerFn, prop: string, val) => {
-  debugger;
-  if (typeof val === "object") {
-    if (val === null) {
-      innerFn[prop] = null;
-    } else if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
-      if (!innerFn[prop]) {
-        innerFn[prop] = val.slice(0);
+const setInnerValue = (innerFn, prop: string, val) => {
+  if (val == null) {
+    innerFn[prop] = val;
+  } else {
+    if (!innerFn[prop]) {
+      if (Array.isArray(val)) {
+        innerFn[prop] = new EventedArray(val.slice(0));
+      } else if (val.hasOwnProperty("innerArray")) {
+        const arr = new EventedArray(
+          val.innerArray.slice(0)
+        ) as EventedArrayReturnType<any>;
+        arr.setEventsFrom(val);
+        innerFn[prop] = arr;
       } else {
-        innerFn[prop].innerArray = val.slice(0);
+        innerFn[prop] = val;
       }
     } else {
-      innerFn[prop] = Object.assign({}, val);
+      if (Array.isArray(val)) {
+        innerFn[prop].innerArray = val.slice(0);
+      } else if (val.hasOwnProperty("innerArray")) {
+        innerFn[prop].innerArray = val.innerArray.slice(0);
+        innerFn[prop].setEventsFrom(val);
+      } else {
+        innerFn[prop] = val;
+      }
     }
-  } else {
-    innerFn[prop] = val;
   }
 };
 
@@ -67,22 +85,21 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
     if (val === undefined) {
       return innerFn["$next"];
     } else {
-      setClonedValue(innerFn, "$next", val);
+      setInnerValue(innerFn, "$next", val);
       const depends = innerFn["depends"];
       if (depends.length) {
         for (var i = 0; i < depends.length; i++) {
           !depends[i]["freezed"] &&
-            depends[i](depends[i].compute(val, innerFn));
+            depends[i](depends[i].compute(val, innerFn["$val"], innerFn));
         }
       }
-      setClonedValue(innerFn, "$val", val);
+      innerFn["$val"] = val;
     }
   };
 
-  setClonedValue(innerFn, "$next", val);
-  setClonedValue(innerFn, "$val", val);
+  innerFn["$val"] = val;
+  setInnerValue(innerFn, "$next", val);
   innerFn["freezed"] = freezed;
-
   innerFn["depends"] = [];
   innerFn.toString = innerFn.toJSON = () => innerFn["$val"].toString();
   return innerFn;
@@ -90,7 +107,7 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
 
 export const computeBy = <T>(
   initial: FidanValue<T>,
-  fn: (nextValue?, changedItem?) => void,
+  fn: (nextValue?, prevValue?, changedItem?) => void,
   ...args: any[]
 ) => {
   var cmp = value(undefined);

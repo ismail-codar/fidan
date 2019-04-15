@@ -2,8 +2,9 @@ var fidan = (function (exports) {
   // TODO concat vs..
   function EventedArray(items) {
     var _self = this,
-        _array = [],
-        _handlers = {
+        _array = [];
+
+    _self._handlers = {
       itemadded: [],
       itemremoved: [],
       itemset: [],
@@ -32,17 +33,17 @@ var fidan = (function (exports) {
     }
 
     function raiseEvent(event) {
-      _handlers[event.type].forEach(function (h) {
+      _self._handlers[event.type].forEach(function (h) {
         h.call(_self, event);
       });
     }
 
     _self.on = function (eventName, handler) {
-      _handlers[eventName].push(handler);
+      _self._handlers[eventName].push(handler);
     };
 
     _self.off = function (eventName, handler) {
-      var h = _handlers[eventName];
+      var h = _self._handlers[eventName];
       var ln = h.length;
 
       while (--ln >= 0) {
@@ -169,10 +170,6 @@ var fidan = (function (exports) {
       return removed;
     };
 
-    _self.slice = function (start, end) {
-      return new EventedArray(_array.slice(start, end));
-    };
-
     Object.defineProperty(_self, "length", {
       configurable: false,
       enumerable: false,
@@ -222,6 +219,12 @@ var fidan = (function (exports) {
       }
     });
 
+    _self.setEventsFrom = function (val) {
+      _self.on = val.on;
+      _self.off = val.off;
+      _self._handlers = val._handlers;
+    };
+
     _self.toJSON = function () {
       return _array;
     };
@@ -233,8 +236,6 @@ var fidan = (function (exports) {
 
   var array = function (items) {
     var arr = value(new EventedArray(items));
-    arr.on = arr.$val.on;
-    arr.off = arr.$val.off;
 
     arr.toJSON = function () { return arr.$val.innerArray; };
 
@@ -247,23 +248,30 @@ var fidan = (function (exports) {
     arr["$val"].off(type, callback);
   };
 
-  var setClonedValue = function (innerFn, prop, val) {
-    debugger;
-
-    if (typeof val === "object") {
-      if (val === null) {
-        innerFn[prop] = null;
-      } else if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
-        if (!innerFn[prop]) {
-          innerFn[prop] = val.slice(0);
+  var setInnerValue = function (innerFn, prop, val) {
+    if (val == null) {
+      innerFn[prop] = val;
+    } else {
+      if (!innerFn[prop]) {
+        if (Array.isArray(val)) {
+          innerFn[prop] = new EventedArray(val.slice(0));
+        } else if (val.hasOwnProperty("innerArray")) {
+          var arr = new EventedArray(val.innerArray.slice(0));
+          arr.setEventsFrom(val);
+          innerFn[prop] = arr;
         } else {
-          innerFn[prop].innerArray = val.slice(0);
+          innerFn[prop] = val;
         }
       } else {
-        innerFn[prop] = Object.assign({}, val);
+        if (Array.isArray(val)) {
+          innerFn[prop].innerArray = val.slice(0);
+        } else if (val.hasOwnProperty("innerArray")) {
+          innerFn[prop].innerArray = val.innerArray.slice(0);
+          innerFn[prop].setEventsFrom(val);
+        } else {
+          innerFn[prop] = val;
+        }
       }
-    } else {
-      innerFn[prop] = val;
     }
   };
 
@@ -272,21 +280,21 @@ var fidan = (function (exports) {
       if (val === undefined) {
         return innerFn["$next"];
       } else {
-        setClonedValue(innerFn, "$next", val);
+        setInnerValue(innerFn, "$next", val);
         var depends = innerFn["depends"];
 
         if (depends.length) {
           for (var i = 0; i < depends.length; i++) {
-            !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn));
+            !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn["$val"], innerFn));
           }
         }
 
-        setClonedValue(innerFn, "$val", val);
+        innerFn["$val"] = val;
       }
     };
 
-    setClonedValue(innerFn, "$next", val);
-    setClonedValue(innerFn, "$val", val);
+    innerFn["$val"] = val;
+    setInnerValue(innerFn, "$next", val);
     innerFn["freezed"] = freezed;
     innerFn["depends"] = [];
 
@@ -404,9 +412,8 @@ var fidan = (function (exports) {
       }
 
       return;
-    }
+    } // Fast path for create
 
-    debugger; // Fast path for create
 
     if (renderedValues.length === 0) {
       var node$1,
@@ -686,10 +693,8 @@ var fidan = (function (exports) {
     }
   };
   var arrayMap = function (arr, parentDom, renderReturn, renderMode) {
-    var oArr = arr.$val instanceof EventedArray ? arr.$val : new EventedArray(arr.$val);
-    var arrVal = arr.$val;
     var parentRef = null;
-    oArr.on("beforemulti", function () {
+    arr.$val.on("beforemulti", function () {
       if (parentDom.parentNode) {
         parentRef = {
           parent: parentDom,
@@ -698,22 +703,21 @@ var fidan = (function (exports) {
         parentDom = document.createDocumentFragment();
       }
     });
-    oArr.on("aftermulti", function () {
+    arr.$val.on("aftermulti", function () {
       if (parentRef) {
         parentRef.parent.insertBefore(parentDom, parentRef.next);
         parentDom = parentRef.parent;
       }
     });
-    oArr.on("itemadded", function (e) {
+    arr.$val.on("itemadded", function (e) {
       insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
     });
-    oArr.on("itemset", function (e) {
+    arr.$val.on("itemset", function (e) {
       parentDom.replaceChild(renderReturn(e.item, e.index), parentDom.children.item(e.index));
     });
-    oArr.on("itemremoved", function (e) {
+    arr.$val.on("itemremoved", function (e) {
       parentDom.removeChild(parentDom.children.item(e.index));
     });
-    arr(oArr);
     var firstRenderOnFragment = undefined;
 
     var arrayComputeRenderAll = function (nextVal) {
@@ -731,7 +735,7 @@ var fidan = (function (exports) {
         var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
         debugger;
         renderFunction(parentDom, // firstRenderOnFragment || parentDom
-        arrVal["innerArray"], nextVal || [], function (nextItem) {
+        arr.$val.innerArray, nextVal || [], function (nextItem) {
           return renderReturn(nextItem);
         }, function (nextItem, prevItem) {
           for (var key in nextItem) {

@@ -13,14 +13,15 @@ export type ArrayMutableMethods =
 
 export function EventedArray(items) {
   var _self = this,
-    _array = [],
-    _handlers = {
-      itemadded: [],
-      itemremoved: [],
-      itemset: [],
-      beforemulti: [],
-      aftermulti: []
-    };
+    _array = [];
+
+  _self._handlers = {
+    itemadded: [],
+    itemremoved: [],
+    itemset: [],
+    beforemulti: [],
+    aftermulti: []
+  };
 
   function defineIndexProperty(index) {
     if (!(index in _self)) {
@@ -43,17 +44,17 @@ export function EventedArray(items) {
   }
 
   function raiseEvent(event) {
-    _handlers[event.type].forEach(function(h) {
+    _self._handlers[event.type].forEach(function(h) {
       h.call(_self, event);
     });
   }
 
   _self.on = function(eventName, handler) {
-    _handlers[eventName].push(handler);
+    _self._handlers[eventName].push(handler);
   };
 
   _self.off = function(eventName, handler) {
-    var h = _handlers[eventName];
+    var h = _self._handlers[eventName];
     var ln = h.length;
     while (--ln >= 0) {
       if (h[ln] === handler) {
@@ -167,10 +168,6 @@ export function EventedArray(items) {
     return removed;
   };
 
-  _self.slice = (start?, end?) => {
-    return new EventedArray(_array.slice(start, end));
-  };
-
   Object.defineProperty(_self, "length", {
     configurable: false,
     enumerable: false,
@@ -218,6 +215,12 @@ export function EventedArray(items) {
       });
     }
   });
+
+  _self.setEventsFrom = function(val) {
+    _self.on = val.on;
+    _self.off = val.off;
+    _self._handlers = val._handlers;
+  };
 
   _self.toJSON = () => {
     return _array;

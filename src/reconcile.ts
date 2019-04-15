@@ -29,7 +29,6 @@ export const reconcile = (
     return;
   }
 
-  debugger;
   // Fast path for create
   if (renderedValues.length === 0) {
     let node,
