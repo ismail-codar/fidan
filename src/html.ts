@@ -1,4 +1,4 @@
-import { FidanValue, array, computeBy } from "./f";
+import { FidanValue, array, computeBy, FidanArray } from "./f";
 import { arrayMap } from "./dom";
 
 const COMMENT_TEXT = 1;
@@ -179,7 +179,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
 };
 
 export const htmlArrayMap = <T>(
-  arr: FidanValue<T[]>,
+  arr: FidanArray<T>,
   renderCallback: (data: T) => DocumentFragment,
   options: {
     useCloneNode: boolean;

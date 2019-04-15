@@ -1,6 +1,4 @@
-import { FidanValue, FidanArray } from "./f";
-import { EventedArray } from "./evented-array";
-import { computeBy } from "./f";
+import { FidanArray, beforeComputeBy } from "./f";
 import { reuseNodes } from "./reuse-nodes";
 import reconcile from "./reconcile";
 
@@ -17,7 +15,7 @@ export const insertToDom = (parentElement, index, itemElement) => {
 };
 
 export const arrayMap = <T>(
-  arr: FidanArray<T[]>,
+  arr: FidanArray<T>,
   parentDom: Node & ParentNode,
   renderReturn: (item: any, idx?: number, isInsert?: boolean) => void,
   renderMode?: "reuse" | "reconcile"
@@ -75,9 +73,8 @@ export const arrayMap = <T>(
         beforeNode?,
         afterNode?
       ) => void = renderMode === "reconcile" ? reconcile : reuseNodes;
-      debugger;
       renderFunction(
-        parentDom, // firstRenderOnFragment || parentDom
+        firstRenderOnFragment || parentDom,
         arr.$val.innerArray,
         nextVal || [],
         nextItem => {
@@ -99,5 +96,5 @@ export const arrayMap = <T>(
     }
   };
 
-  computeBy(arr, arrayComputeRenderAll);
+  beforeComputeBy(arr, arrayComputeRenderAll);
 };

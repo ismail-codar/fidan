@@ -247,56 +247,39 @@ var fidan = (function (exports) {
   var off = function (arr, type, callback) {
     arr["$val"].off(type, callback);
   };
-
-  var setInnerValue = function (innerFn, prop, val) {
-    if (val == null) {
-      innerFn[prop] = val;
-    } else {
-      if (!innerFn[prop]) {
-        if (Array.isArray(val)) {
-          innerFn[prop] = new EventedArray(val.slice(0));
-        } else if (val.hasOwnProperty("innerArray")) {
-          var arr = new EventedArray(val.innerArray.slice(0));
-          arr.setEventsFrom(val);
-          innerFn[prop] = arr;
-        } else {
-          innerFn[prop] = val;
-        }
-      } else {
-        if (Array.isArray(val)) {
-          innerFn[prop].innerArray = val.slice(0);
-        } else if (val.hasOwnProperty("innerArray")) {
-          innerFn[prop].innerArray = val.innerArray.slice(0);
-          innerFn[prop].setEventsFrom(val);
-        } else {
-          innerFn[prop] = val;
-        }
-      }
-    }
-  };
-
   var value = function (val, freezed) {
     var innerFn = function (val) {
       if (val === undefined) {
-        return innerFn["$next"];
+        return innerFn["$val"];
       } else {
-        setInnerValue(innerFn, "$next", val);
-        var depends = innerFn["depends"];
+        if (Array.isArray(val)) {
+          val = new EventedArray(val.slice(0));
+          val.setEventsFrom(innerFn["$val"]);
+        } else if (val && val.hasOwnProperty("innerArray")) {
+          var arr = new EventedArray(val.innerArray.slice(0));
+          arr.setEventsFrom(val);
+          val = arr;
+        }
 
-        if (depends.length) {
-          for (var i = 0; i < depends.length; i++) {
-            !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn["$val"], innerFn));
-          }
+        var depends = innerFn["bc_depends"];
+
+        for (var i = 0; i < depends.length; i++) {
+          !depends[i]["freezed"] && depends[i].beforeCompute(val, innerFn["$val"], innerFn);
         }
 
         innerFn["$val"] = val;
+        depends = innerFn["c_depends"];
+
+        for (var i = 0; i < depends.length; i++) {
+          !depends[i]["freezed"] && depends[i](depends[i].compute(val));
+        }
       }
     };
 
     innerFn["$val"] = val;
-    setInnerValue(innerFn, "$next", val);
     innerFn["freezed"] = freezed;
-    innerFn["depends"] = [];
+    innerFn["bc_depends"] = [];
+    innerFn["c_depends"] = [];
 
     innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toString(); };
 
@@ -311,7 +294,20 @@ var fidan = (function (exports) {
     cmp(fn(initial.$val, cmp));
     args.splice(0, 0, initial);
 
-    for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
+    for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
+
+    return cmp;
+  };
+  var beforeComputeBy = function (initial, fn) {
+    var args = [], len = arguments.length - 2;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
+
+    var cmp = value(undefined);
+    cmp["beforeCompute"] = fn;
+    cmp(fn(initial.$val, undefined, cmp));
+    args.splice(0, 0, initial);
+
+    for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
 
     return cmp;
   };
@@ -323,7 +319,19 @@ var fidan = (function (exports) {
     cmp["compute"] = fn;
     cmp(fn(undefined, cmp));
 
-    for (var i = 0; i < args.length; i++) { args[i]["depends"].push(cmp); }
+    for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
+
+    return cmp;
+  };
+  var beforeCompute = function (fn) {
+    var args = [], len = arguments.length - 1;
+    while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
+
+    var cmp = value(undefined);
+    cmp["beforeCompute"] = fn;
+    cmp(fn(undefined, undefined, cmp));
+
+    for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
 
     return cmp;
   }; // TODO typedCompute, typedValue ...
@@ -336,7 +344,7 @@ var fidan = (function (exports) {
 
   var destroy = function (item) {
     delete item["compute"];
-    delete item["depends"];
+    delete item["c_depends"];
   };
 
   // https://github.com/Freak613/stage0/blob/master/reuseNodes.js
@@ -733,9 +741,7 @@ var fidan = (function (exports) {
       } else {
         if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0) { firstRenderOnFragment = document.createDocumentFragment(); }
         var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
-        debugger;
-        renderFunction(parentDom, // firstRenderOnFragment || parentDom
-        arr.$val.innerArray, nextVal || [], function (nextItem) {
+        renderFunction(firstRenderOnFragment || parentDom, arr.$val.innerArray, nextVal || [], function (nextItem) {
           return renderReturn(nextItem);
         }, function (nextItem, prevItem) {
           for (var key in nextItem) {
@@ -753,7 +759,7 @@ var fidan = (function (exports) {
       }
     };
 
-    computeBy(arr, arrayComputeRenderAll);
+    beforeComputeBy(arr, arrayComputeRenderAll);
   };
 
   var setDefaults = function (obj, defaults) {
@@ -1033,7 +1039,9 @@ var fidan = (function (exports) {
   exports.off = off;
   exports.value = value;
   exports.computeBy = computeBy;
+  exports.beforeComputeBy = beforeComputeBy;
   exports.compute = compute;
+  exports.beforeCompute = beforeCompute;
   exports.destroy = destroy;
   exports.insertToDom = insertToDom;
   exports.arrayMap = arrayMap;
