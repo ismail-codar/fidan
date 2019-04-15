@@ -246,13 +246,24 @@ var fidan = (function (exports) {
   var off = function (arr, type, callback) {
     arr["$val"].off(type, callback);
   };
+
+  var cloneObject = function (val) {
+    if (val === null) { return null; }
+
+    if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
+      return val["slice"](0);
+    } else {
+      return Object.assign({}, val);
+    }
+  };
+
   var value = function (val, freezed) {
     var innerFn = function (val) {
       if (val === undefined) {
         return innerFn["$next"];
       } else {
-        if (Array.isArray(val) || innerFn["$next"] instanceof EventedArray) {
-          innerFn["$next"].innerArray = val["slice"](0);
+        if (typeof val === "object") {
+          innerFn["$next"].innerArray = cloneObject(val);
         } else {
           innerFn["$next"] = val;
         }
@@ -260,15 +271,15 @@ var fidan = (function (exports) {
         var depends = innerFn["depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) { !depends[i]["freezed"] && depends[i](depends[i].compute(val, innerFn)); } }
 
-        if (Array.isArray(val) || val instanceof EventedArray) {
-          innerFn["$val"].innerArray = val["slice"](0);
+        if (typeof val === "object") {
+          innerFn["$val"].innerArray = cloneObject(val);
         } else { innerFn["$val"] = val; }
       }
     };
 
-    if (Array.isArray(val) || innerFn["$val"] instanceof EventedArray) {
-      innerFn["$next"] = val["slice"](0);
-      innerFn["$val"] = val["slice"](0);
+    if (typeof val === "object") {
+      innerFn["$next"] = cloneObject(val);
+      innerFn["$val"] = cloneObject(val);
     } else {
       innerFn["$next"] = val;
       innerFn["$val"] = val;

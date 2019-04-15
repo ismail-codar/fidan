@@ -43,13 +43,22 @@ export const off = (
   arr["$val"].off(type, callback);
 };
 
+const cloneObject = val => {
+  if (val === null) return null;
+  if (Array.isArray(val) || val.hasOwnProperty("innerArray")) {
+    return val["slice"](0);
+  } else {
+    return Object.assign({}, val);
+  }
+};
+
 export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
   const innerFn: any = (val?) => {
     if (val === undefined) {
       return innerFn["$next"];
     } else {
-      if (Array.isArray(val) || innerFn["$next"] instanceof EventedArray) {
-        innerFn["$next"].innerArray = val["slice"](0);
+      if (typeof val === "object") {
+        innerFn["$next"].innerArray = cloneObject(val);
       } else {
         innerFn["$next"] = val;
       }
@@ -59,15 +68,15 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
         for (var i = 0; i < depends.length; i++)
           !depends[i]["freezed"] &&
             depends[i](depends[i].compute(val, innerFn));
-      if (Array.isArray(val) || val instanceof EventedArray) {
-        innerFn["$val"].innerArray = val["slice"](0);
+      if (typeof val === "object") {
+        innerFn["$val"].innerArray = cloneObject(val);
       } else innerFn["$val"] = val;
     }
   };
 
-  if (Array.isArray(val) || innerFn["$val"] instanceof EventedArray) {
-    innerFn["$next"] = val["slice"](0);
-    innerFn["$val"] = val["slice"](0);
+  if (typeof val === "object") {
+    innerFn["$next"] = cloneObject(val);
+    innerFn["$val"] = cloneObject(val);
   } else {
     innerFn["$next"] = val;
     innerFn["$val"] = val;
