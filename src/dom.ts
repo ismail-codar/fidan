@@ -1,6 +1,5 @@
 import { FidanArray, beforeComputeBy } from "./f";
 import { reuseNodes } from "./reuse-nodes";
-import reconcile from "./reconcile";
 
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;
@@ -17,8 +16,8 @@ export const insertToDom = (parentElement, index, itemElement) => {
 export const arrayMap = <T>(
   arr: FidanArray<T>,
   parentDom: Node & ParentNode,
-  renderReturn: (item: any, idx?: number, isInsert?: boolean) => void,
-  renderMode?: "reuse" | "reconcile"
+  renderReturn: (item: any, idx?: number, isInsert?: boolean) => Node,
+  reuseMode?: boolean
 ) => {
   let parentRef: { parent: Node & ParentNode; next: Node } = null;
   arr.$val.on("beforemulti", function() {
@@ -38,7 +37,8 @@ export const arrayMap = <T>(
   });
 
   arr.$val.on("itemadded", function(e) {
-    insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
+    // insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
+    parentDom.appendChild(renderReturn(e.item));
   });
 
   arr.$val.on("itemset", function(e) {
@@ -54,26 +54,17 @@ export const arrayMap = <T>(
 
   let firstRenderOnFragment = undefined;
   const arrayComputeRenderAll = function(nextVal) {
-    if (!renderMode) {
+    if (!reuseMode) {
       const parentFragment = document.createDocumentFragment();
       parentDom.textContent = "";
-      for (var i = 0; i < arr.$val.length; i++) {
-        insertToDom(parentFragment, i, renderReturn(arr.$val[i], i));
+      for (var i = 0; i < nextVal.length; i++) {
+        parentFragment.appendChild(renderReturn(nextVal[i]));
       }
       parentDom.appendChild(parentFragment);
     } else {
       if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0)
         firstRenderOnFragment = document.createDocumentFragment();
-      let renderFunction: (
-        parent,
-        renderedValues,
-        data,
-        createFn,
-        noOp,
-        beforeNode?,
-        afterNode?
-      ) => void = renderMode === "reconcile" ? reconcile : reuseNodes;
-      renderFunction(
+      reuseNodes(
         firstRenderOnFragment || parentDom,
         arr.$val.innerArray,
         nextVal || [],

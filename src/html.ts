@@ -181,14 +181,12 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
 export const htmlArrayMap = <T>(
   arr: FidanArray<T>,
   renderCallback: (data: T) => DocumentFragment,
-  options: {
+  options?: {
     useCloneNode: boolean;
-    renderMode?: "reuse" | "reconcile";
-  } = {
-    useCloneNode: false,
-    renderMode: undefined
+    reuseMode?: boolean;
   }
 ) => {
+  options = Object.assign({ useCloneNode: false, reuseMode: false }, options);
   // if (Array.isArray(arr)) {
   //   const oArray = array(arr);
   //   [
@@ -234,7 +232,7 @@ export const htmlArrayMap = <T>(
         updateNodesByCommentNodes(renderNode, params);
         return renderNode;
       };
-      arrayMap(arr, element, arrayMapFn, options.renderMode);
+      arrayMap(arr, element, arrayMapFn, options.reuseMode);
     };
   } else {
     return function(commentNode) {

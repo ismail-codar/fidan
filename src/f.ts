@@ -3,8 +3,6 @@ import { EventedArray } from "./evented-array";
 export interface FidanValue<T> {
   (val?: T): T;
   readonly $val: T;
-  readonly $next: T;
-  freezed: boolean;
 }
 
 export type FidanArrayEventType =
@@ -24,8 +22,6 @@ export interface EventedArrayReturnType<T> {
 export interface FidanArray<T> {
   (val?: T[]): T[] & EventedArrayReturnType<T>;
   readonly $val: T[] & EventedArrayReturnType<T>;
-  readonly $next: T[] & EventedArrayReturnType<T>;
-  freezed: boolean;
 }
 
 export const array = <T>(items: T[]): FidanArray<T> => {
@@ -35,7 +31,7 @@ export const array = <T>(items: T[]): FidanArray<T> => {
   return arr;
 };
 
-export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
+export const value = <T>(val?: T): FidanValue<T> => {
   const innerFn: any = (val?) => {
     if (val === undefined) {
       return innerFn["$val"];
@@ -49,20 +45,20 @@ export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {
         val = arr;
       }
       let depends = innerFn["bc_depends"];
-      for (var i = 0; i < depends.length; i++) {
-        !depends[i]["freezed"] &&
+      if (depends.length)
+        for (var i = 0; i < depends.length; i++) {
           depends[i].beforeCompute(val, innerFn["$val"], innerFn);
-      }
+        }
       innerFn["$val"] = val;
       depends = innerFn["c_depends"];
-      for (var i = 0; i < depends.length; i++) {
-        !depends[i]["freezed"] && depends[i](depends[i].compute(val));
-      }
+      if (depends.length)
+        for (var i = 0; i < depends.length; i++) {
+          depends[i](depends[i].compute(val));
+        }
     }
   };
 
   innerFn["$val"] = val;
-  innerFn["freezed"] = freezed;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
   innerFn.toString = innerFn.toJSON = () => innerFn["$val"].toString();

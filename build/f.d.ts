@@ -1,8 +1,6 @@
 export interface FidanValue<T> {
     (val?: T): T;
     readonly $val: T;
-    readonly $next: T;
-    freezed: boolean;
 }
 export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved" | "beforemulti" | "aftermulti";
 export interface EventedArrayReturnType<T> {
@@ -14,11 +12,9 @@ export interface EventedArrayReturnType<T> {
 export interface FidanArray<T> {
     (val?: T[]): T[] & EventedArrayReturnType<T>;
     readonly $val: T[] & EventedArrayReturnType<T>;
-    readonly $next: T[] & EventedArrayReturnType<T>;
-    freezed: boolean;
 }
 export declare const array: <T>(items: T[]) => FidanArray<T>;
-export declare const value: <T>(val?: T, freezed?: boolean) => FidanValue<T>;
+export declare const value: <T>(val?: T) => FidanValue<T>;
 export declare const computeBy: <T>(initial: FidanValue<T>, fn: (val?: T, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;
 export declare const beforeComputeBy: <T>(initial: FidanValue<T>, fn: (nextValue?: any, prevValue?: any, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;
 export declare const compute: <T>(fn: (val: T, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;
