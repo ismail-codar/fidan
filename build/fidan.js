@@ -449,7 +449,8 @@ var fidan = (function (exports) {
         }, function (nextItem, prevItem) {
           for (var key in nextItem) {
             if (prevItem[key].hasOwnProperty("$val")) {
-              nextItem[key].depends = prevItem[key].depends;
+              nextItem[key].c_depends = prevItem[key].c_depends;
+              nextItem[key].bc_depends = prevItem[key].bc_depends;
               prevItem[key](nextItem[key]());
             }
           }
