@@ -15,7 +15,7 @@ export type FidanArrayEventType =
   | "aftermulti";
 
 export interface EventedArrayReturnType<T> {
-  on: any;
+  on: (type, callback) => void;
   off: any;
   innerArray: T[];
   setEventsFrom: (val: EventedArrayReturnType<T>) => void;
@@ -33,22 +33,6 @@ export const array = <T>(items: T[]): FidanArray<T> => {
   arr.toJSON = () => arr.$val.innerArray;
 
   return arr;
-};
-
-export const on = (
-  arr: any[],
-  type: FidanArrayEventType,
-  callback: (e: { item: any; index: number }) => void
-) => {
-  arr["$val"].on(type, callback);
-};
-
-export const off = (
-  arr: any[],
-  type: FidanArrayEventType,
-  callback: (e: { item: any; index: number }) => void
-) => {
-  arr["$val"].off(type, callback);
 };
 
 export const value = <T>(val?: T, freezed?: boolean): FidanValue<T> => {

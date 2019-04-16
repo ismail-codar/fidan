@@ -241,12 +241,6 @@ var fidan = (function (exports) {
 
     return arr;
   };
-  var on = function (arr, type, callback) {
-    arr["$val"].on(type, callback);
-  };
-  var off = function (arr, type, callback) {
-    arr["$val"].off(type, callback);
-  };
   var value = function (val, freezed) {
     var innerFn = function (val) {
       if (val === undefined) {
@@ -1035,8 +1029,6 @@ var fidan = (function (exports) {
   };
 
   exports.array = array;
-  exports.on = on;
-  exports.off = off;
   exports.value = value;
   exports.computeBy = computeBy;
   exports.beforeComputeBy = beforeComputeBy;
