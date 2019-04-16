@@ -37,8 +37,7 @@ export const arrayMap = <T>(
   });
 
   arr.$val.on("itemadded", function(e) {
-    // insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
-    parentDom.appendChild(renderReturn(e.item));
+    insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
   });
 
   arr.$val.on("itemset", function(e) {

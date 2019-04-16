@@ -422,8 +422,7 @@ var fidan = (function (exports) {
       }
     });
     arr.$val.on("itemadded", function (e) {
-      // insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
-      parentDom.appendChild(renderReturn(e.item));
+      insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
     });
     arr.$val.on("itemset", function (e) {
       parentDom.replaceChild(renderReturn(e.item, e.index), parentDom.children.item(e.index));
