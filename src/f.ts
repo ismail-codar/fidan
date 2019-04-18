@@ -48,16 +48,19 @@ export const compute = <T>(
 ) => {
   const cmp = value(undefined);
   cmp["compute"] = fn;
+  cmp(fn(undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["c_depends"].push(cmp);
   return cmp;
 };
 
 export const beforeCompute = <T>(
+  initalValue: T,
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
   ...args: any[]
 ) => {
   const cmp = value(undefined);
   cmp["beforeCompute"] = fn;
+  cmp(fn(initalValue, undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
   return cmp;
 };

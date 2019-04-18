@@ -88,5 +88,5 @@ export const arrayMap = <T>(
     }
   };
 
-  beforeCompute(arrayComputeRenderAll, arr);
+  beforeCompute(arr.$val, arrayComputeRenderAll, arr);
 };

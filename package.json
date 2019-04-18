@@ -6,7 +6,7 @@
     "build-browser": "microbundle --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
     "build-browser-min": "microbundle --format iife --name fidan --output build/fidan.min.js --sourcemap false",
     "build-jsx": "copyfiles ./types/** ./build & microbundle src/jsx/index.ts --format cjs",
-    "build": "microbundle --format cjs",
+    "build": "microbundle --format cjs --no-compress",
     "local": "yarn build && yalc publish && yalc push",
     "test": "jasmine-ts",
     "dev": "microbundle watch"
