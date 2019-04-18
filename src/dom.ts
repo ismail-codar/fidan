@@ -1,5 +1,6 @@
-import { FidanArray, beforeCompute } from "./f";
+import { beforeCompute } from "./f";
 import { reuseNodes } from "./reuse-nodes";
+import { FidanArray } from ".";
 
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;

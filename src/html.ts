@@ -1,5 +1,6 @@
-import { FidanArray, compute } from "./f";
+import { compute } from "./f";
 import { arrayMap } from "./dom";
+import { FidanArray } from ".";
 
 const COMMENT_TEXT = 1;
 const COMMENT_DOM = 2;
@@ -195,21 +196,6 @@ export const htmlArrayMap = <T>(
   }
 ) => {
   options = Object.assign({ useCloneNode: false, reuseMode: false }, options);
-  // if (Array.isArray(arr)) {
-  //   const oArray = array(arr);
-  //   [
-  //     "copyWithin",
-  //     "fill",
-  //     "pop",
-  //     "push",
-  //     "reverse",
-  //     "shift",
-  //     "sort",
-  //     "splice",
-  //     "unshift"
-  //   ].forEach(method => (arr[method] = oArray.$val[method]));
-  //   arr = oArray;
-  // }
   if (options.useCloneNode) {
     return (commentNode: Node) => {
       const element = commentNode.parentElement;

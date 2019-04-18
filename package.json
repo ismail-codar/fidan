@@ -3,10 +3,11 @@
   "version": "0.0.13",
   "description": "High performance and easy way for building web user interfaces.",
   "scripts": {
-    "build-browser": "microbundle src/index-browser.ts --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
-    "build-browser-min": "microbundle src/index-browser.ts --format iife --name fidan --output build/fidan.min.js --sourcemap false",
-    "build": "copyfiles ./types/** ./build & microbundle --format cjs",
-    "local": "yarn build && yarn build-browser && yarn build-browser-min && yalc publish && yalc push",
+    "build-browser": "microbundle --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
+    "build-browser-min": "microbundle --format iife --name fidan --output build/fidan.min.js --sourcemap false",
+    "build-jsx": "copyfiles ./types/** ./build & microbundle src/jsx/index.ts --format cjs",
+    "build": "microbundle --format cjs",
+    "local": "yarn build && yalc publish && yalc push",
     "test": "jasmine-ts",
     "dev": "microbundle watch"
   },

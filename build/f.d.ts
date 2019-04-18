@@ -1,18 +1,4 @@
-export interface FidanValue<T> {
-    (val?: T): T;
-    readonly $val: T;
-}
-export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved" | "beforemulti" | "aftermulti";
-export interface EventedArrayReturnType<T> {
-    on: (type: any, callback: any) => void;
-    off: any;
-    innerArray: T[];
-    setEventsFrom: (val: EventedArrayReturnType<T>) => void;
-}
-export interface FidanArray<T> {
-    (val?: T[]): T[] & EventedArrayReturnType<T>;
-    readonly $val: T[] & EventedArrayReturnType<T>;
-}
+import { FidanArray, FidanValue } from ".";
 export declare const array: <T>(items: T[]) => FidanArray<T>;
 export declare const value: <T>(val?: T) => FidanValue<T>;
 export declare const compute: <T>(fn: (val: T, changedItem?: any) => void, ...args: any[]) => FidanValue<any>;

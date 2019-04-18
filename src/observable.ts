@@ -1,5 +1,6 @@
-import { FidanValue, value } from "./f";
 import { jsRoot } from "./util";
+import { FidanValue } from ".";
+import { value } from "./f";
 
 function symbolObservablePonyfill(root) {
   let result;
