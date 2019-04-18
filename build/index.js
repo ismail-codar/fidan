@@ -630,10 +630,9 @@ var updateNodesByCommentNodes = function (element, params) {
           element$1.setAttribute(attributeName, param());
         }
       } else {
-        // if (typeof param === "function") {
-        //   param(element);
-        // } else
-        if (htmlProps[attributeName]) {
+        if (typeof param === "function") {
+          param(element$1);
+        } else if (htmlProps[attributeName]) {
           element$1[attributeName] = param;
         } else {
           element$1.setAttribute(attributeName, param);

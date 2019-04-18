@@ -10,7 +10,7 @@ export type FidanArrayEventType =
   | "beforemulti"
   | "aftermulti";
 
-export interface EventedArrayReturnType<T> {
+export interface EventedArrayReturnType<T> extends Array<T> {
   on: (type, callback) => void;
   off: any;
   innerArray: T[];

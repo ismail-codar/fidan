@@ -167,10 +167,9 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
           element.setAttribute(attributeName, param());
         }
       } else {
-        // if (typeof param === "function") {
-        //   param(element);
-        // } else
-        if (htmlProps[attributeName]) {
+        if (typeof param === "function") {
+          param(element);
+        } else if (htmlProps[attributeName]) {
           element[attributeName] = param;
         } else {
           element.setAttribute(attributeName, param);
