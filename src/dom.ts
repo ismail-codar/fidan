@@ -1,4 +1,4 @@
-import { FidanArray, beforeComputeBy } from "./f";
+import { FidanArray, beforeCompute } from "./f";
 import { reuseNodes } from "./reuse-nodes";
 
 export const insertToDom = (parentElement, index, itemElement) => {
@@ -87,5 +87,5 @@ export const arrayMap = <T>(
     }
   };
 
-  beforeComputeBy(arr, arrayComputeRenderAll);
+  beforeCompute(arrayComputeRenderAll, arr);
 };

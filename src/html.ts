@@ -1,4 +1,4 @@
-import { FidanValue, array, computeBy, FidanArray } from "./f";
+import { FidanArray, compute } from "./f";
 import { arrayMap } from "./dom";
 
 const COMMENT_TEXT = 1;
@@ -155,15 +155,23 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
         if (htmlProps[attributeName]) {
-          computeBy(param, val => {
+          compute(val => {
             element[attributeName] = val;
-          })["name$"] = "[" + attributeName + "]";
+          }, param)["name$"] = "[" + attributeName + "]";
+          element[attributeName] = param();
         } else {
-          computeBy(param, val => {
+          compute(val => {
             element.setAttribute(attributeName, val);
-          })["name$"] = "attr(" + attributeName + ")";
+          }, param)["name$"] = "attr(" + attributeName + ")";
+          element.setAttribute(attributeName, param());
         }
       } else {
+        if (typeof param === "function") {
+          const returned = param(element);
+          if (returned !== undefined) {
+            param = returned;
+          }
+        }
         if (htmlProps[attributeName]) {
           element[attributeName] = param;
         } else {

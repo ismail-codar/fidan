@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/runtime",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "description": "High performance and easy way for building web user interfaces.",
   "scripts": {
     "build-browser": "microbundle src/index-browser.ts --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
@@ -19,7 +19,7 @@
     "@starptech/prettyhtml": "^0.8.17",
     "@types/babel-traverse": "^6.25.5",
     "@types/jasmine": "^3.3.12",
-    "@types/node": "^11.13.4",
+    "@types/node": "^11.13.5",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "basichtml": "^0.22.0",
     "copyfiles": "^2.1.0",
@@ -27,7 +27,7 @@
     "jasmine-spec-reporter": "^4.2.1",
     "jasmine-ts": "^0.3.0",
     "microbundle": "^0.11.0",
-    "ts-node": "^8.0.3",
+    "ts-node": "^8.1.0",
     "typescript": "^3.4.3"
   },
   "main": "build/index.js",

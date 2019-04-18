@@ -65,39 +65,12 @@ export const value = <T>(val?: T): FidanValue<T> => {
   return innerFn;
 };
 
-export const computeBy = <T>(
-  initial: FidanValue<T>,
-  fn: (val?: T, changedItem?) => void,
-  ...args: any[]
-) => {
-  var cmp = value(undefined);
-  cmp["compute"] = fn;
-  cmp(fn(initial.$val, cmp));
-  args.splice(0, 0, initial);
-  for (var i = 0; i < args.length; i++) args[i]["c_depends"].push(cmp);
-  return cmp;
-};
-
-export const beforeComputeBy = <T>(
-  initial: FidanValue<T>,
-  fn: (nextValue?, prevValue?, changedItem?) => void,
-  ...args: any[]
-) => {
-  var cmp = value(undefined);
-  cmp["beforeCompute"] = fn;
-  cmp(fn(initial.$val, undefined, cmp));
-  args.splice(0, 0, initial);
-  for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
-  return cmp;
-};
-
 export const compute = <T>(
   fn: (val: T, changedItem?) => void,
   ...args: any[]
 ) => {
   const cmp = value(undefined);
   cmp["compute"] = fn;
-  cmp(fn(undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["c_depends"].push(cmp);
   return cmp;
 };
@@ -108,7 +81,6 @@ export const beforeCompute = <T>(
 ) => {
   const cmp = value(undefined);
   cmp["beforeCompute"] = fn;
-  cmp(fn(undefined, undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
   return cmp;
 };

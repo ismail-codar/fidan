@@ -275,39 +275,12 @@ var fidan = (function (exports) {
 
     return innerFn;
   };
-  var computeBy = function (initial, fn) {
-    var args = [], len = arguments.length - 2;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
-    var cmp = value(undefined);
-    cmp["compute"] = fn;
-    cmp(fn(initial.$val, cmp));
-    args.splice(0, 0, initial);
-
-    for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
-
-    return cmp;
-  };
-  var beforeComputeBy = function (initial, fn) {
-    var args = [], len = arguments.length - 2;
-    while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
-    var cmp = value(undefined);
-    cmp["beforeCompute"] = fn;
-    cmp(fn(initial.$val, undefined, cmp));
-    args.splice(0, 0, initial);
-
-    for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
-
-    return cmp;
-  };
   var compute = function (fn) {
     var args = [], len = arguments.length - 1;
     while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
     var cmp = value(undefined);
     cmp["compute"] = fn;
-    cmp(fn(undefined, cmp));
 
     for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
 
@@ -319,7 +292,6 @@ var fidan = (function (exports) {
 
     var cmp = value(undefined);
     cmp["beforeCompute"] = fn;
-    cmp(fn(undefined, undefined, cmp));
 
     for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
 
@@ -463,7 +435,7 @@ var fidan = (function (exports) {
       }
     };
 
-    beforeComputeBy(arr, arrayComputeRenderAll);
+    beforeCompute(arrayComputeRenderAll, arr);
   };
 
   var setDefaults = function (obj, defaults) {
@@ -646,15 +618,25 @@ var fidan = (function (exports) {
           element$1.addEventListener(attributeName.substr(2), param);
         } else if (param.hasOwnProperty("$val")) {
           if (htmlProps[attributeName]) {
-            computeBy(param, function (val) {
+            compute(function (val) {
               element$1[attributeName] = val;
-            })["name$"] = "[" + attributeName + "]";
+            }, param)["name$"] = "[" + attributeName + "]";
+            element$1[attributeName] = param();
           } else {
-            computeBy(param, function (val) {
+            compute(function (val) {
               element$1.setAttribute(attributeName, val);
-            })["name$"] = "attr(" + attributeName + ")";
+            }, param)["name$"] = "attr(" + attributeName + ")";
+            element$1.setAttribute(attributeName, param());
           }
         } else {
+          if (typeof param === "function") {
+            var returned = param(element$1);
+
+            if (returned !== undefined) {
+              param = returned;
+            }
+          }
+
           if (htmlProps[attributeName]) {
             element$1[attributeName] = param;
           } else {
@@ -739,8 +721,6 @@ var fidan = (function (exports) {
 
   exports.array = array;
   exports.value = value;
-  exports.computeBy = computeBy;
-  exports.beforeComputeBy = beforeComputeBy;
   exports.compute = compute;
   exports.beforeCompute = beforeCompute;
   exports.destroy = destroy;
