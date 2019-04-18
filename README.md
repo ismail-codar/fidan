@@ -1,38 +1,14 @@
 # fidan
 
-High performance and easy way for building web user interfaces.
-
-<!-- ## A counter example:
-
-```jsx
-var counter$ = 0; // An option: If a variable ends with $ then it is observable.
-
-var view = (
-  <>
-    <button onClick={() => counter$++}> + </button>
-    {counter$}
-    <button onClick={() => counter$--}> - </button>
-  </>
-); // Bonus! view is a real DOM element(s)
-
-document.body.appendChild(view);
-```
-
-The above example can work because our [compiler](./packages/babel-plugin-transform-jsx) compiles to knockout style observable functions. -->
+Easiest, strong and high performance way for building web user interfaces.
 
 ## Template literals based examples
 
 > It can be works directly in the browsers. There is no additional bundler or any compiler required
 
-- [Basic Crud](https://codesandbox.io/s/jnj869m5zy)
+- [Crud App](https://codesandbox.io/s/jnj869m5zy)
 
-<!-- ## Bundler based examples
-
-- [Starter Kit](https://github.com/ismail-codar/fidan-starter)
-
-## API
-
-TODO -->
+- [Grid Component](https://codesandbox.io/embed/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fgrid%2Findex.html&module=%2Fexamples%2Fbasic%2Fgrid%2Fdemo-grid.ts)
 
 ## Acknowledgement
 
