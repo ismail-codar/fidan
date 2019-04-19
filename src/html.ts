@@ -155,19 +155,28 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
       if (attributeName.startsWith("on")) {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (htmlProps[attributeName]) {
+        const val = param();
+        if (typeof val === "boolean") {
+          val
+            ? element.setAttribute(attributeName, val)
+            : element.removeAttribute(attributeName);
+        } else if (htmlProps[attributeName]) {
           compute(val => {
             element[attributeName] = val;
           }, param)["name$"] = "[" + attributeName + "]";
-          element[attributeName] = param();
+          element[attributeName] = val;
         } else {
           compute(val => {
             element.setAttribute(attributeName, val);
           }, param)["name$"] = "attr(" + attributeName + ")";
-          element.setAttribute(attributeName, param());
+          element.setAttribute(attributeName, val);
         }
       } else {
-        if (typeof param === "function") {
+        if (typeof param === "boolean") {
+          param
+            ? element.setAttribute(attributeName, param)
+            : element.removeAttribute(attributeName);
+        } else if (typeof param === "function") {
           param(element);
         } else if (htmlProps[attributeName]) {
           element[attributeName] = param;

@@ -622,19 +622,25 @@ var updateNodesByCommentNodes = function (element, params) {
       if (attributeName.startsWith("on")) {
         element$1.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (htmlProps[attributeName]) {
+        var val = param();
+
+        if (typeof val === "boolean") {
+          val ? element$1.setAttribute(attributeName, val) : element$1.removeAttribute(attributeName);
+        } else if (htmlProps[attributeName]) {
           compute(function (val) {
             element$1[attributeName] = val;
           }, param)["name$"] = "[" + attributeName + "]";
-          element$1[attributeName] = param();
+          element$1[attributeName] = val;
         } else {
           compute(function (val) {
             element$1.setAttribute(attributeName, val);
           }, param)["name$"] = "attr(" + attributeName + ")";
-          element$1.setAttribute(attributeName, param());
+          element$1.setAttribute(attributeName, val);
         }
       } else {
-        if (typeof param === "function") {
+        if (typeof param === "boolean") {
+          param ? element$1.setAttribute(attributeName, param) : element$1.removeAttribute(attributeName);
+        } else if (typeof param === "function") {
           param(element$1);
         } else if (htmlProps[attributeName]) {
           element$1[attributeName] = param;
