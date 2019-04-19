@@ -35,6 +35,11 @@ export const value = <T>(val?: T): FidanValue<T> => {
     }
   };
 
+  if (Array.isArray(val)) {
+    val = new EventedArray(val.slice(0));
+  } else if (val && val.hasOwnProperty("innerArray")) {
+    val = new EventedArray(val["innerArray"].slice(0));
+  }
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
@@ -46,9 +51,8 @@ export const compute = <T>(
   fn: (val: T, changedItem?) => void,
   ...args: any[]
 ) => {
-  const cmp = value(undefined);
+  const cmp = value(fn(undefined));
   cmp["compute"] = fn;
-  cmp(fn(undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["c_depends"].push(cmp);
   return cmp;
 };
@@ -58,9 +62,8 @@ export const beforeCompute = <T>(
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
   ...args: any[]
 ) => {
-  const cmp = value(undefined);
+  const cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
-  cmp(fn(initalValue, undefined, cmp));
   for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
   return cmp;
 };

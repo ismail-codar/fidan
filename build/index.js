@@ -266,6 +266,12 @@ var value = function (val) {
     }
   };
 
+  if (Array.isArray(val)) {
+    val = new EventedArray(val.slice(0));
+  } else if (val && val.hasOwnProperty("innerArray")) {
+    val = new EventedArray(val["innerArray"].slice(0));
+  }
+
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
@@ -278,9 +284,8 @@ var compute = function (fn) {
   var args = [], len = arguments.length - 1;
   while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
 
-  var cmp = value(undefined);
+  var cmp = value(fn(undefined));
   cmp["compute"] = fn;
-  cmp(fn(undefined, cmp));
 
   for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
 
@@ -290,9 +295,8 @@ var beforeCompute = function (initalValue, fn) {
   var args = [], len = arguments.length - 2;
   while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
 
-  var cmp = value(undefined);
+  var cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
-  cmp(fn(initalValue, undefined, cmp));
 
   for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
 
