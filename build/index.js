@@ -233,11 +233,51 @@ function EventedArray(items) {
   }
 }
 
+var animFrameId = 0;
+
+var arrayRefresh = function (arr) {
+  if (animFrameId) { cancelAnimationFrame(animFrameId); }
+  animFrameId = window.requestAnimationFrame(function () {
+    var depends = arr["c_depends"];
+    console.log(depends);
+    if (depends.length) { for (var i = 0; i < depends.length; i++) {
+      depends[i](depends[i].compute(arr.$val));
+    } }
+  });
+};
+
+var anyPropertyChange = function (obj, callback) {
+  // TODO deep check & isArray
+  for (var key in obj) {
+    if (obj[key].hasOwnProperty("$val")) {
+      compute(callback, obj[key]);
+    }
+  }
+};
+
+var arrayItemsAnyPropertyChange = function (arr, callback) {
+  console.log(arr.length);
+  arr.forEach(function (item) {
+    console.log(item);
+    anyPropertyChange(item, callback);
+  });
+};
+
 var array = function (items) {
   var arr = value(new EventedArray(items));
 
-  arr.toJSON = function () { return arr.$val.innerArray; };
+  arr["toJSON"] = function () { return arr.$val.innerArray; };
 
+  arr.$val.on("itemadded", function (e) {
+    anyPropertyChange(e.item, function () { return arrayRefresh(arr); });
+    arrayRefresh(arr);
+  });
+  arr.$val.on("itemremoved", arrayRefresh);
+  arr.$val.on("itemset", function (e) {
+    anyPropertyChange(e.item, function () { return arrayRefresh(arr); });
+    arrayRefresh(arr);
+  });
+  arrayItemsAnyPropertyChange(arr.$val, function () { return arrayRefresh(arr); });
   return arr;
 };
 var value = function (val) {
@@ -248,10 +288,12 @@ var value = function (val) {
       if (Array.isArray(val)) {
         val = new EventedArray(val.slice(0));
         val.setEventsFrom(innerFn["$val"]);
+        arrayItemsAnyPropertyChange(val, function () { return arrayRefresh(innerFn); });
       } else if (val && val.hasOwnProperty("innerArray")) {
+        // val.innerArray = val.innerArray.slice(0); array reuseMode !!!
         var arr = new EventedArray(val.innerArray.slice(0));
         arr.setEventsFrom(val);
-        val = arr;
+        val = arr; // arrayItemsAnyPropertyChange(val, () => arrayRefresh(innerFn));
       }
 
       var depends = innerFn["bc_depends"];
@@ -276,7 +318,7 @@ var value = function (val) {
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
 
-  innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toString(); };
+  innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"]; };
 
   return innerFn;
 };

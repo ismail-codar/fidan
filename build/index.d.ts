@@ -1,10 +1,10 @@
 export interface FidanValue<T> {
     (val?: T): T;
-    readonly $val: T;
+    $val: T;
 }
 export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved" | "beforemulti" | "aftermulti";
 export interface EventedArrayReturnType<T> extends Array<T> {
-    on: (type: any, callback: any) => void;
+    on: (type: FidanArrayEventType, callback: any) => void;
     off: any;
     innerArray: T[];
     setEventsFrom: (val: EventedArrayReturnType<T>) => void;
