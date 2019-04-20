@@ -622,20 +622,20 @@ var updateNodesByCommentNodes = function (element, params) {
       if (attributeName.startsWith("on")) {
         element$1.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        var val = param();
-
-        if (typeof val === "boolean") {
-          val ? element$1.setAttribute(attributeName, val) : element$1.removeAttribute(attributeName);
+        if (typeof param() === "boolean") {
+          compute(function () {
+            param() ? element$1.setAttribute(attributeName, true) : element$1.removeAttribute(attributeName);
+          }, param);
         } else if (htmlProps[attributeName]) {
           compute(function (val) {
             element$1[attributeName] = val;
           }, param)["name$"] = "[" + attributeName + "]";
-          element$1[attributeName] = val;
+          element$1[attributeName] = param();
         } else {
           compute(function (val) {
             element$1.setAttribute(attributeName, val);
           }, param)["name$"] = "attr(" + attributeName + ")";
-          element$1.setAttribute(attributeName, val);
+          element$1.setAttribute(attributeName, param());
         }
       } else {
         if (typeof param === "boolean") {
