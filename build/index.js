@@ -284,11 +284,10 @@ var value = function (val) {
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
 
-  innerFn.depends = function () {
-    var args = [], len = arguments.length;
-    while ( len-- ) args[ len ] = arguments[ len ];
+  innerFn.depends = function (dependencies) {
+    var deps = dependencies();
 
-    for (var i = 0; i < args.length; i++) { innerFn["c_depends"].push(args[i]); }
+    for (var i = 0; i < deps.length; i++) { innerFn["c_depends"].push(deps[i]); }
 
     return innerFn;
   };
@@ -304,25 +303,21 @@ var value = function (val) {
 
   return innerFn;
 };
-var compute = function (fn) {
-  var args = [], len = arguments.length - 1;
-  while ( len-- > 0 ) args[ len ] = arguments[ len + 1 ];
-
+var compute = function (fn, dependencies) {
   var cmp = value(fn(undefined));
   cmp["compute"] = fn;
+  var deps = dependencies();
 
-  for (var i = 0; i < args.length; i++) { args[i]["c_depends"].push(cmp); }
+  for (var i = 0; i < deps.length; i++) { deps[i]["c_depends"].push(cmp); }
 
   return cmp;
 };
-var beforeCompute = function (initalValue, fn) {
-  var args = [], len = arguments.length - 2;
-  while ( len-- > 0 ) args[ len ] = arguments[ len + 2 ];
-
+var beforeCompute = function (initalValue, fn, dependencies) {
   var cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
+  var deps = dependencies();
 
-  for (var i = 0; i < args.length; i++) { args[i]["bc_depends"].push(cmp); }
+  for (var i = 0; i < deps.length; i++) { deps[i]["bc_depends"].push(cmp); }
 
   return cmp;
 };
@@ -642,16 +637,16 @@ var updateNodesByCommentNodes = function (element, params) {
         if (typeof param() === "boolean") {
           compute(function () {
             param() ? element$1.setAttribute(attributeName, true) : element$1.removeAttribute(attributeName);
-          }, param);
+          }, function () { return [param]; });
         } else if (htmlProps[attributeName]) {
           compute(function (val) {
             element$1[attributeName] = val;
-          }, param)["name$"] = "[" + attributeName + "]";
+          }, function () { return [param]; }).debugName("[" + attributeName + "]");
           element$1[attributeName] = param();
         } else {
           compute(function (val) {
             element$1.setAttribute(attributeName, val);
-          }, param)["name$"] = "attr(" + attributeName + ")";
+          }, function () { return [param]; }).debugName("attr(" + attributeName + ")");
           element$1.setAttribute(attributeName, param());
         }
       } else {

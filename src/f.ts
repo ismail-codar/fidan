@@ -53,8 +53,9 @@ export const value = <T>(val?: T): FidanValue<T> => {
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
-  innerFn.depends = (...args: FidanData<T>[]): FidanValue<T> => {
-    for (var i = 0; i < args.length; i++) innerFn["c_depends"].push(args[i]);
+  innerFn.depends = (dependencies: () => FidanData<any>[]): FidanValue<T> => {
+    const deps = dependencies();
+    for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
     return innerFn;
   };
   innerFn.debugName = (name: string) => {
@@ -66,23 +67,25 @@ export const value = <T>(val?: T): FidanValue<T> => {
 };
 
 export const compute = <T>(
-  fn: (val: T, changedItem?) => T,
-  ...args: FidanData<T>[]
+  fn: (val: T, changedItem?) => any,
+  dependencies: () => FidanData<any>[]
 ) => {
   const cmp = value(fn(undefined));
   cmp["compute"] = fn;
-  for (var i = 0; i < args.length; i++) args[i]["c_depends"].push(cmp);
+  const deps = dependencies();
+  for (var i = 0; i < deps.length; i++) deps[i]["c_depends"].push(cmp);
   return cmp;
 };
 
 export const beforeCompute = <T>(
   initalValue: T,
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
-  ...args: FidanData<T>[]
+  dependencies: () => FidanData<any>[]
 ) => {
   const cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
-  for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
+  const deps = dependencies();
+  for (var i = 0; i < deps.length; i++) deps[i]["bc_depends"].push(cmp);
   return cmp;
 };
 

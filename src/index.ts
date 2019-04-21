@@ -2,7 +2,7 @@ export interface FidanValue<T> {
   (val?: T): T;
   $val: T;
   debugName: (name: string) => FidanValue<T>;
-  depends: (...args) => FidanValue<T>;
+  depends: (dependencies: () => FidanData<any>[]) => FidanValue<T>;
 }
 
 export type FidanArrayEventType =
@@ -23,6 +23,8 @@ export interface FidanArray<T> {
   (val?: T[]): T[] & EventedArrayReturnType<T>;
   readonly $val: T[] & EventedArrayReturnType<T>;
   size?: FidanValue<number>;
+  debugName: (name: string) => FidanArray<T>;
+  depends: (dependencies: () => FidanData<any>[]) => FidanArray<T>;
 }
 
 export type FidanData<T> = FidanValue<T> | FidanArray<T>;
