@@ -1,51 +1,14 @@
 import { EventedArray } from "./evented-array";
-import { FidanArray, FidanValue } from ".";
-
-let animFrameId = 0;
-const arrayRefresh = (arr: FidanArray<any>) => {
-  if (animFrameId) cancelAnimationFrame(animFrameId);
-  animFrameId = window.requestAnimationFrame(() => {
-    const depends = arr["c_depends"];
-    console.log(depends);
-    if (depends.length)
-      for (var i = 0; i < depends.length; i++) {
-        depends[i](depends[i].compute(arr.$val));
-      }
-  });
-};
-
-const anyPropertyChange = (obj: FidanValue<any>, callback: () => any) => {
-  // TODO deep check & isArray
-  for (var key in obj) {
-    if (obj[key].hasOwnProperty("$val")) {
-      compute(callback, obj[key]);
-    }
-  }
-};
-
-const arrayItemsAnyPropertyChange = (arr: any[], callback: () => any) => {
-  console.log(arr.length);
-  arr.forEach(item => {
-    console.log(item);
-    anyPropertyChange(item as any, callback);
-  });
-};
+import { FidanArray, FidanValue, FidanData } from ".";
 
 export const array = <T>(items: T[]): FidanArray<T> => {
   const arr = value(new EventedArray(items)) as FidanArray<T>;
   arr["toJSON"] = () => arr.$val.innerArray;
 
-  arr.$val.on("itemadded", e => {
-    anyPropertyChange(e.item, () => arrayRefresh(arr));
-    arrayRefresh(arr);
-  });
-  arr.$val.on("itemremoved", arrayRefresh);
-  arr.$val.on("itemset", e => {
-    anyPropertyChange(e.item, () => arrayRefresh(arr));
-    arrayRefresh(arr);
-  });
+  arr.size = value(items.length);
 
-  arrayItemsAnyPropertyChange(arr.$val, () => arrayRefresh(arr));
+  arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
+  arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
 
   return arr;
 };
@@ -58,13 +21,11 @@ export const value = <T>(val?: T): FidanValue<T> => {
       if (Array.isArray(val)) {
         val = new EventedArray(val.slice(0));
         val.setEventsFrom(innerFn["$val"]);
-        arrayItemsAnyPropertyChange(val, () => arrayRefresh(innerFn));
       } else if (val && val.hasOwnProperty("innerArray")) {
         // val.innerArray = val.innerArray.slice(0); array reuseMode !!!
         var arr = new EventedArray(val.innerArray.slice(0));
         arr.setEventsFrom(val);
         val = arr;
-        // arrayItemsAnyPropertyChange(val, () => arrayRefresh(innerFn));
       }
       let depends = innerFn["bc_depends"];
       if (depends.length)
@@ -77,6 +38,10 @@ export const value = <T>(val?: T): FidanValue<T> => {
         for (var i = 0; i < depends.length; i++) {
           depends[i](depends[i].compute(val));
         }
+
+      if (val.hasOwnProperty("innerArray")) {
+        innerFn.size && innerFn.size(val.innerArray.length);
+      }
     }
   };
 
@@ -88,13 +53,21 @@ export const value = <T>(val?: T): FidanValue<T> => {
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
+  innerFn.depends = (...args: FidanData<T>[]): FidanValue<T> => {
+    for (var i = 0; i < args.length; i++) innerFn["c_depends"].push(args[i]);
+    return innerFn;
+  };
+  innerFn.debugName = (name: string) => {
+    Object.defineProperty(innerFn, "name", { value: name });
+    return innerFn;
+  };
   innerFn.toString = innerFn.toJSON = () => innerFn["$val"];
   return innerFn;
 };
 
 export const compute = <T>(
-  fn: (val: T, changedItem?) => void,
-  ...args: any[]
+  fn: (val: T, changedItem?) => T,
+  ...args: FidanData<T>[]
 ) => {
   const cmp = value(fn(undefined));
   cmp["compute"] = fn;
@@ -105,22 +78,13 @@ export const compute = <T>(
 export const beforeCompute = <T>(
   initalValue: T,
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
-  ...args: any[]
+  ...args: FidanData<T>[]
 ) => {
   const cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
   for (var i = 0; i < args.length; i++) args[i]["bc_depends"].push(cmp);
   return cmp;
 };
-
-// TODO typedCompute, typedValue ...
-// export const computeReturn = <T>(fn: () => T, ...args: any[]): T =>
-//   initCompute(fn, ...args) as any;
-
-// export const setCompute = (prev: any, fn: () => void, ...args: any[]) => {
-//   destroy(prev);
-//   return initCompute(prev, fn, ...args);
-// };
 
 export const destroy = (item: any) => {
   delete item["compute"];

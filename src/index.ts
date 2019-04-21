@@ -1,6 +1,8 @@
 export interface FidanValue<T> {
   (val?: T): T;
   $val: T;
+  debugName: (name: string) => FidanValue<T>;
+  depends: (...args) => FidanValue<T>;
 }
 
 export type FidanArrayEventType =
@@ -20,7 +22,10 @@ export interface EventedArrayReturnType<T> extends Array<T> {
 export interface FidanArray<T> {
   (val?: T[]): T[] & EventedArrayReturnType<T>;
   readonly $val: T[] & EventedArrayReturnType<T>;
+  size?: FidanValue<number>;
 }
+
+export type FidanData<T> = FidanValue<T> | FidanArray<T>;
 
 import * as fidanObj from "./index-libs";
 export const fidan = fidanObj;
