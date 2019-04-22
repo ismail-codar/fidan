@@ -4,15 +4,35 @@ import { FidanArray, FidanData } from ".";
 
 export const coditionalDom = (
   condition: () => boolean,
-  htmlFragment: DocumentFragment,
-  dependencies: () => FidanData<any>[]
+  dependencies: () => FidanData<any>[],
+  htmlFragment: DocumentFragment
 ) => (element: Element) => {
-  const dom = htmlFragment.firstElementChild;
+  const childs = Array.from(htmlFragment.children);
   compute(() => {
-    if (!element.nextElementSibling && condition()) {
-      element.parentElement.insertBefore(dom, element.nextElementSibling);
+    if (condition()) {
+      if (!element.nextElementSibling) {
+        if (element.parentElement) {
+          for (var i = childs.length; i--; ) {
+            const child = childs[i];
+            element.parentElement.insertBefore(
+              child,
+              element.nextElementSibling
+            );
+          }
+        } else {
+          window.requestAnimationFrame(() => {
+            for (var i = childs.length; i--; ) {
+              const child = childs[i];
+              element.parentElement.insertBefore(
+                child,
+                element.nextElementSibling
+              );
+            }
+          });
+        }
+      }
     } else {
-      dom.remove();
+      childs.forEach(child => child.remove());
     }
   }, dependencies);
 };

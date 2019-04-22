@@ -380,13 +380,27 @@ var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeN
   }
 };
 
-var coditionalDom = function (condition, htmlFragment, dependencies) { return function (element) {
-  var dom = htmlFragment.firstElementChild;
+var coditionalDom = function (condition, dependencies, htmlFragment) { return function (element) {
+  var childs = Array.from(htmlFragment.children);
   compute(function () {
-    if (!element.nextElementSibling && condition()) {
-      element.parentElement.insertBefore(dom, element.nextElementSibling);
+    if (condition()) {
+      if (!element.nextElementSibling) {
+        if (element.parentElement) {
+          for (var i = childs.length; i--;) {
+            var child = childs[i];
+            element.parentElement.insertBefore(child, element.nextElementSibling);
+          }
+        } else {
+          window.requestAnimationFrame(function () {
+            for (var i = childs.length; i--;) {
+              var child = childs[i];
+              element.parentElement.insertBefore(child, element.nextElementSibling);
+            }
+          });
+        }
+      }
     } else {
-      dom.remove();
+      childs.forEach(function (child) { return child.remove(); });
     }
   }, dependencies);
 }; };
