@@ -652,14 +652,12 @@ var updateNodesByCommentNodes = function (element, params) {
         element$1 = commentNode.nextElementSibling;
       }
 
+      commentType !== COMMENT_FN && commentNode.remove();
+
       if (attributeName.startsWith("on")) {
         element$1.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (typeof param() === "boolean") {
-          compute(function () {
-            param() ? element$1.setAttribute(attributeName, true) : element$1.removeAttribute(attributeName);
-          }, function () { return [param]; });
-        } else if (htmlProps[attributeName]) {
+        if (htmlProps[attributeName] || typeof param() === "boolean") {
           compute(function (val) {
             element$1[attributeName] = val;
           }, function () { return [param]; }).debugName("[" + attributeName + "]");
@@ -671,12 +669,10 @@ var updateNodesByCommentNodes = function (element, params) {
           element$1.setAttribute(attributeName, param());
         }
       } else {
-        if (typeof param === "boolean") {
-          param ? element$1.setAttribute(attributeName, param) : element$1.removeAttribute(attributeName);
+        if (htmlProps[attributeName] || typeof param === "boolean") {
+          element$1[attributeName] = param;
         } else if (typeof param === "function") {
           param(element$1);
-        } else if (htmlProps[attributeName]) {
-          element$1[attributeName] = param;
         } else {
           element$1.setAttribute(attributeName, param);
         }
@@ -695,8 +691,6 @@ var updateNodesByCommentNodes = function (element, params) {
     } else if (commentType === COMMENT_HTM) {
       commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
     }
-
-    commentType !== COMMENT_FN && commentNode.remove();
   };
 
   for (var i = 0; i < commentNodes.length; i++) loop( i );

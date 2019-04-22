@@ -152,19 +152,11 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         );
         element = commentNode.nextElementSibling;
       }
+      commentType !== COMMENT_FN && commentNode.remove();
       if (attributeName.startsWith("on")) {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (typeof param() === "boolean") {
-          compute(
-            () => {
-              param()
-                ? element.setAttribute(attributeName, true)
-                : element.removeAttribute(attributeName);
-            },
-            () => [param]
-          );
-        } else if (htmlProps[attributeName]) {
+        if (htmlProps[attributeName] || typeof param() === "boolean") {
           compute(
             val => {
               element[attributeName] = val;
@@ -182,14 +174,10 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
           element.setAttribute(attributeName, param());
         }
       } else {
-        if (typeof param === "boolean") {
-          param
-            ? element.setAttribute(attributeName, param)
-            : element.removeAttribute(attributeName);
+        if (htmlProps[attributeName] || typeof param === "boolean") {
+          element[attributeName] = param;
         } else if (typeof param === "function") {
           param(element);
-        } else if (htmlProps[attributeName]) {
-          element[attributeName] = param;
         } else {
           element.setAttribute(attributeName, param);
         }
@@ -208,8 +196,6 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
     } else if (commentType === COMMENT_HTM) {
       commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
     }
-
-    commentType !== COMMENT_FN && commentNode.remove();
   }
 };
 
