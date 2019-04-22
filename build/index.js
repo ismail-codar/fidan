@@ -594,6 +594,14 @@ var html = function () {
 
   template = template.cloneNode(false);
   template.innerHTML = htm.join("");
+  /**
+    .replace(/\n/g, "")
+    .replace(/  /g, " ")
+    .replace(/  /g, "")
+    .replace(/> /g, ">")
+    .replace(/ </g, "<");
+     */
+
   var element = template.content;
   element["$params"] = params;
 
@@ -663,7 +671,6 @@ var updateNodesByCommentNodes = function (element, params) {
         element$1.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
         if (htmlProps[attributeName]) {
-          console.log(param.name);
           compute(function (val) {
             element$1[attributeName] = val;
           }, function () { return [param]; }).debugName("[" + attributeName + "]");

@@ -93,6 +93,13 @@ export const html = (...args) => {
   }
   template = template.cloneNode(false) as HTMLTemplateElement;
   template.innerHTML = htm.join("");
+  /**    
+    .replace(/\n/g, "")
+    .replace(/  /g, " ")
+    .replace(/  /g, "")
+    .replace(/> /g, ">")
+    .replace(/ </g, "<");
+     */
   const element = template.content;
   element["$params"] = params;
   if (!_templateMode) {
@@ -169,7 +176,6 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
         if (htmlProps[attributeName]) {
-          console.log(param.name);
           compute(
             val => {
               element[attributeName] = val;
