@@ -380,27 +380,24 @@ var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeN
   }
 };
 
-var coditionalDom = function (condition, dependencies, htmlFragment) { return function (element) {
+var coditionalDom = function (condition, dependencies, htmlFragment) { return function (parentElement, nextElement) {
   var childs = Array.from(htmlFragment.children);
+  var inserted = false;
   compute(function () {
     if (condition()) {
-      if (!element.nextElementSibling) {
-        if (element.parentElement) {
-          for (var i = childs.length; i--;) {
-            var child = childs[i];
-            element.parentElement.insertBefore(child, element.nextElementSibling);
-          }
-        } else {
-          window.requestAnimationFrame(function () {
-            for (var i = childs.length; i--;) {
-              var child = childs[i];
-              element.parentElement.insertBefore(child, element.nextElementSibling);
-            }
-          });
+      if (!inserted) {
+        var tmpNextElement = nextElement;
+
+        for (var i = childs.length - 1; i >= 0; i--) {
+          var child = childs[i];
+          tmpNextElement = parentElement.insertBefore(child, tmpNextElement);
         }
+
+        inserted = true;
       }
     } else {
       childs.forEach(function (child) { return child.remove(); });
+      inserted = false;
     }
   }, dependencies);
 }; };
@@ -417,7 +414,7 @@ var insertToDom = function (parentElement, index, itemElement) {
     parentElement.insertBefore(itemElement, parentElement.children[index]);
   }
 };
-var arrayMap = function (arr, parentDom, renderReturn, reuseMode) {
+var arrayMap = function (arr, parentDom, nextElement, renderReturn, reuseMode) {
   var parentRef = null;
   arr.$val.on("beforemulti", function () {
     if (parentDom.parentNode) {
@@ -685,10 +682,21 @@ var updateNodesByCommentNodes = function (element, params) {
         }
       }
     } else if (commentType === COMMENT_FN) {
-      param(commentNode);
+      if (commentNode.parentElement) {
+        param(commentNode.parentElement, commentNode.nextElement);
+        commentNode.remove();
+      } else {
+        //conditionalDom can be place on root
+        window.requestAnimationFrame(function () {
+          param(commentNode.parentElement, commentNode.nextElement);
+          commentNode.remove();
+        });
+      }
     } else if (commentType === COMMENT_HTM) {
       commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
     }
+
+    commentType !== COMMENT_FN && commentNode.remove();
   };
 
   for (var i = 0; i < commentNodes.length; i++) loop( i );
@@ -701,8 +709,7 @@ var htmlArrayMap = function (arr, renderCallback, options) {
   }, options);
 
   if (options.useCloneNode) {
-    return function (commentNode) {
-      var element = commentNode.parentElement;
+    return function (parentElement, nextElement) {
       var clonedNode = null;
       var params = null;
       var dataParamIndexes = [];
@@ -736,12 +743,11 @@ var htmlArrayMap = function (arr, renderCallback, options) {
         return renderNode;
       };
 
-      arrayMap(arr, element, arrayMapFn, options.reuseMode);
+      arrayMap(arr, parentElement, nextElement, arrayMapFn, options.reuseMode);
     };
   } else {
-    return function (commentNode) {
-      var element = commentNode.parentElement;
-      arrayMap(arr, element, renderCallback);
+    return function (parentElement, nextElement) {
+      arrayMap(arr, parentElement, nextElement, renderCallback);
     };
   }
 };

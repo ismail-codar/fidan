@@ -6,33 +6,22 @@ export const coditionalDom = (
   condition: () => boolean,
   dependencies: () => FidanData<any>[],
   htmlFragment: DocumentFragment
-) => (element: Element) => {
+) => (parentElement: Element, nextElement: Element) => {
   const childs = Array.from(htmlFragment.children);
+  let inserted = false;
   compute(() => {
     if (condition()) {
-      if (!element.nextElementSibling) {
-        if (element.parentElement) {
-          for (var i = childs.length; i--; ) {
-            const child = childs[i];
-            element.parentElement.insertBefore(
-              child,
-              element.nextElementSibling
-            );
-          }
-        } else {
-          window.requestAnimationFrame(() => {
-            for (var i = childs.length; i--; ) {
-              const child = childs[i];
-              element.parentElement.insertBefore(
-                child,
-                element.nextElementSibling
-              );
-            }
-          });
+      if (!inserted) {
+        let tmpNextElement = nextElement;
+        for (var i = childs.length - 1; i >= 0; i--) {
+          const child = childs[i];
+          tmpNextElement = parentElement.insertBefore(child, tmpNextElement);
         }
+        inserted = true;
       }
     } else {
       childs.forEach(child => child.remove());
+      inserted = false;
     }
   }, dependencies);
 };
@@ -52,6 +41,7 @@ export const insertToDom = (parentElement, index, itemElement) => {
 export const arrayMap = <T>(
   arr: FidanArray<T>,
   parentDom: Node & ParentNode,
+  nextElement: Element,
   renderReturn: (item: any, idx?: number, isInsert?: boolean) => Node,
   reuseMode?: boolean
 ) => {

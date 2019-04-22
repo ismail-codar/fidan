@@ -195,10 +195,21 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         }
       }
     } else if (commentType === COMMENT_FN) {
-      param(commentNode);
+      if (commentNode.parentElement) {
+        param(commentNode.parentElement, commentNode.nextElement);
+        commentNode.remove();
+      } else {
+        //conditionalDom can be place on root
+        window.requestAnimationFrame(() => {
+          param(commentNode.parentElement, commentNode.nextElement);
+          commentNode.remove();
+        });
+      }
     } else if (commentType === COMMENT_HTM) {
       commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
     }
+
+    commentType !== COMMENT_FN && commentNode.remove();
   }
 };
 
@@ -212,8 +223,7 @@ export const htmlArrayMap = <T>(
 ) => {
   options = Object.assign({ useCloneNode: false, reuseMode: false }, options);
   if (options.useCloneNode) {
-    return (commentNode: Node) => {
-      const element = commentNode.parentElement;
+    return (parentElement: Element, nextElement: Element) => {
       let clonedNode = null;
       let params = null;
       let dataParamIndexes = [];
@@ -241,12 +251,11 @@ export const htmlArrayMap = <T>(
         updateNodesByCommentNodes(renderNode, params);
         return renderNode;
       };
-      arrayMap(arr, element, arrayMapFn, options.reuseMode);
+      arrayMap(arr, parentElement, nextElement, arrayMapFn, options.reuseMode);
     };
   } else {
-    return function(commentNode) {
-      var element = commentNode.parentElement;
-      arrayMap(arr as any, element, renderCallback);
+    return function(parentElement: Element, nextElement: Element) {
+      arrayMap(arr as any, parentElement, nextElement, renderCallback);
     };
   }
 };
