@@ -452,7 +452,7 @@ var arrayMap = function (arr, parentDom, renderReturn, reuseMode) {
     }
   };
 
-  beforeCompute(arr.$val, arrayComputeRenderAll, arr);
+  beforeCompute(arr.$val, arrayComputeRenderAll, function () { return [arr]; });
 };
 
 var setDefaults = function (obj, defaults) {
