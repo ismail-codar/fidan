@@ -1,6 +1,21 @@
-import { beforeCompute } from "./f";
+import { beforeCompute, compute } from "./f";
 import { reuseNodes } from "./reuse-nodes";
-import { FidanArray } from ".";
+import { FidanArray, FidanData } from ".";
+
+export const coditionalDom = (
+  condition: () => boolean,
+  htmlFragment: DocumentFragment,
+  dependencies: () => FidanData<any>[]
+) => (element: Element) => {
+  const dom = htmlFragment.firstElementChild;
+  compute(() => {
+    if (!element.nextElementSibling && condition()) {
+      element.parentElement.insertBefore(dom, element.nextElementSibling);
+    } else {
+      dom.remove();
+    }
+  }, dependencies);
+};
 
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;

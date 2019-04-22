@@ -380,6 +380,16 @@ var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeN
   }
 };
 
+var coditionalDom = function (condition, htmlFragment, dependencies) { return function (element) {
+  var dom = htmlFragment.firstElementChild;
+  compute(function () {
+    if (!element.nextElementSibling && condition()) {
+      element.parentElement.insertBefore(dom, element.nextElementSibling);
+    } else {
+      dom.remove();
+    }
+  }, dependencies);
+}; };
 var insertToDom = function (parentElement, index, itemElement) {
   var typeOf = typeof itemElement;
 
@@ -821,6 +831,7 @@ var fidanObj = ({
   compute: compute,
   beforeCompute: beforeCompute,
   destroy: destroy,
+  coditionalDom: coditionalDom,
   insertToDom: insertToDom,
   arrayMap: arrayMap,
   setDefaults: setDefaults,
