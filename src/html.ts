@@ -4,7 +4,7 @@ import { FidanArray } from ".";
 
 const COMMENT_TEXT = 1;
 const COMMENT_DOM = 2;
-const COMMENT_FN = 4;
+const COMMENT_FN = 4; // "function" && !isDynamic
 const COMMENT_HTM = 8;
 const COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
 
@@ -16,11 +16,23 @@ const htmlProps = {
   innerHTML: true,
   innerText: true,
   tabIndex: true,
-  value: true
+  value: true,
+  checked: true,
+  disabled: true,
+  readonly: true,
+  contentEditable: true
 };
 
 let _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 let template = document.createElement("template");
+
+const isPromise = (obj): obj is Promise<any> => {
+  return (
+    !!obj &&
+    (typeof obj === "object" || typeof obj === "function") &&
+    typeof obj.then === "function"
+  );
+};
 
 const putCommentToTagStart = (
   htm: string[],
@@ -156,7 +168,8 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
       if (attributeName.startsWith("on")) {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (htmlProps[attributeName] || typeof param() === "boolean") {
+        if (htmlProps[attributeName]) {
+          console.log(param.name);
           compute(
             val => {
               element[attributeName] = val;
@@ -174,7 +187,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
           element.setAttribute(attributeName, param());
         }
       } else {
-        if (htmlProps[attributeName] || typeof param === "boolean") {
+        if (htmlProps[attributeName]) {
           element[attributeName] = param;
         } else if (typeof param === "function") {
           param(element);

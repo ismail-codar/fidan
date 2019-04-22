@@ -516,7 +516,8 @@ var jsRoot = function () {
 
 var COMMENT_TEXT = 1;
 var COMMENT_DOM = 2;
-var COMMENT_FN = 4;
+var COMMENT_FN = 4; // "function" && !isDynamic
+
 var COMMENT_HTM = 8;
 var COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
 var htmlProps = {
@@ -527,7 +528,11 @@ var htmlProps = {
   innerHTML: true,
   innerText: true,
   tabIndex: true,
-  value: true
+  value: true,
+  checked: true,
+  disabled: true,
+  readonly: true,
+  contentEditable: true
 };
 var _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 
@@ -657,7 +662,8 @@ var updateNodesByCommentNodes = function (element, params) {
       if (attributeName.startsWith("on")) {
         element$1.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
-        if (htmlProps[attributeName] || typeof param() === "boolean") {
+        if (htmlProps[attributeName]) {
+          console.log(param.name);
           compute(function (val) {
             element$1[attributeName] = val;
           }, function () { return [param]; }).debugName("[" + attributeName + "]");
@@ -669,7 +675,7 @@ var updateNodesByCommentNodes = function (element, params) {
           element$1.setAttribute(attributeName, param());
         }
       } else {
-        if (htmlProps[attributeName] || typeof param === "boolean") {
+        if (htmlProps[attributeName]) {
           element$1[attributeName] = param;
         } else if (typeof param === "function") {
           param(element$1);
