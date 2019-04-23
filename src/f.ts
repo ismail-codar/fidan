@@ -39,7 +39,7 @@ export const value = <T>(val?: T): FidanValue<T> => {
           depends[i](depends[i].compute(val));
         }
 
-      if (val.hasOwnProperty("innerArray")) {
+      if (val && val.hasOwnProperty("innerArray")) {
         innerFn.size && innerFn.size(val.innerArray.length);
       }
     }

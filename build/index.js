@@ -268,7 +268,7 @@ var value = function (val) {
         depends[i](depends[i].compute(val));
       } }
 
-      if (val.hasOwnProperty("innerArray")) {
+      if (val && val.hasOwnProperty("innerArray")) {
         innerFn.size && innerFn.size(val.innerArray.length);
       }
     }
@@ -663,9 +663,8 @@ var updateNodesByCommentNodes = function (element, params) {
       } else if (commentType === COMMENT_DOM) {
         attributeName = commentValue.substr(i2 + 1, commentValue.length - i2 - 2);
         element$1 = commentNode.nextElementSibling;
-      }
+      } // commentType !== COMMENT_FN && commentNode.remove();
 
-      commentType !== COMMENT_FN && commentNode.remove();
 
       if (attributeName.startsWith("on")) {
         element$1.addEventListener(attributeName.substr(2), param);
@@ -673,12 +672,12 @@ var updateNodesByCommentNodes = function (element, params) {
         if (htmlProps[attributeName]) {
           compute(function (val) {
             element$1[attributeName] = val;
-          }, function () { return [param]; }).debugName("[" + attributeName + "]");
+          }, function () { return [param]; });
           element$1[attributeName] = param();
         } else {
           compute(function (val) {
             element$1.setAttribute(attributeName, val);
-          }, function () { return [param]; }).debugName("attr(" + attributeName + ")");
+          }, function () { return [param]; });
           element$1.setAttribute(attributeName, param());
         }
       } else {
@@ -692,13 +691,11 @@ var updateNodesByCommentNodes = function (element, params) {
       }
     } else if (commentType === COMMENT_FN) {
       if (commentNode.parentElement) {
-        param(commentNode.parentElement, commentNode.nextElement);
-        commentNode.remove();
+        param(commentNode.parentElement, commentNode.nextElement); // commentNode.remove();
       } else {
         //conditionalDom can be place on root
         window.requestAnimationFrame(function () {
-          param(commentNode.parentElement, commentNode.nextElement);
-          commentNode.remove();
+          param(commentNode.parentElement, commentNode.nextElement); // commentNode.remove();
         });
       }
     } else if (commentType === COMMENT_HTM) {

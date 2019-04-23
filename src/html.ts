@@ -171,7 +171,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         );
         element = commentNode.nextElementSibling;
       }
-      commentType !== COMMENT_FN && commentNode.remove();
+      // commentType !== COMMENT_FN && commentNode.remove();
       if (attributeName.startsWith("on")) {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
@@ -181,7 +181,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
               element[attributeName] = val;
             },
             () => [param]
-          ).debugName("[" + attributeName + "]");
+          );
           element[attributeName] = param();
         } else {
           compute(
@@ -189,7 +189,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
               element.setAttribute(attributeName, val);
             },
             () => [param]
-          ).debugName("attr(" + attributeName + ")");
+          );
           element.setAttribute(attributeName, param());
         }
       } else {
@@ -204,12 +204,12 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
     } else if (commentType === COMMENT_FN) {
       if (commentNode.parentElement) {
         param(commentNode.parentElement, commentNode.nextElement);
-        commentNode.remove();
+        // commentNode.remove();
       } else {
         //conditionalDom can be place on root
         window.requestAnimationFrame(() => {
           param(commentNode.parentElement, commentNode.nextElement);
-          commentNode.remove();
+          // commentNode.remove();
         });
       }
     } else if (commentType === COMMENT_HTM) {
