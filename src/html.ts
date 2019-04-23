@@ -103,7 +103,9 @@ export const html = (...args) => {
   const element = template.content;
   element["$params"] = params;
   if (!_templateMode) {
-    updateNodesByCommentNodes(element, params);
+    var commentNodes = [];
+    walkForCommentNodes(element, commentNodes);
+    updateNodesByCommentNodes(commentNodes, params);
   }
   return element;
 };
@@ -128,10 +130,7 @@ const walkForCommentNodes = (element, commentNodes) => {
   }
 };
 
-const updateNodesByCommentNodes = (element: Node, params: any[]) => {
-  var commentNodes = [];
-  walkForCommentNodes(element, commentNodes);
-
+const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
   for (var i = 0; i < commentNodes.length; i++) {
     const commentNode = commentNodes[i];
     var commentValue = commentNode.nodeValue;
@@ -203,12 +202,12 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
       }
     } else if (commentType === COMMENT_FN) {
       if (commentNode.parentElement) {
-        param(commentNode.parentElement, commentNode.nextElement);
+        param(commentNode.parentElement, commentNode.nextElementSibling);
         // commentNode.remove();
       } else {
         //conditionalDom can be place on root
         window.requestAnimationFrame(() => {
-          param(commentNode.parentElement, commentNode.nextElement);
+          param(commentNode.parentElement, commentNode.nextElementSibling);
           // commentNode.remove();
         });
       }
@@ -232,8 +231,10 @@ export const htmlArrayMap = <T>(
       let clonedNode = null;
       let params = null;
       let dataParamIndexes = [];
+      // let commentNodesAddresses: number[][] = null;
       const arrayMapFn = data => {
         let renderNode = null;
+        var commentNodes = [];
         if (clonedNode === null) {
           _templateMode = true;
           renderNode = renderCallback(data);
@@ -247,13 +248,21 @@ export const htmlArrayMap = <T>(
               }
           }
           clonedNode = renderNode.cloneNode(true);
+          // walkForCommentNodes(clonedNode, commentNodes);
+          // commentNodesAddresses = generateCommentNodesAddresses(commentNodes);
         } else {
           renderNode = clonedNode.cloneNode(true);
         }
         for (var i = 0; i < dataParamIndexes.length; i += 2) {
           params[dataParamIndexes[i]] = data[dataParamIndexes[i + 1]];
         }
-        updateNodesByCommentNodes(renderNode, params);
+        // generateCommentNodesFromAddresses(
+        //   commentNodesAddresses,
+        //   renderNode,
+        //   commentNodes
+        // );
+        walkForCommentNodes(renderNode, commentNodes);
+        updateNodesByCommentNodes(commentNodes, params);
         return renderNode;
       };
       arrayMap(arr, parentElement, nextElement, arrayMapFn, options.reuseMode);
@@ -264,3 +273,35 @@ export const htmlArrayMap = <T>(
     };
   }
 };
+
+// const generateCommentNodesAddresses = (commentNodes: Comment[]) => {
+//   const paths: number[][] = [];
+//   for (var i = 0; i < commentNodes.length; i++) {
+//     const path: number[] = [];
+//     let node = commentNodes[i] as Node & ChildNode;
+//     let parent = node.parentNode as Node & ParentNode;
+//     while (parent) {
+//       path.push(Array.from(parent.childNodes).indexOf(node));
+//       node = parent as any;
+//       parent = parent.parentNode;
+//     }
+//     paths.push(path.reverse());
+//   }
+//   return paths;
+// };
+// const generateCommentNodesFromAddresses = (
+//   commentNodesAddresses: number[][],
+//   element: Element,
+//   commentNodes: Comment[]
+// ) => {
+//   for (var i = 0; i < commentNodesAddresses.length; i++) {
+//     const path = commentNodesAddresses[i];
+//     let node = null;
+//     let parent = element;
+//     for (var p = 0; p < path.length; p++) {
+//       node = parent.childNodes.item(path[p]);
+//       parent = node;
+//     }
+//     commentNodes.push(node);
+//   }
+// };

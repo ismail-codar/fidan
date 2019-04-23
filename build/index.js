@@ -606,7 +606,9 @@ var html = function () {
   element["$params"] = params;
 
   if (!_templateMode) {
-    updateNodesByCommentNodes(element, params);
+    var commentNodes = [];
+    walkForCommentNodes(element, commentNodes);
+    updateNodesByCommentNodes(commentNodes, params);
   }
 
   return element;
@@ -625,14 +627,11 @@ var walkForCommentNodes = function (element, commentNodes) {
   }
 };
 
-var updateNodesByCommentNodes = function (element, params) {
-  var commentNodes = [];
-  walkForCommentNodes(element, commentNodes);
-
+var updateNodesByCommentNodes = function (commentNodes, params) {
   var loop = function ( i ) {
     var commentNode = commentNodes[i];
     var commentValue = commentNode.nodeValue;
-    var element$1 = null;
+    var element = null;
     var attributeName = null;
     var i1 = commentValue.indexOf("_") + 1;
     var i2 = commentValue.indexOf("_", i1);
@@ -650,8 +649,8 @@ var updateNodesByCommentNodes = function (element, params) {
     if (commentType & COMMENT_TEXT_OR_DOM) {
       if (commentType === COMMENT_TEXT) {
         attributeName = "textContent";
-        element$1 = document.createTextNode(param.$val);
-        commentNode.parentElement.insertBefore(element$1, commentNode.nextSibling);
+        element = document.createTextNode(param.$val);
+        commentNode.parentElement.insertBefore(element, commentNode.nextSibling);
 
         if (!param.hasOwnProperty("$val")) {
           if (Array.isArray(param)) {
@@ -662,40 +661,40 @@ var updateNodesByCommentNodes = function (element, params) {
         }
       } else if (commentType === COMMENT_DOM) {
         attributeName = commentValue.substr(i2 + 1, commentValue.length - i2 - 2);
-        element$1 = commentNode.nextElementSibling;
+        element = commentNode.nextElementSibling;
       } // commentType !== COMMENT_FN && commentNode.remove();
 
 
       if (attributeName.startsWith("on")) {
-        element$1.addEventListener(attributeName.substr(2), param);
+        element.addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
         if (htmlProps[attributeName]) {
           compute(function (val) {
-            element$1[attributeName] = val;
+            element[attributeName] = val;
           }, function () { return [param]; });
-          element$1[attributeName] = param();
+          element[attributeName] = param();
         } else {
           compute(function (val) {
-            element$1.setAttribute(attributeName, val);
+            element.setAttribute(attributeName, val);
           }, function () { return [param]; });
-          element$1.setAttribute(attributeName, param());
+          element.setAttribute(attributeName, param());
         }
       } else {
         if (htmlProps[attributeName]) {
-          element$1[attributeName] = param;
+          element[attributeName] = param;
         } else if (typeof param === "function") {
-          param(element$1);
+          param(element);
         } else {
-          element$1.setAttribute(attributeName, param);
+          element.setAttribute(attributeName, param);
         }
       }
     } else if (commentType === COMMENT_FN) {
       if (commentNode.parentElement) {
-        param(commentNode.parentElement, commentNode.nextElement); // commentNode.remove();
+        param(commentNode.parentElement, commentNode.nextElementSibling); // commentNode.remove();
       } else {
         //conditionalDom can be place on root
         window.requestAnimationFrame(function () {
-          param(commentNode.parentElement, commentNode.nextElement); // commentNode.remove();
+          param(commentNode.parentElement, commentNode.nextElementSibling); // commentNode.remove();
         });
       }
     } else if (commentType === COMMENT_HTM) {
@@ -716,10 +715,11 @@ var htmlArrayMap = function (arr, renderCallback, options) {
     return function (parentElement, nextElement) {
       var clonedNode = null;
       var params = null;
-      var dataParamIndexes = [];
+      var dataParamIndexes = []; // let commentNodesAddresses: number[][] = null;
 
       var arrayMapFn = function (data) {
         var renderNode = null;
+        var commentNodes = [];
 
         if (clonedNode === null) {
           _templateMode = true;
@@ -734,16 +734,23 @@ var htmlArrayMap = function (arr, renderCallback, options) {
             } }
           }
 
-          clonedNode = renderNode.cloneNode(true);
+          clonedNode = renderNode.cloneNode(true); // walkForCommentNodes(clonedNode, commentNodes);
+          // commentNodesAddresses = generateCommentNodesAddresses(commentNodes);
         } else {
           renderNode = clonedNode.cloneNode(true);
         }
 
         for (var i = 0; i < dataParamIndexes.length; i += 2) {
           params[dataParamIndexes[i]] = data[dataParamIndexes[i + 1]];
-        }
+        } // generateCommentNodesFromAddresses(
+        //   commentNodesAddresses,
+        //   renderNode,
+        //   commentNodes
+        // );
 
-        updateNodesByCommentNodes(renderNode, params);
+
+        walkForCommentNodes(renderNode, commentNodes);
+        updateNodesByCommentNodes(commentNodes, params);
         return renderNode;
       };
 
@@ -754,7 +761,37 @@ var htmlArrayMap = function (arr, renderCallback, options) {
       arrayMap(arr, parentElement, nextElement, renderCallback);
     };
   }
-};
+}; // const generateCommentNodesAddresses = (commentNodes: Comment[]) => {
+//   const paths: number[][] = [];
+//   for (var i = 0; i < commentNodes.length; i++) {
+//     const path: number[] = [];
+//     let node = commentNodes[i] as Node & ChildNode;
+//     let parent = node.parentNode as Node & ParentNode;
+//     while (parent) {
+//       path.push(Array.from(parent.childNodes).indexOf(node));
+//       node = parent as any;
+//       parent = parent.parentNode;
+//     }
+//     paths.push(path.reverse());
+//   }
+//   return paths;
+// };
+// const generateCommentNodesFromAddresses = (
+//   commentNodesAddresses: number[][],
+//   element: Element,
+//   commentNodes: Comment[]
+// ) => {
+//   for (var i = 0; i < commentNodesAddresses.length; i++) {
+//     const path = commentNodesAddresses[i];
+//     let node = null;
+//     let parent = element;
+//     for (var p = 0; p < path.length; p++) {
+//       node = parent.childNodes.item(path[p]);
+//       parent = node;
+//     }
+//     commentNodes.push(node);
+//   }
+// };
 
 function symbolObservablePonyfill(root) {
   var result;
