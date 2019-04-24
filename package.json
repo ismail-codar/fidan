@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/runtime",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "High performance and easy way for building web user interfaces.",
   "scripts": {
     "build-browser": "microbundle --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
