@@ -1,6 +1,8 @@
 import { EventedArray } from "./evented-array";
 import { FidanArray, FidanValue, FidanData } from ".";
 
+let autoTrackDependencies: any[] = null;
+
 export const array = <T>(items: T[]): FidanArray<T> => {
   const arr = value(new EventedArray(items)) as FidanArray<T>;
   arr["toJSON"] = () => arr.$val.innerArray;
@@ -16,6 +18,12 @@ export const array = <T>(items: T[]): FidanArray<T> => {
 export const value = <T>(val?: T): FidanValue<T> => {
   const innerFn: any = (val?) => {
     if (val === undefined) {
+      if (
+        autoTrackDependencies &&
+        autoTrackDependencies.indexOf(innerFn) === -1
+      ) {
+        autoTrackDependencies.push(innerFn);
+      }
       return innerFn["$val"];
     } else {
       if (Array.isArray(val)) {
@@ -68,11 +76,14 @@ export const value = <T>(val?: T): FidanValue<T> => {
 
 export const compute = <T>(
   fn: (val: T, changedItem?) => any,
-  dependencies: () => FidanData<any>[]
+  dependencies?: () => FidanData<any>[]
 ) => {
-  const cmp = value(fn(undefined));
+  autoTrackDependencies = dependencies ? null : [];
+  const val = fn(undefined);
+  const deps = autoTrackDependencies ? autoTrackDependencies : dependencies();
+  autoTrackDependencies = null;
+  const cmp = value(val);
   cmp["compute"] = fn;
-  const deps = dependencies();
   for (var i = 0; i < deps.length; i++) deps[i]["c_depends"].push(cmp);
   return cmp;
 };

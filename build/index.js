@@ -233,6 +233,7 @@ function EventedArray(items) {
   }
 }
 
+var autoTrackDependencies = null;
 var array = function (items) {
   var arr = value(new EventedArray(items));
 
@@ -246,6 +247,10 @@ var array = function (items) {
 var value = function (val) {
   var innerFn = function (val) {
     if (val === undefined) {
+      if (autoTrackDependencies && autoTrackDependencies.indexOf(innerFn) === -1) {
+        autoTrackDependencies.push(innerFn);
+      }
+
       return innerFn["$val"];
     } else {
       if (Array.isArray(val)) {
@@ -304,9 +309,12 @@ var value = function (val) {
   return innerFn;
 };
 var compute = function (fn, dependencies) {
-  var cmp = value(fn(undefined));
+  autoTrackDependencies = dependencies ? null : [];
+  var val = fn(undefined);
+  var deps = autoTrackDependencies ? autoTrackDependencies : dependencies();
+  autoTrackDependencies = null;
+  var cmp = value(val);
   cmp["compute"] = fn;
-  var deps = dependencies();
 
   for (var i = 0; i < deps.length; i++) { deps[i]["c_depends"].push(cmp); }
 
