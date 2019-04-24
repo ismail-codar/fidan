@@ -489,20 +489,23 @@ var setDefaults = function (obj, defaults) {
     if (obj[key] === undefined) { obj[key] = defaults[key]; }
   }
 };
-var mapProperty = function (obj, propertyKey, value$) {
+var injectToProperty = function (obj, propertyKey, val) {
   var descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
   if (descr.configurable) { Object.defineProperty(obj, propertyKey, {
     configurable: false,
     enumerable: true,
-    get: function () {
-      return value$.$val;
-    },
-    set: value$
+    get: function () { return val; },
+    set: function (v) { return val(v); }
   }); }else {
-    descr.set["depends"].push(value(function () {
-      value$(obj[propertyKey]);
-    }));
+    descr.set["c_depends"].push(val);
   }
+};
+var inject = function (obj) {
+  for (var key in obj) {
+    injectToProperty(obj, key, value(obj[key]));
+  }
+
+  return obj;
 };
 var jsRoot = function () {
   var root;
@@ -904,7 +907,8 @@ var fidanObj = ({
   insertToDom: insertToDom,
   arrayMap: arrayMap,
   setDefaults: setDefaults,
-  mapProperty: mapProperty,
+  injectToProperty: injectToProperty,
+  inject: inject,
   jsRoot: jsRoot,
   html: html,
   htmlArrayMap: htmlArrayMap,

@@ -1,3 +1,4 @@
+import { FidanData } from ".";
 import { value } from "./f";
 
 export const setDefaults = <T>(
@@ -9,24 +10,29 @@ export const setDefaults = <T>(
   }
 };
 
-export const mapProperty = (obj: Object, propertyKey: string, value$: any) => {
+export const injectToProperty = (
+  obj: Object,
+  propertyKey: string,
+  val: FidanData<any>
+) => {
   const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
   if (descr.configurable)
     Object.defineProperty(obj, propertyKey, {
       configurable: false,
       enumerable: true,
-      get: () => {
-        return value$.$val;
-      },
-      set: value$
+      get: () => val,
+      set: v => val(v)
     });
   else {
-    descr.set["depends"].push(
-      value(() => {
-        value$(obj[propertyKey]);
-      })
-    );
+    descr.set["c_depends"].push(val);
   }
+};
+
+export const inject = <T extends Object>(obj: T): T => {
+  for (var key in obj) {
+    injectToProperty(obj, key, value(obj[key]));
+  }
+  return obj;
 };
 
 export const jsRoot = () => {
