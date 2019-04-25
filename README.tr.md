@@ -25,11 +25,11 @@ Web arayüzü geliştirmek için kullanımı kolay ve hızlı bir yol.
   ```
 
 - Kolay, basit anlaşılır API.
-  > Çünkü reaktif değişkenleri oluşturmak, html sözdizimine sahip şablon üzerinde kullanmak ve kodunuzun içinde reaktif değişkenleri değiştirerek arayüzün güncellendiğini seyretmek dışında birşeye ihtiyacınız yok.
+  > Çünkü reaktif değişkenleri oluşturmak, klasik html sözdizimine sahip bir şablon üzerine bu değişkenleri koymak ve kodunuzun içinde bu değişkenlerin değerini değiştirerek arayüzün güncellendiğini seyretmek dışında birşeye ihtiyacınız yok.
 
 ## Neden yeni bir kütüphane?
 
-Dünya genelinde sürekli yaygın kullanılan React, Vue, Angular gibi kütüphaneleri herkes biliyor. Ancak sürekli [benchmarklarda](https://krausest.github.io/js-framework-benchmark/current.html) kendini sınayan yeni bir framework sendromu da vardır. Elbette ki bunların amacı **tekerleği yeniden icat etmek değildir**. Belki mevcut tekerleklerin sıkıntılı olmasındandır.
+Dünya genelinde yaygın kullanılan React, Vue, Angular gibi kütüphaneleri herkes biliyor. Ancak sürekli [benchmarklarda](https://krausest.github.io/js-framework-benchmark/current.html) kendini sınayan yeni bir framework sendromu da vardır. Elbette ki bunların amacı **tekerleği yeniden icat etmek değildir**. Belki mevcut tekerleklerin sıkıntılı olmasındandır.
 
 ### React mı, Vue mi, Angular mı?
 
@@ -48,12 +48,50 @@ Bu ayrıca birkaç blog yazısı ile anlatılabilecek kadar çok uzun bir konudu
 
 # FidanJS nasıl bir çözüm olabiliyor?
 
-**Soru:** Virtual dom tekniğini kulllanılmıyor ise state üzerinde değişiklik olduğunda arayüz nasıl efektif olarak yeniden oluşturuluyor? Yoksa eski zamanlarda olduğu gibi her seferinde baştan mı oluşturuluyor! Ya da [vanillajs](http://vanilla-js.com/) yaklaşımı ile her şeyi web geliştiricisi manuel olarak mı yönetiyor?
+Virtual dom tekniğini kulllanılmıyor ise state üzerinde değişiklik olduğunda arayüz nasıl efektif olarak yeniden oluşturuluyor? Yoksa eski zamanlarda olduğu gibi her seferinde baştan mı oluşturuluyor! Ya da [vanillajs](http://vanilla-js.com/) yaklaşımı ile her şeyi web geliştiricisi manuel olarak mı yönetiyor?
 
-**Cevap:** Kendisi ile aynı yaklaşıma sahip diğer alternatifleri olan [svelte](https://svelte.dev/), [solid](https://github.com/ryansolid/solid), [surplus](https://github.com/adamhaile/surplus) gibi "Functional Reactive Programming" yaklaşımını kullanmaktadır.
+Diğer alternatifleri olan [svelte](https://svelte.dev/), [solid](https://github.com/ryansolid/solid), [surplus](https://github.com/adamhaile/surplus) benzer bir yaklaşım kullanmaktadır.
 
 Buna göre:
 
 - Tanımlanan "functional reactive" değişkenlere bir template (html) üzerinde kodlanır.
 - Template compiler aracılığı ile kullanıldıkları yerlerdeki arayüz parçasını güncelleme görevi olan yeni reaktif fonksiyonlar bağlanılır.
 - Gerektiği zaman da bu değişkenler üzerindeki veri güncellenir. Bu arayüzü güncelleme görevi olan fonksiyonlardan sadece gerekli olanları tetiklenerek sadece gerekli olan arayüz parçacığı güncellenmiş olur.
+
+## Örnekler üzerinden gidecek olursak:
+
+```js
+import { value, compute, html } from "@fidanjs/runtime";
+
+var A = value(1); // A adında reaktif bir değişkenin değeri 1
+var B = value(2); // B adında reaktif bir değişkenin değeri 2
+var C = compute(() => A() + B()); // C değişkeni ise A ve B nin toplamını döndürür
+
+/* Aşağıda javascript in template literal özelliği kullanılarak kodlanmış bir html template vardır. 
+
+// oninput event leri ile A ve B nin değeri değiştirildiğinde C değişkeninin blunduğu text bölgesi fidanjs runtime i tarafından otomatik olarak arayüz üzerinde değiştirilmektedir.
+*/
+var view = html`
+  <div>
+    A:
+    <input
+      type="number"
+      value="${A}"
+      oninput="${e => A(parseInt(e.target.value))}"
+    />
+    <br />
+    B:
+    <input
+      type="number"
+      value="${B}"
+      oninput="${e => B(parseInt(e.target.value))}"
+    />
+    <br />
+    C: ${C}
+  </div>
+`;
+
+document.body.appendChild(view);
+```
+
+Bu örneğin çalışır haline [buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fsum%2Findex.html&module=%2Fexamples%2Fbasic%2Fsum%2Fapp.ts) erişebilirsiniz.
