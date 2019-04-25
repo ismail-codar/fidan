@@ -50,7 +50,7 @@ Bu konu ayrıca birkaç blog yazısı ile anlatılabilecek kadar uzundur.
 
 Virtual dom tekniğini kulllanılmıyor ise state üzerinde değişiklik olduğunda arayüz nasıl efektif olarak yeniden oluşturuluyor? Yoksa eski zamanlarda olduğu gibi her seferinde baştan mı oluşturuluyor! Ya da [vanillajs](http://vanilla-js.com/) yaklaşımı ile her şeyi web geliştiricisi manuel olarak mı yönetiyor?
 
-Diğer alternatifleri olan [svelte](https://svelte.dev/), [solid](https://github.com/ryansolid/solid), [surplus](https://github.com/adamhaile/surplus) benzer bir yaklaşım kullanmaktadır.
+FidanJS diğer alternatifleri olan [svelte](https://svelte.dev/), [solid](https://github.com/ryansolid/solid), [surplus](https://github.com/adamhaile/surplus) benzer bir yaklaşım kullanmaktadır.
 
 Buna göre:
 
@@ -99,10 +99,11 @@ document.body.appendChild(view);
 
 Bu örneğin çalışır haline [buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fsum%2Findex.html&module=%2Fexamples%2Fbasic%2Fsum%2Fapp.ts) erişebilirsiniz.
 
-Burada `A = value(1)` şeklinde A değişkeni, oluşturmak, sonra değerini almak için `A()` kullanmak, değer atamak istediğinizde de `A(2)` şeklinde kullanmak biraz çirkin gözüküyor olabilir.
+### Örnek biraz çirkin mü gözüküyor?
+Evet burada `A = value(1)` şeklinde A değişkeni, oluşturmak, sonra değerini almak için `A()` kullanmak, değer atamak istediğinizde de `A(2)` şeklinde kullanmak biraz çirkin gözüküyor olabilir.
 
 Ancak alternatif bir kullanım şekli ile daha temiz görünümde kod elde edilebilir.
-Bunun için `inject` metodu ile bir objenin property lerinin reaktif değişkenler haline getirildiği mouse pozisyonunu sayfa üzerinde gösterme [örneğimize](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fmouse-position%2Findex.html&module=%2Fexamples%2Fbasic%2Fmouse-position%2Fapp.ts) göz atabilirsiniz.
+Bunun için `inject` metodu ile bir objenin property lerinin reaktif değişkenler haline getirildiği mouse pozisyonunu sayfa üzerinde gösterme [örneğimize buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fmouse-position%2Findex.html&module=%2Fexamples%2Fbasic%2Fmouse-position%2Fapp.ts) göz atabilirsiniz.
 
 ```js
 import { inject, html } from "@fidanjs/runtime";
