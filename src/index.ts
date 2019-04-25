@@ -29,5 +29,8 @@ export interface FidanArray<T> {
 
 export type FidanData<T> = FidanValue<T> | FidanArray<T>;
 
-import * as fidanObj from "./index-libs";
-export const fidan = fidanObj;
+export * from "./f";
+export * from "./dom";
+export * from "./util";
+export * from "./html";
+export * from "./observable";

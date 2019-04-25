@@ -894,31 +894,23 @@ var toObservable = function (data) {
     var compute$$1 = value(function () {
       observer.next(data.$val);
     });
-    data["depends"].push(compute$$1);
+    data["c_depends"].push(compute$$1);
   });
 };
 
-
-
-var fidanObj = ({
-  array: array,
-  value: value,
-  compute: compute,
-  beforeCompute: beforeCompute,
-  destroy: destroy,
-  coditionalDom: coditionalDom,
-  insertToDom: insertToDom,
-  arrayMap: arrayMap,
-  setDefaults: setDefaults,
-  injectToProperty: injectToProperty,
-  inject: inject,
-  jsRoot: jsRoot,
-  html: html,
-  htmlArrayMap: htmlArrayMap,
-  toObservable: toObservable
-});
-
-var fidan = fidanObj;
-
-exports.fidan = fidan;
+exports.array = array;
+exports.value = value;
+exports.compute = compute;
+exports.beforeCompute = beforeCompute;
+exports.destroy = destroy;
+exports.coditionalDom = coditionalDom;
+exports.insertToDom = insertToDom;
+exports.arrayMap = arrayMap;
+exports.setDefaults = setDefaults;
+exports.injectToProperty = injectToProperty;
+exports.inject = inject;
+exports.jsRoot = jsRoot;
+exports.html = html;
+exports.htmlArrayMap = htmlArrayMap;
+exports.toObservable = toObservable;
 //# sourceMappingURL=index.js.map

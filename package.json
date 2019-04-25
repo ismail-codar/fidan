@@ -1,13 +1,14 @@
 {
   "name": "@fidanjs/runtime",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "High performance and easy way for building web user interfaces.",
   "scripts": {
     "build-browser": "microbundle --format iife --name fidan --output build/fidan.js --sourcemap false --no-compress",
     "build-browser-min": "microbundle --format iife --name fidan --output build/fidan.min.js --sourcemap false",
     "build-jsx": "copyfiles ./types/** ./build & microbundle src/jsx/index.ts --format cjs",
     "build": "microbundle --format cjs --no-compress",
-    "local": "yarn build && yalc publish && yalc push",
+    "build-all": "yarn build & yarn build-browser",
+    "local": "yarn build-all && yalc publish && yalc push",
     "test": "jasmine-ts",
     "dev": "microbundle watch"
   },

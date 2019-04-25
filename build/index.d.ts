@@ -19,5 +19,8 @@ export interface FidanArray<T> {
     depends: (dependencies: () => FidanData<any>[]) => FidanArray<T>;
 }
 export declare type FidanData<T> = FidanValue<T> | FidanArray<T>;
-import * as fidanObj from "./index-libs";
-export declare const fidan: typeof fidanObj;
+export * from "./f";
+export * from "./dom";
+export * from "./util";
+export * from "./html";
+export * from "./observable";

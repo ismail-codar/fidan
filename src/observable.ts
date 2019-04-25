@@ -94,6 +94,6 @@ export const toObservable = <T>(data: FidanValue<any>): T => {
     var compute = value(() => {
       observer.next(data.$val);
     });
-    data["depends"].push(compute);
+    data["c_depends"].push(compute);
   }) as any;
 };
