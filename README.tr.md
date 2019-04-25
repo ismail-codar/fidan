@@ -99,4 +99,28 @@ document.body.appendChild(view);
 
 Bu örneğin çalışır haline [buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fsum%2Findex.html&module=%2Fexamples%2Fbasic%2Fsum%2Fapp.ts) erişebilirsiniz.
 
+Burada `A = value(1)` şeklinde A değişkeni, oluşturmak, sonra değerini almak için `A()` kullanmak, değer atamak istediğinizde de `A(2)` şeklinde kullanmak biraz çirkin gözüküyor olabilir.
+
+Ancak alternatif bir kullanım şekli ile daha temiz görünümde kod elde edilebilir.
+Bunun için `inject` metodu ile bir objenin property lerinin reaktif değişkenler haline getirildiği mouse pozisyonunu sayfa üzerinde gösterme [örneğimize](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fmouse-position%2Findex.html&module=%2Fexamples%2Fbasic%2Fmouse-position%2Fapp.ts) göz atabilirsiniz.
+
+```js
+import { inject, html } from "@fidanjs/runtime";
+
+const mousePosition = inject({ x: 0, y: 0 });
+
+const app = html`
+  <div style="width:100%; height:1000px">
+    x: ${mousePosition.x}, y:${mousePosition.y}
+  </div>
+`;
+
+document.body.addEventListener("mousemove", e => {
+  mousePosition.x = e.clientX;
+  mousePosition.y = e.clientY;
+});
+
+document.getElementById("main").appendChild(app);
+```
+
 ## .... Örnekler ve API dökümantasyonu devam edecek....
