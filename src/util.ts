@@ -20,7 +20,10 @@ export const injectToProperty = (
     Object.defineProperty(obj, propertyKey, {
       configurable: false,
       enumerable: true,
-      get: () => val,
+      get: () => {
+        val();
+        return val;
+      },
       set: v => val(v)
     });
   else {

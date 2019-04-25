@@ -494,7 +494,10 @@ var injectToProperty = function (obj, propertyKey, val) {
   if (descr.configurable) { Object.defineProperty(obj, propertyKey, {
     configurable: false,
     enumerable: true,
-    get: function () { return val; },
+    get: function () {
+      val();
+      return val;
+    },
     set: function (v) { return val(v); }
   }); }else {
     descr.set["c_depends"].push(val);
