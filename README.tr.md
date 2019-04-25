@@ -67,9 +67,12 @@ var A = value(1); // A adında reaktif bir değişkenin değeri 1
 var B = value(2); // B adında reaktif bir değişkenin değeri 2
 var C = compute(() => A() + B()); // C değişkeni ise A ve B nin toplamını döndürür
 
-/* Aşağıda javascript in template literal özelliği kullanılarak kodlanmış bir html template vardır. 
+/* Aşağıda javascript in template literal özelliği kullanılarak 
+kodlanmış bir html template vardır. 
 
-// oninput event leri ile A ve B nin değeri değiştirildiğinde C değişkeninin blunduğu text bölgesi fidanjs runtime i tarafından otomatik olarak arayüz üzerinde değiştirilmektedir.
+oninput event leri ile A ve B nin değeri değiştirildiğinde C 
+değişkeninin blunduğu text bölgesi fidanjs runtime i tarafından 
+otomatik olarak arayüz üzerinde değiştirilmektedir.
 */
 var view = html`
   <div>
