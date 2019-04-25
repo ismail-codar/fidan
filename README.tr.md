@@ -37,8 +37,8 @@ En çok sorulan, cevabı aranan bir soruya hoş geldiniz. Kişisel olarak kısa,
 
 Virtual dom bir şeylere çözüm olurken başka problemlere sebep olmaktadır. Bunlardan kaçınmak içinde kendinizi **sonsuz bir öğrenme döngüsü** içinde bulursunuz. React bir şaka mı başlıklı [bu tartışmaya](https://news.ycombinator.com/item?id=15052555) ya da [buraya](https://games.greggman.com/game/react-and-redux-are-a-joke-right) gözatabilirsiniz.
 
-Bu ayrıca birkaç blog yazısı ile anlatılabilecek kadar çok uzun bir konudur.
-Şimdilik tıpkı fidanjs gibi virtual dom konsepti dışında hareket eden [svelte kütüphanesinin blog yazısını](https://svelte.dev/blog/virtual-dom-is-pure-overhead) okuyabilirsiniz.
+Bu konu ayrıca birkaç blog yazısı ile anlatılabilecek kadar uzundur.
+Şimdilik tıpkı fidanjs gibi virtual dom konsepti dışında hareket eden [svelte kütüphanesinin blog yazısını](https://svelte.dev/blog/virtual-dom-is-pure-overhead) tavsiye edebilirim.
 
 #### Yaygın frameworkler ve çözüm arayışları
 
@@ -98,3 +98,5 @@ document.body.appendChild(view);
 ```
 
 Bu örneğin çalışır haline [buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fsum%2Findex.html&module=%2Fexamples%2Fbasic%2Fsum%2Fapp.ts) erişebilirsiniz.
+
+## .... Örnekler ve API dökümantasyonu devam edecek....
