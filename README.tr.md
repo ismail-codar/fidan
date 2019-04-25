@@ -99,7 +99,7 @@ document.body.appendChild(view);
 
 Bu örneğin çalışır haline [buradan](https://codesandbox.io/s/github/ismail-codar/fidan-html-examples/tree/master/?fontsize=14&initialpath=%2Fexamples%2Fbasic%2Fsum%2Findex.html&module=%2Fexamples%2Fbasic%2Fsum%2Fapp.ts) erişebilirsiniz.
 
-### Örnek biraz çirkin mü gözüküyor?
+### Örnek biraz çirkin mi gözüküyor?
 Evet burada `A = value(1)` şeklinde A değişkeni, oluşturmak, sonra değerini almak için `A()` kullanmak, değer atamak istediğinizde de `A(2)` şeklinde kullanmak biraz çirkin gözüküyor olabilir.
 
 Ancak alternatif bir kullanım şekli ile daha temiz görünümde kod elde edilebilir.
