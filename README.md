@@ -1,4 +1,4 @@
-[Türkçe açıklama için tıklayınız](README.tr.md)
+> [Türkçe açıklama için tıklayınız](README.tr.md)
 
 # FidanJS Web View Library
 
