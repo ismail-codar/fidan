@@ -1,4 +1,6 @@
-# fidan
+[Türkçe açıklama için tıklayınız](README.tr.md)
+
+# FidanJS Web View Library
 
 Easiest, strong and high performance way for building web user interfaces.
 
