@@ -485,11 +485,6 @@ var fidan = (function (exports) {
     beforeCompute(arr.$val, arrayComputeRenderAll, function () { return [arr]; });
   };
 
-  var setDefaults = function (obj, defaults) {
-    for (var key in defaults) {
-      if (obj[key] === undefined) { obj[key] = defaults[key]; }
-    }
-  };
   var injectToProperty = function (obj, propertyKey, val) {
     var descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
     if (descr.configurable) { Object.defineProperty(obj, propertyKey, {
@@ -808,97 +803,6 @@ var fidan = (function (exports) {
   //   }
   // };
 
-  function symbolObservablePonyfill(root) {
-    var result;
-    var Symbol = root.Symbol;
-
-    if (typeof Symbol === "function") {
-      if (Symbol.observable) {
-        result = Symbol.observable;
-      } else {
-        result = Symbol("observable");
-        Symbol.observable = result;
-      }
-    } else {
-      result = "@@observable";
-    }
-
-    return result;
-  }
-
-  var $$symbolObservable = symbolObservablePonyfill(jsRoot());
-
-  var Observer = function Observer(handlers) {
-    this.isUnsubscribed = false;
-    this.handlers = null;
-    this._unsubscribe = null;
-    this.handlers = handlers;
-    this.isUnsubscribed = false;
-  };
-
-  Observer.prototype.next = function next (value$$1) {
-    if (this.handlers.next && !this.isUnsubscribed) {
-      this.handlers.next(value$$1);
-    }
-  };
-
-  Observer.prototype.error = function error (error$1) {
-    if (!this.isUnsubscribed) {
-      if (this.handlers.error) {
-        this.handlers.error(error$1);
-      }
-
-      this.unsubscribe();
-    }
-  };
-
-  Observer.prototype.complete = function complete () {
-    if (!this.isUnsubscribed) {
-      if (this.handlers.complete) {
-        this.handlers.complete();
-      }
-
-      this.unsubscribe();
-    }
-  };
-
-  Observer.prototype.unsubscribe = function unsubscribe () {
-    this.isUnsubscribed = true;
-
-    if (this._unsubscribe) {
-      this._unsubscribe();
-    }
-  };
-
-  var Observable = function Observable(subscribe) {
-    this._subscribe = null;
-    this._subscribe = subscribe;
-  };
-
-  Observable.prototype.subscribe = function subscribe (obs) {
-    var observer = new Observer(obs);
-    observer._unsubscribe = this._subscribe(observer);
-    return {
-      unsubscribe: function unsubscribe() {
-        observer.unsubscribe();
-      }
-
-    };
-  };
-
-  Observable.prototype[$$symbolObservable] = function () {
-    return this;
-  };
-
-  var toObservable = function (data) {
-    return new Observable(function (observer) {
-      var compute$$1 = value(function () {
-        observer.next(data.$val);
-      });
-      data["c_depends"].push(compute$$1);
-    });
-  };
-
   exports.array = array;
   exports.value = value;
   exports.compute = compute;
@@ -907,13 +811,11 @@ var fidan = (function (exports) {
   exports.coditionalDom = coditionalDom;
   exports.insertToDom = insertToDom;
   exports.arrayMap = arrayMap;
-  exports.setDefaults = setDefaults;
   exports.injectToProperty = injectToProperty;
   exports.inject = inject;
   exports.jsRoot = jsRoot;
   exports.html = html;
   exports.htmlArrayMap = htmlArrayMap;
-  exports.toObservable = toObservable;
 
   return exports;
 
