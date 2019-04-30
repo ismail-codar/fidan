@@ -1,26 +1,18 @@
 var overrideArrayMutators = function (dataArray) {
-  // if (!dataArray.$val["$overrided"])
+  dataArray.size = value(dataArray().length);
   ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
     dataArray.$val[method] = function () {
       var arr = this.slice(0);
+      var size1 = arr.length;
       Array.prototype[method].apply(arr, arguments);
+      var size2 = arr.length;
+      if (size1 !== size2) { dataArray.size(size2); }
       dataArray(arr);
-    }; // dataArray.$val["$overrided"] = true;
-
+    };
   });
 };
 
 var autoTrackDependencies = null;
-var array = function (items) {
-  var arr = value(items);
-
-  arr["toJSON"] = function () { return arr.$val; }; // arr.size = value(items.length);
-  // arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
-  // arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
-
-
-  return arr;
-};
 var value = function (val) {
   var innerFn = function (val) {
     if (val === undefined) {
@@ -480,15 +472,6 @@ var insertToDom = function (parentElement, index, itemElement) {
 };
 var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode) {
   beforeCompute(arr.$val, function (nextVal, beforeVal) {
-    // reconcile(
-    //   parentDom,
-    //   beforeVal || [],
-    //   nextVal,
-    //   item => {
-    //     return renderCallback(item);
-    //   },
-    //   () => {}
-    // );
     if (!renderMode) {
       var parentFragment = document.createDocumentFragment();
       parentDom.textContent = "";
@@ -833,7 +816,6 @@ var htmlArrayMap = function (arr, renderCallback, options) {
 //   }
 // };
 
-exports.array = array;
 exports.value = value;
 exports.compute = compute;
 exports.beforeCompute = beforeCompute;

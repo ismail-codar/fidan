@@ -1,11 +1,11 @@
 import { beforeCompute, compute } from "./f";
 import { reuseNodes } from "./reuse-nodes";
-import { FidanArray, FidanData } from ".";
+import { FidanValue } from ".";
 import reconcile from "./reconcile";
 
 export const coditionalDom = (
   condition: () => boolean,
-  dependencies: () => FidanData<any>[],
+  dependencies: () => FidanValue<any>[],
   htmlFragment: DocumentFragment
 ) => (parentElement: Element, nextElement: Element) => {
   const childs = Array.from(htmlFragment.children);
@@ -40,7 +40,7 @@ export const insertToDom = (parentElement, index, itemElement) => {
 };
 
 export const arrayMap = <T>(
-  arr: FidanArray<T>,
+  arr: FidanValue<T[]>,
   parentDom: Node & ParentNode,
   nextElement: Element,
   renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
@@ -49,16 +49,6 @@ export const arrayMap = <T>(
   beforeCompute(
     arr.$val,
     (nextVal, beforeVal) => {
-      // reconcile(
-      //   parentDom,
-      //   beforeVal || [],
-      //   nextVal,
-      //   item => {
-      //     return renderCallback(item);
-      //   },
-      //   () => {}
-      // );
-
       if (!renderMode) {
         const parentFragment = document.createDocumentFragment();
         parentDom.textContent = "";

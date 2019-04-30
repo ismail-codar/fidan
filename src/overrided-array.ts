@@ -1,7 +1,10 @@
-import { FidanArray } from ".";
+import { FidanValue } from ".";
+import { value } from "./f";
 
-export const overrideArrayMutators = <T>(dataArray: FidanArray<T>) => {
-  // if (!dataArray.$val["$overrided"])
+export const overrideArrayMutators = <T extends Array<any>>(
+  dataArray: FidanValue<T>
+) => {
+  dataArray.size = value(dataArray().length);
   [
     "copyWithin",
     "fill",
@@ -15,9 +18,11 @@ export const overrideArrayMutators = <T>(dataArray: FidanArray<T>) => {
   ].forEach(method => {
     dataArray.$val[method] = function() {
       const arr = this.slice(0);
+      const size1 = arr.length;
       Array.prototype[method].apply(arr, arguments);
+      const size2 = arr.length;
+      if (size1 !== size2) dataArray.size(size2);
       dataArray(arr);
     };
-    // dataArray.$val["$overrided"] = true;
   });
 };

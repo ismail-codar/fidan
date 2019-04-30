@@ -1,2 +1,2 @@
-import { FidanArray } from ".";
-export declare const overrideArrayMutators: <T>(dataArray: FidanArray<T>) => void;
+import { FidanValue } from ".";
+export declare const overrideArrayMutators: <T extends any[]>(dataArray: FidanValue<T>) => void;

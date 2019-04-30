@@ -1,10 +1,10 @@
-import { FidanData } from ".";
 import { value } from "./f";
+import { FidanValue } from ".";
 
 export const injectToProperty = (
   obj: Object,
   propertyKey: string,
-  val: FidanData<any>
+  val: FidanValue<any>
 ) => {
   const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
   if (descr.configurable)

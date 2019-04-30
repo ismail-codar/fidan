@@ -1,19 +1,7 @@
-import { FidanArray, FidanValue, FidanData } from ".";
+import { FidanValue } from ".";
 import { overrideArrayMutators } from "./overrided-array";
 
 let autoTrackDependencies: any[] = null;
-
-export const array = <T>(items: T[]): FidanArray<T> => {
-  const arr = value(items) as FidanArray<T>;
-  arr["toJSON"] = () => arr.$val;
-
-  // arr.size = value(items.length);
-
-  // arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
-  // arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
-
-  return arr;
-};
 
 export const value = <T>(val?: T): FidanValue<T> => {
   const innerFn: any = (val?) => {
@@ -46,7 +34,7 @@ export const value = <T>(val?: T): FidanValue<T> => {
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
-  innerFn.depends = (dependencies: () => FidanData<any>[]): FidanValue<T> => {
+  innerFn.depends = (dependencies: () => FidanValue<any>[]): FidanValue<T> => {
     const deps = dependencies();
     for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
     return innerFn;
@@ -61,7 +49,7 @@ export const value = <T>(val?: T): FidanValue<T> => {
 
 export const compute = <T>(
   fn: (val: T, changedItem?) => any,
-  dependencies?: () => FidanData<any>[]
+  dependencies?: () => FidanValue<any>[]
 ) => {
   autoTrackDependencies = dependencies ? null : [];
   const val = fn(undefined);
@@ -76,7 +64,7 @@ export const compute = <T>(
 export const beforeCompute = <T>(
   initalValue: T,
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
-  dependencies: () => FidanData<any>[]
+  dependencies: () => FidanValue<any>[]
 ) => {
   const cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
