@@ -222,7 +222,7 @@ export const htmlArrayMap = <T>(
   renderCallback: (data: T) => DocumentFragment,
   options?: {
     useCloneNode: boolean;
-    reuseMode?: boolean;
+    renderMode?: "reuse" | "reconcile";
   }
 ) => {
   options = Object.assign({ useCloneNode: false, reuseMode: false }, options);
@@ -265,7 +265,7 @@ export const htmlArrayMap = <T>(
         updateNodesByCommentNodes(commentNodes, params);
         return renderNode;
       };
-      arrayMap(arr, parentElement, nextElement, arrayMapFn, options.reuseMode);
+      arrayMap(arr, parentElement, nextElement, arrayMapFn, options.renderMode);
     };
   } else {
     return function(parentElement: Element, nextElement: Element) {

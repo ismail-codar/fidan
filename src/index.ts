@@ -15,7 +15,6 @@ export type FidanArrayEventType =
 export interface EventedArrayReturnType<T> extends Array<T> {
   on: (type: FidanArrayEventType, callback) => void;
   off: any;
-  innerArray: T[];
   setEventsFrom: (val: EventedArrayReturnType<T>) => void;
 }
 

@@ -8,7 +8,6 @@ export declare type FidanArrayEventType = "itemadded" | "itemset" | "itemremoved
 export interface EventedArrayReturnType<T> extends Array<T> {
     on: (type: FidanArrayEventType, callback: any) => void;
     off: any;
-    innerArray: T[];
     setEventsFrom: (val: EventedArrayReturnType<T>) => void;
 }
 export interface FidanArray<T> {

@@ -1,16 +1,16 @@
-import { EventedArray } from "./evented-array";
 import { FidanArray, FidanValue, FidanData } from ".";
+import { overrideArrayMutators } from "./overrided-array";
 
 let autoTrackDependencies: any[] = null;
 
 export const array = <T>(items: T[]): FidanArray<T> => {
-  const arr = value(new EventedArray(items)) as FidanArray<T>;
-  arr["toJSON"] = () => arr.$val.innerArray;
+  const arr = value(items) as FidanArray<T>;
+  arr["toJSON"] = () => arr.$val;
 
-  arr.size = value(items.length);
+  // arr.size = value(items.length);
 
-  arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
-  arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
+  // arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
+  // arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
 
   return arr;
 };
@@ -26,38 +26,23 @@ export const value = <T>(val?: T): FidanValue<T> => {
       }
       return innerFn["$val"];
     } else {
-      if (Array.isArray(val)) {
-        val = new EventedArray(val.slice(0));
-        val.setEventsFrom(innerFn["$val"]);
-      } else if (val && val.hasOwnProperty("innerArray")) {
-        // val.innerArray = val.innerArray.slice(0); array reuseMode !!!
-        var arr = new EventedArray(val.innerArray.slice(0));
-        arr.setEventsFrom(val);
-        val = arr;
-      }
       let depends = innerFn["bc_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
           depends[i].beforeCompute(val, innerFn["$val"], innerFn);
         }
       innerFn["$val"] = val;
+      if (Array.isArray(val)) {
+        overrideArrayMutators(innerFn);
+      }
       depends = innerFn["c_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
           depends[i](depends[i].compute(val));
         }
-
-      if (val && val.hasOwnProperty("innerArray")) {
-        innerFn.size && innerFn.size(val.innerArray.length);
-      }
     }
   };
 
-  if (Array.isArray(val)) {
-    val = new EventedArray(val.slice(0));
-  } else if (val && val.hasOwnProperty("innerArray")) {
-    val = new EventedArray(val["innerArray"].slice(0));
-  }
   innerFn["$val"] = val;
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];

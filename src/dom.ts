@@ -1,6 +1,7 @@
 import { beforeCompute, compute } from "./f";
 import { reuseNodes } from "./reuse-nodes";
 import { FidanArray, FidanData } from ".";
+import reconcile from "./reconcile";
 
 export const coditionalDom = (
   condition: () => boolean,
@@ -42,76 +43,59 @@ export const arrayMap = <T>(
   arr: FidanArray<T>,
   parentDom: Node & ParentNode,
   nextElement: Element,
-  renderReturn: (item: any, idx?: number, isInsert?: boolean) => Node,
-  reuseMode?: boolean
+  renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
+  renderMode?: "reuse" | "reconcile"
 ) => {
-  let parentRef: { parent: Node & ParentNode; next: Node } = null;
-  arr.$val.on("beforemulti", function() {
-    if (parentDom.parentNode) {
-      parentRef = {
-        parent: parentDom,
-        next: (parentDom as Element).nextElementSibling
-      };
-      parentDom = document.createDocumentFragment();
-    }
-  });
-  arr.$val.on("aftermulti", function() {
-    if (parentRef) {
-      parentRef.parent.insertBefore(parentDom, parentRef.next);
-      parentDom = parentRef.parent;
-    }
-  });
+  beforeCompute(
+    arr.$val,
+    (nextVal, beforeVal) => {
+      // reconcile(
+      //   parentDom,
+      //   beforeVal || [],
+      //   nextVal,
+      //   item => {
+      //     return renderCallback(item);
+      //   },
+      //   () => {}
+      // );
 
-  arr.$val.on("itemadded", function(e) {
-    insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
-  });
-
-  arr.$val.on("itemset", function(e) {
-    parentDom.replaceChild(
-      renderReturn(e.item, e.index) as any,
-      parentDom.children.item(e.index)
-    );
-  });
-
-  arr.$val.on("itemremoved", function(e) {
-    parentDom.removeChild(parentDom.children.item(e.index));
-  });
-
-  let firstRenderOnFragment = undefined;
-  const arrayComputeRenderAll = function(nextVal) {
-    if (!reuseMode) {
-      const parentFragment = document.createDocumentFragment();
-      parentDom.textContent = "";
-      for (var i = 0; i < nextVal.length; i++) {
-        parentFragment.appendChild(renderReturn(nextVal[i]));
-      }
-      parentDom.appendChild(parentFragment);
-    } else {
-      if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0)
-        firstRenderOnFragment = document.createDocumentFragment();
-      reuseNodes(
-        firstRenderOnFragment || parentDom,
-        arr.$val.innerArray,
-        nextVal || [],
-        nextItem => {
-          return renderReturn(nextItem);
-        },
-        (nextItem, prevItem) => {
-          for (var key in nextItem) {
-            if (prevItem[key].hasOwnProperty("$val")) {
-              nextItem[key].c_depends = prevItem[key].c_depends;
-              nextItem[key].bc_depends = prevItem[key].bc_depends;
-              prevItem[key](nextItem[key]());
-            }
-          }
+      if (!renderMode) {
+        const parentFragment = document.createDocumentFragment();
+        parentDom.textContent = "";
+        for (var i = 0; i < arr.$val.length; i++) {
+          insertToDom(parentFragment, i, renderCallback(arr.$val[i], i));
         }
-      );
-      if (firstRenderOnFragment) {
-        parentDom.appendChild(firstRenderOnFragment);
-        firstRenderOnFragment = null;
+        parentDom.appendChild(parentFragment);
+      } else {
+        let renderFunction: (
+          parent,
+          renderedValues,
+          data,
+          createFn,
+          noOp,
+          beforeNode?,
+          afterNode?
+        ) => void = renderMode === "reconcile" ? reconcile : reuseNodes;
+        renderFunction(
+          parentDom,
+          beforeVal || [],
+          nextVal || [],
+          nextItem => {
+            // create
+            return renderCallback(nextItem);
+          },
+          (nextItem, prevItem) => {
+            // update
+            // for (var key in nextItem) {
+            //   if (prevItem[key].hasOwnProperty("$val")) {
+            //     nextItem[key].depends = prevItem[key].depends;
+            //     prevItem[key](nextItem[key]());
+            //   }
+            // }
+          }
+        );
       }
-    }
-  };
-
-  beforeCompute(arr.$val, arrayComputeRenderAll, () => [arr]);
+    },
+    () => [arr]
+  );
 };

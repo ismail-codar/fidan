@@ -1,248 +1,25 @@
 var fidan = (function (exports) {
-  // TODO concat vs..
-  function EventedArray(items) {
-    var _self = this,
-        _array = [];
+  var overrideArrayMutators = function (dataArray) {
+    // if (!dataArray.$val["$overrided"])
+    ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
+      dataArray.$val[method] = function () {
+        var arr = this.slice(0);
+        Array.prototype[method].apply(arr, arguments);
+        dataArray(arr);
+      }; // dataArray.$val["$overrided"] = true;
 
-    _self._handlers = {
-      itemadded: [],
-      itemremoved: [],
-      itemset: [],
-      beforemulti: [],
-      aftermulti: []
-    };
-
-    function defineIndexProperty(index) {
-      if (!(index in _self)) {
-        Object.defineProperty(_self, index, {
-          configurable: true,
-          enumerable: true,
-          get: function () {
-            return _array[index];
-          },
-          set: function (v) {
-            _array[index] = v;
-            raiseEvent({
-              type: "itemset",
-              index: index,
-              item: v
-            });
-          }
-        });
-      }
-    }
-
-    function raiseEvent(event) {
-      _self._handlers[event.type].forEach(function (h) {
-        h.call(_self, event);
-      });
-    }
-
-    _self.on = function (eventName, handler) {
-      _self._handlers[eventName].push(handler);
-    };
-
-    _self.off = function (eventName, handler) {
-      var h = _self._handlers[eventName];
-      var ln = h.length;
-
-      while (--ln >= 0) {
-        if (h[ln] === handler) {
-          h.splice(ln, 1);
-        }
-      }
-    };
-
-    _self.push = function () {
-      var arguments$1 = arguments;
-
-      var index;
-      arguments.length > 1 && raiseEvent({
-        type: "beforemulti"
-      });
-
-      for (var i = 0, ln = arguments.length; i < ln; i++) {
-        index = _array.length;
-
-        _array.push(arguments$1[i]);
-
-        defineIndexProperty(index);
-        raiseEvent({
-          type: "itemadded",
-          index: index,
-          item: arguments$1[i]
-        });
-      }
-
-      arguments.length > 1 && raiseEvent({
-        type: "aftermulti"
-      });
-      return _array.length;
-    };
-
-    _self.pop = function () {
-      if (_array.length > -1) {
-        var index = _array.length - 1,
-            item = _array.pop();
-
-        delete _self[index];
-        raiseEvent({
-          type: "itemremoved",
-          index: index,
-          item: item
-        });
-        return item;
-      }
-    };
-
-    _self.unshift = function () {
-      var arguments$1 = arguments;
-
-      for (var i = 0, ln = arguments.length; i < ln; i++) {
-        _array.splice(i, 0, arguments$1[i]);
-
-        defineIndexProperty(_array.length - 1);
-        raiseEvent({
-          type: "itemadded",
-          index: i,
-          item: arguments$1[i]
-        });
-      }
-
-      for (; i < _array.length; i++) {
-        raiseEvent({
-          type: "itemset",
-          index: i,
-          item: _array[i]
-        });
-      }
-
-      return _array.length;
-    };
-
-    _self.shift = function () {
-      if (_array.length > -1) {
-        var item = _array.shift();
-
-        delete _self[_array.length];
-        raiseEvent({
-          type: "itemremoved",
-          index: 0,
-          item: item
-        });
-        return item;
-      }
-    };
-
-    _self.splice = function (index, howMany
-    /*, element1, element2, ... */
-    ) {
-      var arguments$1 = arguments;
-
-      var removed = [],
-          item;
-      index = index == null ? 0 : index < 0 ? _array.length + index : index;
-      howMany = howMany == null ? _array.length - index : howMany > 0 ? howMany : 0;
-
-      while (howMany--) {
-        item = _array.splice(index, 1)[0];
-        removed.push(item);
-        delete _self[_array.length];
-        raiseEvent({
-          type: "itemremoved",
-          index: index + removed.length - 1,
-          item: item
-        });
-      }
-
-      for (var i = 2, ln = arguments.length; i < ln; i++) {
-        _array.splice(index, 0, arguments$1[i]);
-
-        defineIndexProperty(_array.length - 1);
-        raiseEvent({
-          type: "itemadded",
-          index: index,
-          item: arguments$1[i]
-        });
-        index++;
-      }
-
-      return removed;
-    };
-
-    Object.defineProperty(_self, "length", {
-      configurable: false,
-      enumerable: false,
-      get: function () {
-        return _array.length;
-      },
-      set: function (value) {
-        var n = Number(value);
-        var length = _array.length;
-
-        if (n % 1 === 0 && n >= 0) {
-          if (n < length) {
-            _self.splice(n);
-          } else if (n > length) {
-            _self.push.apply(_self, new Array(n - length));
-          }
-        } else {
-          throw new RangeError("Invalid array length");
-        }
-
-        _array.length = n;
-        return value;
-      }
     });
-    Object.defineProperty(_self, "innerArray", {
-      configurable: false,
-      enumerable: false,
-      get: function () {
-        return _array;
-      },
-      set: function (v) {
-        _array = v;
-
-        for (var i = 0; i < v.length; i++) {
-          defineIndexProperty(i);
-        }
-      }
-    });
-    Object.getOwnPropertyNames(Array.prototype).forEach(function (name) {
-      if (!(name in _self)) {
-        Object.defineProperty(_self, name, {
-          configurable: false,
-          enumerable: false,
-          writable: false,
-          value: Array.prototype[name]
-        });
-      }
-    });
-
-    _self.setEventsFrom = function (val) {
-      _self.on = val.on;
-      _self.off = val.off;
-      _self._handlers = val._handlers;
-    };
-
-    _self.toJSON = function () {
-      return _array;
-    };
-
-    if (Array.isArray(items)) {
-      _self.push.apply(_self, items);
-    }
-  }
+  };
 
   var autoTrackDependencies = null;
   var array = function (items) {
-    var arr = value(new EventedArray(items));
+    var arr = value(items);
 
-    arr["toJSON"] = function () { return arr.$val.innerArray; };
+    arr["toJSON"] = function () { return arr.$val; }; // arr.size = value(items.length);
+    // arr.$val.on("itemadded", () => arr.size(arr.$val.innerArray.length));
+    // arr.$val.on("itemremoved", () => arr.size(arr.$val.innerArray.length));
 
-    arr.size = value(items.length);
-    arr.$val.on("itemadded", function () { return arr.size(arr.$val.innerArray.length); });
-    arr.$val.on("itemremoved", function () { return arr.size(arr.$val.innerArray.length); });
+
     return arr;
   };
   var value = function (val) {
@@ -254,37 +31,22 @@ var fidan = (function (exports) {
 
         return innerFn["$val"];
       } else {
-        if (Array.isArray(val)) {
-          val = new EventedArray(val.slice(0));
-          val.setEventsFrom(innerFn["$val"]);
-        } else if (val && val.hasOwnProperty("innerArray")) {
-          // val.innerArray = val.innerArray.slice(0); array reuseMode !!!
-          var arr = new EventedArray(val.innerArray.slice(0));
-          arr.setEventsFrom(val);
-          val = arr;
-        }
-
         var depends = innerFn["bc_depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) {
           depends[i].beforeCompute(val, innerFn["$val"], innerFn);
         } }
         innerFn["$val"] = val;
+
+        if (Array.isArray(val)) {
+          overrideArrayMutators(innerFn);
+        }
+
         depends = innerFn["c_depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) {
           depends[i](depends[i].compute(val));
         } }
-
-        if (val && val.hasOwnProperty("innerArray")) {
-          innerFn.size && innerFn.size(val.innerArray.length);
-        }
       }
     };
-
-    if (Array.isArray(val)) {
-      val = new EventedArray(val.slice(0));
-    } else if (val && val.hasOwnProperty("innerArray")) {
-      val = new EventedArray(val["innerArray"].slice(0));
-    }
 
     innerFn["$val"] = val;
     innerFn["bc_depends"] = [];
@@ -389,6 +151,300 @@ var fidan = (function (exports) {
     }
   };
 
+  // This is almost straightforward implementation of reconcillation algorithm
+  // based on ivi documentation:
+  // https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
+  // With some fast paths from Surplus implementation:
+  // https://github.com/adamhaile/surplus/blob/master/src/runtime/content.ts#L86
+  //
+  // How this implementation differs from others, is that it's working with data directly,
+  // without maintaining nodes arrays, and uses dom props firstElementChild/lastElementChild/nextElementSibling
+  // for markers moving.
+  function reconcile(parent, renderedValues, data, createFn, noOp, beforeNode, afterNode) {
+    // Fast path for clear
+    if (data.length === 0) {
+      if (beforeNode !== undefined || afterNode !== undefined) {
+        var node = beforeNode !== undefined ? beforeNode.nextElementSibling : parent.firstElementChild,
+            tmp;
+        if (afterNode === undefined) { afterNode = null; }
+
+        while (node !== afterNode) {
+          tmp = node.nextElementSibling;
+          parent.removeChild(node);
+          node = tmp;
+        }
+      } else {
+        parent.textContent = "";
+      }
+
+      return;
+    } // Fast path for create
+
+
+    if (renderedValues.length === 0) {
+      var node$1,
+          mode = afterNode !== undefined ? 1 : 0;
+
+      for (var i = 0, len = data.length; i < len; i++) {
+        node$1 = createFn(data[i]);
+        mode ? parent.insertBefore(node$1, afterNode) : parent.appendChild(node$1);
+      }
+
+      return;
+    }
+
+    var prevStart = 0,
+        newStart = 0,
+        loop = true,
+        prevEnd = renderedValues.length - 1,
+        newEnd = data.length - 1,
+        a,
+        b,
+        prevStartNode = beforeNode ? beforeNode.nextElementSibling : parent.firstElementChild,
+        newStartNode = prevStartNode,
+        prevEndNode = afterNode ? afterNode.previousElementSibling : parent.lastElementChild,
+        newEndNode = prevEndNode;
+
+    fixes: while (loop) {
+      loop = false;
+
+      var _node = (void 0); // Skip prefix
+
+
+      a = renderedValues[prevStart], b = data[newStart];
+
+      while (a === b) {
+        noOp(prevStartNode, b);
+        prevStart++;
+        newStart++;
+        newStartNode = prevStartNode = prevStartNode.nextElementSibling;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevStart];
+        b = data[newStart];
+      } // Skip suffix
+
+
+      a = renderedValues[prevEnd], b = data[newEnd];
+
+      while (a === b) {
+        noOp(prevEndNode, b);
+        prevEnd--;
+        newEnd--;
+        afterNode = prevEndNode;
+        newEndNode = prevEndNode = prevEndNode.previousElementSibling;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevEnd];
+        b = data[newEnd];
+      } // Fast path to swap backward
+
+
+      a = renderedValues[prevEnd], b = data[newStart];
+
+      while (a === b) {
+        loop = true;
+        noOp(prevEndNode, b);
+        _node = prevEndNode.previousElementSibling;
+        parent.insertBefore(prevEndNode, newStartNode);
+        newEndNode = prevEndNode = _node;
+        newStart++;
+        prevEnd--;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevEnd];
+        b = data[newStart];
+      } // Fast path to swap forward
+
+
+      a = renderedValues[prevStart], b = data[newEnd];
+
+      while (a === b) {
+        loop = true;
+        noOp(prevStartNode, b);
+        _node = prevStartNode.nextElementSibling;
+        parent.insertBefore(prevStartNode, afterNode);
+        prevStart++;
+        afterNode = newEndNode = prevStartNode;
+        prevStartNode = _node;
+        newEnd--;
+        if (prevEnd < prevStart || newEnd < newStart) { break fixes; }
+        a = renderedValues[prevStart];
+        b = data[newEnd];
+      }
+    } // Fast path for shrink
+
+
+    if (newEnd < newStart) {
+      if (prevStart <= prevEnd) {
+        var next;
+
+        while (prevStart <= prevEnd) {
+          if (prevEnd === 0) {
+            parent.removeChild(prevEndNode);
+          } else {
+            next = prevEndNode.previousElementSibling;
+            parent.removeChild(prevEndNode);
+            prevEndNode = next;
+          }
+
+          prevEnd--;
+        }
+      }
+
+      return;
+    } // Fast path for add
+
+
+    if (prevEnd < prevStart) {
+      if (newStart <= newEnd) {
+        var node$2,
+            mode$1 = afterNode ? 1 : 0;
+
+        while (newStart <= newEnd) {
+          node$2 = createFn(data[newStart]);
+          mode$1 ? parent.insertBefore(node$2, afterNode) : parent.appendChild(node$2);
+          newStart++;
+        }
+      }
+
+      return;
+    } // Positions for reusing nodes from current DOM state
+
+
+    var P = new Array(newEnd + 1 - newStart);
+
+    for (var i$1 = newStart; i$1 <= newEnd; i$1++) { P[i$1] = -1; } // Index to resolve position from current to new
+
+
+    var I = new Map();
+
+    for (var i$2 = newStart; i$2 <= newEnd; i$2++) { I.set(data[i$2], i$2); }
+
+    var reusingNodes = newStart + data.length - 1 - newEnd,
+        toRemove = [];
+
+    for (var i$3 = prevStart; i$3 <= prevEnd; i$3++) {
+      if (I.has(renderedValues[i$3])) {
+        P[I.get(renderedValues[i$3])] = i$3;
+        reusingNodes++;
+      } else {
+        toRemove.push(i$3);
+      }
+    } // Fast path for full replace
+
+
+    if (reusingNodes === 0) {
+      if (beforeNode !== undefined || afterNode !== undefined) {
+        var node$3 = beforeNode !== undefined ? beforeNode.nextElementSibling : parent.firstElementChild,
+            tmp$1;
+        if (afterNode === undefined) { afterNode = null; }
+
+        while (node$3 !== afterNode) {
+          tmp$1 = node$3.nextElementSibling;
+          parent.removeChild(node$3);
+          node$3 = tmp$1;
+          prevStart++;
+        }
+      } else {
+        parent.textContent = "";
+      }
+
+      var node$4,
+          mode$2 = afterNode ? 1 : 0;
+
+      for (var i$4 = newStart; i$4 <= newEnd; i$4++) {
+        node$4 = createFn(data[i$4]);
+        mode$2 ? parent.insertBefore(node$4, afterNode) : parent.appendChild(node$4);
+      }
+
+      return;
+    } // What else?
+
+
+    var longestSeq = longestPositiveIncreasingSubsequence(P, newStart); // Collect nodes to work with them
+
+    var nodes = [];
+    var tmpC = prevStartNode;
+
+    for (var i$5 = prevStart; i$5 <= prevEnd; i$5++) {
+      nodes[i$5] = tmpC;
+      tmpC = tmpC.nextElementSibling;
+    }
+
+    for (var i$6 = 0; i$6 < toRemove.length; i$6++) { parent.removeChild(nodes[toRemove[i$6]]); }
+
+    var lisIdx = longestSeq.length - 1,
+        tmpD;
+
+    for (var i$7 = newEnd; i$7 >= newStart; i$7--) {
+      if (longestSeq[lisIdx] === i$7) {
+        afterNode = nodes[P[longestSeq[lisIdx]]];
+        noOp(afterNode, data[i$7]);
+        lisIdx--;
+      } else {
+        if (P[i$7] === -1) {
+          tmpD = createFn(data[i$7]);
+        } else {
+          tmpD = nodes[P[i$7]];
+          noOp(tmpD, data[i$7]);
+        }
+
+        parent.insertBefore(tmpD, afterNode);
+        afterNode = tmpD;
+      }
+    }
+  }
+  // https://github.com/adamhaile/surplus/blob/master/src/runtime/content.ts#L368
+  // return an array of the indices of ns that comprise the longest increasing subsequence within ns
+
+  function longestPositiveIncreasingSubsequence(ns, newStart) {
+    var seq = [],
+        is = [],
+        l = -1,
+        pre = new Array(ns.length);
+
+    for (var i = newStart, len = ns.length; i < len; i++) {
+      var n = ns[i];
+      if (n < 0) { continue; }
+      var j = findGreatestIndexLEQ(seq, n);
+      if (j !== -1) { pre[i] = is[j]; }
+
+      if (j === l) {
+        l++;
+        seq[l] = n;
+        is[l] = i;
+      } else if (n < seq[j + 1]) {
+        seq[j + 1] = n;
+        is[j + 1] = i;
+      }
+    }
+
+    for (i = is[l]; l >= 0; i = pre[i], l--) {
+      seq[l] = i;
+    }
+
+    return seq;
+  }
+
+  function findGreatestIndexLEQ(seq, n) {
+    // invariant: lo is guaranteed to be index of a value <= n, hi to be >
+    // therefore, they actually start out of range: (-1, last + 1)
+    var lo = -1,
+        hi = seq.length; // fast path for simple increasing sequences
+
+    if (hi > 0 && seq[hi - 1] <= n) { return hi - 1; }
+
+    while (hi - lo > 1) {
+      var mid = Math.floor((lo + hi) / 2);
+
+      if (seq[mid] > n) {
+        hi = mid;
+      } else {
+        lo = mid;
+      }
+    }
+
+    return lo;
+  }
+
   var coditionalDom = function (condition, dependencies, htmlFragment) { return function (parentElement, nextElement) {
     var childs = Array.from(htmlFragment.children);
     var inserted = false;
@@ -423,66 +479,41 @@ var fidan = (function (exports) {
       parentElement.insertBefore(itemElement, parentElement.children[index]);
     }
   };
-  var arrayMap = function (arr, parentDom, nextElement, renderReturn, reuseMode) {
-    var parentRef = null;
-    arr.$val.on("beforemulti", function () {
-      if (parentDom.parentNode) {
-        parentRef = {
-          parent: parentDom,
-          next: parentDom.nextElementSibling
-        };
-        parentDom = document.createDocumentFragment();
-      }
-    });
-    arr.$val.on("aftermulti", function () {
-      if (parentRef) {
-        parentRef.parent.insertBefore(parentDom, parentRef.next);
-        parentDom = parentRef.parent;
-      }
-    });
-    arr.$val.on("itemadded", function (e) {
-      insertToDom(parentDom, e.index, renderReturn(e.item, e.index));
-    });
-    arr.$val.on("itemset", function (e) {
-      parentDom.replaceChild(renderReturn(e.item, e.index), parentDom.children.item(e.index));
-    });
-    arr.$val.on("itemremoved", function (e) {
-      parentDom.removeChild(parentDom.children.item(e.index));
-    });
-    var firstRenderOnFragment = undefined;
-
-    var arrayComputeRenderAll = function (nextVal) {
-      if (!reuseMode) {
+  var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode) {
+    beforeCompute(arr.$val, function (nextVal, beforeVal) {
+      // reconcile(
+      //   parentDom,
+      //   beforeVal || [],
+      //   nextVal,
+      //   item => {
+      //     return renderCallback(item);
+      //   },
+      //   () => {}
+      // );
+      if (!renderMode) {
         var parentFragment = document.createDocumentFragment();
         parentDom.textContent = "";
 
-        for (var i = 0; i < nextVal.length; i++) {
-          parentFragment.appendChild(renderReturn(nextVal[i]));
+        for (var i = 0; i < arr.$val.length; i++) {
+          insertToDom(parentFragment, i, renderCallback(arr.$val[i], i));
         }
 
         parentDom.appendChild(parentFragment);
       } else {
-        if (firstRenderOnFragment === undefined && nextVal && nextVal.length > 0) { firstRenderOnFragment = document.createDocumentFragment(); }
-        reuseNodes(firstRenderOnFragment || parentDom, arr.$val.innerArray, nextVal || [], function (nextItem) {
-          return renderReturn(nextItem);
-        }, function (nextItem, prevItem) {
-          for (var key in nextItem) {
-            if (prevItem[key].hasOwnProperty("$val")) {
-              nextItem[key].c_depends = prevItem[key].c_depends;
-              nextItem[key].bc_depends = prevItem[key].bc_depends;
-              prevItem[key](nextItem[key]());
-            }
-          }
+        var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
+        renderFunction(parentDom, beforeVal || [], nextVal || [], function (nextItem) {
+          // create
+          return renderCallback(nextItem);
+        }, function (nextItem, prevItem) {// update
+          // for (var key in nextItem) {
+          //   if (prevItem[key].hasOwnProperty("$val")) {
+          //     nextItem[key].depends = prevItem[key].depends;
+          //     prevItem[key](nextItem[key]());
+          //   }
+          // }
         });
-
-        if (firstRenderOnFragment) {
-          parentDom.appendChild(firstRenderOnFragment);
-          firstRenderOnFragment = null;
-        }
       }
-    };
-
-    beforeCompute(arr.$val, arrayComputeRenderAll, function () { return [arr]; });
+    }, function () { return [arr]; });
   };
 
   var injectToProperty = function (obj, propertyKey, val) {
@@ -764,7 +795,7 @@ var fidan = (function (exports) {
           return renderNode;
         };
 
-        arrayMap(arr, parentElement, nextElement, arrayMapFn, options.reuseMode);
+        arrayMap(arr, parentElement, nextElement, arrayMapFn, options.renderMode);
       };
     } else {
       return function (parentElement, nextElement) {
