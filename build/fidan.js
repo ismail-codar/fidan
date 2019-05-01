@@ -77,15 +77,16 @@ var fidan = (function (exports) {
   };
 
   var overrideArrayMutators = function (dataArray) {
-    dataArray.size = value(dataArray().length);
+    dataArray.size = value(dataArray.$val.length);
     ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
       dataArray.$val[method] = function () {
-        var arr = this.slice(0);
+        var arr = dataArray.$val.slice(0);
         var size1 = arr.length;
-        Array.prototype[method].apply(arr, arguments);
+        var ret = Array.prototype[method].apply(arr, arguments);
         var size2 = arr.length;
         if (size1 !== size2) { dataArray.size(size2); }
         dataArray(arr);
+        return ret;
       };
     });
   };

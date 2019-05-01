@@ -78,7 +78,7 @@ export const beforeCompute = <T>(
 };
 
 const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
-  dataArray.size = value(dataArray().length);
+  dataArray.size = value(dataArray.$val.length);
   [
     "copyWithin",
     "fill",
@@ -91,12 +91,13 @@ const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
     "unshift"
   ].forEach(method => {
     dataArray.$val[method] = function() {
-      const arr = this.slice(0);
+      const arr = dataArray.$val.slice(0);
       const size1 = arr.length;
-      Array.prototype[method].apply(arr, arguments);
+      const ret = Array.prototype[method].apply(arr, arguments);
       const size2 = arr.length;
       if (size1 !== size2) dataArray.size(size2);
       dataArray(arr);
+      return ret;
     };
   });
 };
