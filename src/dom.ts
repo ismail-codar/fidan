@@ -52,8 +52,8 @@ export const arrayMap = <T>(
       if (!renderMode) {
         const parentFragment = document.createDocumentFragment();
         parentDom.textContent = "";
-        for (var i = 0; i < arr.$val.length; i++) {
-          insertToDom(parentFragment, i, renderCallback(arr.$val[i], i));
+        for (var i = 0; i < nextVal.length; i++) {
+          insertToDom(parentFragment, i, renderCallback(nextVal[i], i));
         }
         parentDom.appendChild(parentFragment);
       } else {

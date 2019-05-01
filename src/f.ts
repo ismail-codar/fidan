@@ -1,9 +1,10 @@
-import { FidanValue } from ".";
-import { overrideArrayMutators } from "./overrided-array";
+import { FidanValue, FidanArray } from ".";
 
 let autoTrackDependencies: any[] = null;
 
-export const value = <T>(val?: T): FidanValue<T> => {
+export const value = <T>(
+  val?: T
+): T extends Array<any> ? FidanArray<T> : FidanValue<T> => {
   const innerFn: any = (val?) => {
     if (val === undefined) {
       if (
@@ -32,6 +33,9 @@ export const value = <T>(val?: T): FidanValue<T> => {
   };
 
   innerFn["$val"] = val;
+  if (Array.isArray(val)) {
+    overrideArrayMutators(innerFn);
+  }
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
   innerFn.depends = (dependencies: () => FidanValue<any>[]): FidanValue<T> => {
@@ -73,7 +77,26 @@ export const beforeCompute = <T>(
   return cmp;
 };
 
-export const destroy = (item: any) => {
-  delete item["compute"];
-  delete item["c_depends"];
+const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
+  dataArray.size = value(dataArray().length);
+  [
+    "copyWithin",
+    "fill",
+    "pop",
+    "push",
+    "reverse",
+    "shift",
+    "sort",
+    "splice",
+    "unshift"
+  ].forEach(method => {
+    dataArray.$val[method] = function() {
+      const arr = this.slice(0);
+      const size1 = arr.length;
+      Array.prototype[method].apply(arr, arguments);
+      const size2 = arr.length;
+      if (size1 !== size2) dataArray.size(size2);
+      dataArray(arr);
+    };
+  });
 };

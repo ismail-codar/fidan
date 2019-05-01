@@ -1,17 +1,3 @@
-var overrideArrayMutators = function (dataArray) {
-  dataArray.size = value(dataArray().length);
-  ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
-    dataArray.$val[method] = function () {
-      var arr = this.slice(0);
-      var size1 = arr.length;
-      Array.prototype[method].apply(arr, arguments);
-      var size2 = arr.length;
-      if (size1 !== size2) { dataArray.size(size2); }
-      dataArray(arr);
-    };
-  });
-};
-
 var autoTrackDependencies = null;
 var value = function (val) {
   var innerFn = function (val) {
@@ -40,6 +26,11 @@ var value = function (val) {
   };
 
   innerFn["$val"] = val;
+
+  if (Array.isArray(val)) {
+    overrideArrayMutators(innerFn);
+  }
+
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
 
@@ -83,12 +74,22 @@ var beforeCompute = function (initalValue, fn, dependencies) {
 
   return cmp;
 };
-var destroy = function (item) {
-  delete item["compute"];
-  delete item["c_depends"];
+
+var overrideArrayMutators = function (dataArray) {
+  dataArray.size = value(dataArray().length);
+  ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
+    dataArray.$val[method] = function () {
+      var arr = this.slice(0);
+      var size1 = arr.length;
+      Array.prototype[method].apply(arr, arguments);
+      var size2 = arr.length;
+      if (size1 !== size2) { dataArray.size(size2); }
+      dataArray(arr);
+    };
+  });
 };
 
-// https://github.com/Freak613/stage0/blob/master/reuseNodes.js
+// Original: https://github.com/Freak613/stage0/blob/master/reuseNodes.js
 var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeNode, afterNode) {
   if (data.length === 0) {
     if (beforeNode !== undefined || afterNode !== undefined) {
@@ -142,15 +143,7 @@ var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeN
   }
 };
 
-// This is almost straightforward implementation of reconcillation algorithm
-// based on ivi documentation:
-// https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
-// With some fast paths from Surplus implementation:
-// https://github.com/adamhaile/surplus/blob/master/src/runtime/content.ts#L86
-//
-// How this implementation differs from others, is that it's working with data directly,
-// without maintaining nodes arrays, and uses dom props firstElementChild/lastElementChild/nextElementSibling
-// for markers moving.
+// Original: https://github.com/Freak613/stage0/blob/master/reconcile.js
 function reconcile(parent, renderedValues, data, createFn, noOp, beforeNode, afterNode) {
   // Fast path for clear
   if (data.length === 0) {
@@ -476,8 +469,8 @@ var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode
       var parentFragment = document.createDocumentFragment();
       parentDom.textContent = "";
 
-      for (var i = 0; i < arr.$val.length; i++) {
-        insertToDom(parentFragment, i, renderCallback(arr.$val[i], i));
+      for (var i = 0; i < nextVal.length; i++) {
+        insertToDom(parentFragment, i, renderCallback(nextVal[i], i));
       }
 
       parentDom.appendChild(parentFragment);
@@ -518,23 +511,6 @@ var inject = function (obj) {
   }
 
   return obj;
-};
-var jsRoot = function () {
-  var root;
-
-  if (typeof self !== "undefined") {
-    root = self;
-  } else if (typeof window !== "undefined") {
-    root = window;
-  } else if (typeof global !== "undefined") {
-    root = global;
-  } else if (typeof module !== "undefined") {
-    root = module;
-  } else {
-    root = Function("return this")();
-  }
-
-  return root;
 };
 
 var COMMENT_TEXT = 1;
@@ -819,13 +795,11 @@ var htmlArrayMap = function (arr, renderCallback, options) {
 exports.value = value;
 exports.compute = compute;
 exports.beforeCompute = beforeCompute;
-exports.destroy = destroy;
 exports.coditionalDom = coditionalDom;
 exports.insertToDom = insertToDom;
 exports.arrayMap = arrayMap;
 exports.injectToProperty = injectToProperty;
 exports.inject = inject;
-exports.jsRoot = jsRoot;
 exports.html = html;
 exports.htmlArrayMap = htmlArrayMap;
 //# sourceMappingURL=index.js.map

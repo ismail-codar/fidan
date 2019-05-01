@@ -1,12 +1,5 @@
-// This is almost straightforward implementation of reconcillation algorithm
-// based on ivi documentation:
-// https://github.com/localvoid/ivi/blob/2c81ead934b9128e092cc2a5ef2d3cabc73cb5dd/packages/ivi/src/vdom/implementation.ts#L1366
-// With some fast paths from Surplus implementation:
-// https://github.com/adamhaile/surplus/blob/master/src/runtime/content.ts#L86
-//
-// How this implementation differs from others, is that it's working with data directly,
-// without maintaining nodes arrays, and uses dom props firstElementChild/lastElementChild/nextElementSibling
-// for markers moving.
+// Original: https://github.com/Freak613/stage0/blob/master/reconcile.js
+
 export function reconcile(
   parent,
   renderedValues,

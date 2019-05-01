@@ -1,4 +1,4 @@
-// https://github.com/Freak613/stage0/blob/master/reuseNodes.js
+// Original: https://github.com/Freak613/stage0/blob/master/reuseNodes.js
 
 export const reuseNodes = (
   parent,
