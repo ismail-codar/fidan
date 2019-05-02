@@ -66,7 +66,7 @@ export const html = (...args) => {
     if (param === undefined) {
       break;
     }
-    const isDynamic = param.hasOwnProperty("$val");
+    const isDynamic = param && param.hasOwnProperty("$val");
     if (isDynamic) {
       if (param["$indexes"] === undefined) {
         param["$indexes"] = [];
@@ -85,7 +85,7 @@ export const html = (...args) => {
       let commentType =
         typeof param === "function" && !isDynamic
           ? COMMENT_FN
-          : typeof param === "object"
+          : typeof param === "object" && param
           ? COMMENT_HTM
           : COMMENT_TEXT;
       htm[index] = item + `<!-- cmt_${commentType}_${index} -->`;
@@ -147,16 +147,17 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     }
     let paramIndex = parseInt(commentValue.substr(i1, i2 - i1));
     let param = params[paramIndex];
+    const isDynamic = param && param.hasOwnProperty("$val");
 
     if (commentType & COMMENT_TEXT_OR_DOM) {
       if (commentType === COMMENT_TEXT) {
         attributeName = "textContent";
-        element = document.createTextNode(param.$val);
+        element = document.createTextNode(isDynamic ? param.$val : param);
         commentNode.parentElement.insertBefore(
           element,
           commentNode.nextSibling
         );
-        if (!param.hasOwnProperty("$val")) {
+        if (!isDynamic) {
           if (Array.isArray(param)) {
             for (var p = 0; p < param.length; p++) {
               commentNode.parentElement.appendChild(param[p]);
@@ -173,7 +174,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
       // commentType !== COMMENT_FN && commentNode.remove();
       if (attributeName.startsWith("on")) {
         (element as Element).addEventListener(attributeName.substr(2), param);
-      } else if (param.hasOwnProperty("$val")) {
+      } else if (isDynamic) {
         if (htmlProps[attributeName]) {
           compute(
             val => {

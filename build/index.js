@@ -572,7 +572,7 @@ var html = function () {
       break;
     }
 
-    var isDynamic = param.hasOwnProperty("$val");
+    var isDynamic = param && param.hasOwnProperty("$val");
 
     if (isDynamic) {
       if (param["$indexes"] === undefined) {
@@ -587,7 +587,7 @@ var html = function () {
       attributeName = item.substr(i, item.length - i - 2);
       putCommentToTagStart(htm, index, ("<!-- cmt_" + COMMENT_DOM + "_" + index + "_" + attributeName + " -->"));
     } else {
-      var commentType = typeof param === "function" && !isDynamic ? COMMENT_FN : typeof param === "object" ? COMMENT_HTM : COMMENT_TEXT;
+      var commentType = typeof param === "function" && !isDynamic ? COMMENT_FN : typeof param === "object" && param ? COMMENT_HTM : COMMENT_TEXT;
       htm[index] = item + "<!-- cmt_" + commentType + "_" + index + " -->";
     }
   }
@@ -645,14 +645,15 @@ var updateNodesByCommentNodes = function (commentNodes, params) {
 
     var paramIndex = parseInt(commentValue.substr(i1, i2 - i1));
     var param = params[paramIndex];
+    var isDynamic = param && param.hasOwnProperty("$val");
 
     if (commentType & COMMENT_TEXT_OR_DOM) {
       if (commentType === COMMENT_TEXT) {
         attributeName = "textContent";
-        element = document.createTextNode(param.$val);
+        element = document.createTextNode(isDynamic ? param.$val : param);
         commentNode.parentElement.insertBefore(element, commentNode.nextSibling);
 
-        if (!param.hasOwnProperty("$val")) {
+        if (!isDynamic) {
           if (Array.isArray(param)) {
             for (var p = 0; p < param.length; p++) {
               commentNode.parentElement.appendChild(param[p]);
@@ -667,7 +668,7 @@ var updateNodesByCommentNodes = function (commentNodes, params) {
 
       if (attributeName.startsWith("on")) {
         element.addEventListener(attributeName.substr(2), param);
-      } else if (param.hasOwnProperty("$val")) {
+      } else if (isDynamic) {
         if (htmlProps[attributeName]) {
           compute(function (val) {
             element[attributeName] = val;
