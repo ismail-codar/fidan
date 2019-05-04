@@ -1,0 +1,29 @@
+{
+  "name": "@fidanjs/jsx",
+  "version": "0.0.0",
+  "repository": "https://github.com/ismail-codar/fidan/packages/fidan-jsx",
+  "author": "ismail codar <icodar@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build-lib": "microbundle; rm -rf build/_demo",
+    "dev-lib": "microbundle watch",
+    "start": "parcel src/_demo/index.html --no-cache",
+    "build-demo": "parcel  build src/_demo/index.html --no-cache",
+    "yalc-link": "yalc link @fidanjs/runtime & @fidanjs/babel-plugin-fidan-jsx",
+    "test": "jasmine-ts"
+  },
+  "dependencies": {
+    "@fidanjs/runtime": "latest"
+  },
+  "devDependencies": {
+    "jasmine": "^3.3.1",
+    "jasmine-spec-reporter": "^4.2.1",
+    "jasmine-ts": "^0.3.0",
+    "microbundle": "^0.9.0",
+    "parcel-bundler": "^1.11.0",
+    "ts-node": "^8.0.2"
+  },
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "source": "src/index.ts"
+}
