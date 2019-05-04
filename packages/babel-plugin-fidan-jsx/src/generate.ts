@@ -288,6 +288,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
         );
       }
     } else {
+      if (key === "className") key = "class";
       results.template += ` ${key}`;
       if (value) results.template += `='${value.value}'`;
     }

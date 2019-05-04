@@ -150,6 +150,8 @@ function transformAttributes(path, jsx, results) {
             }
         }
         else {
+            if (key === "className")
+                key = "class";
             results.template += ` ${key}`;
             if (value)
                 results.template += `='${value.value}'`;

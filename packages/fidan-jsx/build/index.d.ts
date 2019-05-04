@@ -1,3 +1,5 @@
+export * from "./events";
+export * from "./array-map";
 export declare const cleanup: any;
 export declare const wrap: <T>(fn: (prev?: T) => T) => void;
 export declare const sample: <T>(fn: () => T) => T;

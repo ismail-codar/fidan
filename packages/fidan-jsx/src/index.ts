@@ -1,5 +1,8 @@
 import { compute } from "@fidanjs/runtime";
 
+export * from "./events";
+export * from "./array-map";
+
 const nop: any = () => {};
 
 export const cleanup = nop;
