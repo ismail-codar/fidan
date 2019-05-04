@@ -1,8 +1,11 @@
 // original: https://github.com/ryansolid/babel-plugin-jsx-dom-expressions/blob/master/src/index.js
+import * as t from "@babel/types";
+
 import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import VoidElements from "./VoidElements";
 import { Attributes } from "./dom-expressions/Attributes";
 import { NonComposedEvents } from "./dom-expressions/NonComposedEvents";
+import { NodePath } from "babel-traverse";
 
 type GenerationResultType = {
   id?: any;
@@ -17,8 +20,7 @@ type GenerationResultType = {
 };
 
 export default babel => {
-  const { types: t } = babel;
-  let moduleName = "r",
+  let moduleName = "r$",
     delegateEvents = true;
 
   function checkParens(jsx, path) {
@@ -214,7 +216,7 @@ export default babel => {
       render = children[0].expression;
     else if (children.length > 1) {
       children = [
-        t.JSXFragment(t.JSXOpeningFragment(), t.JSXClosingFragment(), children)
+        t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), children)
       ];
     } else if (t.isJSXText(children[0]))
       children[0] = t.stringLiteral(trimWhitespace(children[0].value));
@@ -265,8 +267,8 @@ export default babel => {
           runningObject = [];
         }
         if (
-          attribute.argument.extra &&
-          attribute.argument.extra.parenthesized
+          attribute.argument["extra"] &&
+          attribute.argument["extra"].parenthesized
         ) {
           const key = t.identifier("k$"),
             memo = t.identifier("m$");
@@ -312,7 +314,8 @@ export default babel => {
         } else props.push(attribute.argument);
       } else {
         const value = attribute.value;
-        if (t.isJSXExpressionContainer(value))
+        if (t.isJSXExpressionContainer(value)) {
+          const valueExpression = value.expression as any;
           if (attribute.name.name === "ref") {
             runningObject.push(
               t.objectProperty(
@@ -321,7 +324,7 @@ export default babel => {
                   [t.identifier("r$")],
                   t.assignmentExpression(
                     "=",
-                    value.expression,
+                    valueExpression,
                     t.identifier("r$")
                   )
                 )
@@ -329,27 +332,28 @@ export default babel => {
             );
           } else if (attribute.name.name === "forwardRef") {
             runningObject.push(
-              t.objectProperty(t.identifier("ref"), value.expression)
+              t.objectProperty(t.identifier("ref"), valueExpression)
             );
           } else if (checkParens(value, path)) {
             dynamic.push(t.stringLiteral(attribute.name.name));
             runningObject.push(
               t.objectProperty(
                 t.identifier(attribute.name.name),
-                t.arrowFunctionExpression([], value.expression)
+                t.arrowFunctionExpression([], valueExpression)
               )
             );
           } else
             runningObject.push(
               t.objectProperty(
                 t.identifier(attribute.name.name),
-                value.expression
+                valueExpression
               )
             );
-        else
+        } else {
           runningObject.push(
             t.objectProperty(t.identifier(attribute.name.name), value)
           );
+        }
       }
     });
 
@@ -406,7 +410,7 @@ export default babel => {
     return { exprs, template: "" };
   }
 
-  function transformAttributes(path, jsx, results) {
+  function transformAttributes(path: NodePath<any>, jsx, results) {
     let elem = results.id;
     const spread = t.memberExpression(
       t.identifier(moduleName),
@@ -415,8 +419,8 @@ export default babel => {
     jsx.openingElement.attributes.forEach(attribute => {
       if (t.isJSXSpreadAttribute(attribute)) {
         if (
-          attribute.argument.extra &&
-          attribute.argument.extra.parenthesized
+          attribute.argument["extra"] &&
+          attribute.argument["extra"].parenthesized
         ) {
           results.exprs.push(
             t.expressionStatement(
@@ -438,10 +442,11 @@ export default babel => {
       let value = attribute.value,
         key = attribute.name.name;
       if (t.isJSXExpressionContainer(value)) {
+        const valueExpression = value.expression as any;
         if (key === "ref") {
           results.exprs.unshift(
             t.expressionStatement(
-              t.assignmentExpression("=", value.expression, elem)
+              t.assignmentExpression("=", valueExpression, elem)
             )
           );
         } else if (key === "forwardRef") {
@@ -449,8 +454,8 @@ export default babel => {
             t.expressionStatement(
               t.logicalExpression(
                 "&&",
-                value.expression,
-                t.callExpression(value.expression, [elem])
+                valueExpression,
+                t.callExpression(valueExpression, [elem])
               )
             )
           );
@@ -462,8 +467,8 @@ export default babel => {
             !NonComposedEvents.has(ev)
           ) {
             const events =
-              path.scope.getProgramParent().data.events ||
-              (path.scope.getProgramParent().data.events = new Set());
+              path.scope.getProgramParent()["data"].events ||
+              (path.scope.getProgramParent()["data"].events = new Set());
             events.add(ev);
             results.exprs.unshift(
               t.expressionStatement(
@@ -473,7 +478,7 @@ export default babel => {
                     t.identifier(elem.name),
                     t.identifier(`__${ev}`)
                   ),
-                  value.expression
+                  valueExpression
                 )
               )
             );
@@ -486,27 +491,36 @@ export default babel => {
                     t.identifier(elem.name),
                     t.identifier(`on${ev}`)
                   ),
-                  value.expression
+                  valueExpression
                 )
               )
             );
         } else if (key === "events") {
-          value.expression.properties.forEach(prop =>
-            results.exprs.push(
-              t.expressionStatement(
-                t.callExpression(
-                  t.memberExpression(elem, t.identifier("addEventListener")),
-                  [t.stringLiteral(prop.key.name || prop.key.value), prop.value]
+          (value.expression as t.ObjectExpression).properties.forEach(prop => {
+            if (t.isObjectProperty(prop)) {
+              results.exprs.push(
+                t.expressionStatement(
+                  t.callExpression(
+                    t.memberExpression(elem, t.identifier("addEventListener")),
+                    [
+                      t.stringLiteral(prop.key.name || prop.key.value),
+                      prop.value as t.Expression
+                    ]
+                  )
                 )
-              )
-            )
-          );
+              );
+            } else {
+              debugger;
+              throw "NotImplemented -> transformAttributes -> events -> " +
+                prop.toString();
+            }
+          });
         } else if (key.startsWith("$")) {
           results.exprs.unshift(
             t.expressionStatement(
               t.callExpression(t.identifier(key.slice(1)), [
                 elem,
-                t.arrowFunctionExpression([], value.expression)
+                t.arrowFunctionExpression([], value.expression as t.Expression)
               ])
             )
           );
@@ -667,7 +681,7 @@ export default babel => {
       if (!checkParens(jsx, path))
         return { exprs: [jsx.expression], template: "" };
       return {
-        exprs: [t.arrowFunctionExpression([], jsx.expression)],
+        exprs: [t.arrowFunctionExpression([], jsx.expression as t.Expression)],
         template: ""
       };
     }
@@ -771,7 +785,7 @@ export default babel => {
                   [
                     t.arrayExpression(
                       Array.from(path.scope.data.events).map(e =>
-                        t.stringLiteral(e)
+                        t.stringLiteral(e.toString())
                       )
                     )
                   ]

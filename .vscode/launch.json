@@ -38,6 +38,16 @@
     {
       "type": "node",
       "request": "launch",
+      "name": "babel-plugin-fidan-jsx (test/index.ts)",
+      "runtimeArgs": ["-r", "ts-node/register"],
+      "cwd": "${workspaceFolder}/packages/babel-plugin-fidan-jsx",
+      "args": [
+        "${workspaceFolder}/packages/babel-plugin-fidan-jsx/test/index.ts"
+      ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
       "name": "ts-node",
       "runtimeArgs": ["-r", "ts-node/register"],
       "cwd": "${fileDirname}",

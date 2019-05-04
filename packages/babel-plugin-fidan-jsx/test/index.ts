@@ -1,4 +1,4 @@
-import { format } from "../node_modules/@types/prettier";
+import { format } from "prettier";
 var assert = require("assert");
 var babel = require("@babel/core");
 var chalk = require("chalk");
@@ -59,7 +59,8 @@ function runTest(dir) {
       pluginPath,
       "@babel/plugin-syntax-dynamic-import",
       ["@babel/plugin-proposal-decorators", { legacy: true }],
-      ["@babel/plugin-proposal-class-properties", { loose: true }]
+      ["@babel/plugin-proposal-class-properties", { loose: true }],
+      "@babel/plugin-syntax-jsx"
     ],
     presets: ["@babel/preset-typescript"]
   });
@@ -87,13 +88,10 @@ function runTest(dir) {
     return str.replace(/\r/g, "").trim();
   }
 
-  const diffParts = diff.diffLines(
-    normalizeLines(output.code),
-    normalizeLines(expected)
-  );
-
   const formattedOutput = normalizeLines(output.code);
   const formattedExpected = normalizeLines(expected);
+  const diffParts = diff.diffLines(formattedOutput, formattedExpected);
+
   if (formattedOutput == formattedExpected) {
     process.stdout.write("√");
   } else {
