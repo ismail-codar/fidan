@@ -1,2 +1,2 @@
-import{compute as n}from"@fidanjs/runtime";export default{wrap:function(t){n(t)},sample:function(n){return n()},root:function(n){return n(function(){return null})},cleanup:function(){},insert:function(t,o){"object"==typeof o?t.appendChild(o):"function"==typeof o?n(function(){t.textContent=o()},function(){return[o]}):t.textContent=o}};
+import{compute as n}from"@fidanjs/runtime";var t=function(){},o=function(t){n(t)},u=function(n){return n()},e=function(n){return n(function(){return null})},f=function(t,o){"object"==typeof o?t.appendChild(o):"function"==typeof o?n(function(){t.textContent=o()},function(){return[o]}):t.textContent=o};export{t as cleanup,o as wrap,u as sample,e as root,f as insert};
 //# sourceMappingURL=index.mjs.map

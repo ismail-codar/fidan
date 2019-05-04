@@ -1,2 +1,2 @@
-var n=require("@fidanjs/runtime");module.exports={wrap:function(t){n.compute(t)},sample:function(n){return n()},root:function(n){return n(function(){return null})},cleanup:function(){},insert:function(t,e){"object"==typeof e?t.appendChild(e):"function"==typeof e?n.compute(function(){t.textContent=e()},function(){return[e]}):t.textContent=e}};
+var t=require("@fidanjs/runtime");exports.cleanup=function(){},exports.wrap=function(n){t.compute(n)},exports.sample=function(t){return t()},exports.root=function(t){return t(function(){return null})},exports.insert=function(n,e){"object"==typeof e?n.appendChild(e):"function"==typeof e?t.compute(function(){n.textContent=e()},function(){return[e]}):n.textContent=e};
 //# sourceMappingURL=index.js.map

@@ -1,8 +1,5 @@
-declare const _default: {
-    wrap<T>(fn: (prev?: T) => T): void;
-    sample: <T>(fn: () => T) => T;
-    root: <T>(fn: (dispose: () => void) => T) => T;
-    cleanup: any;
-    insert: (parent: any, accessor: any) => void;
-};
-export default _default;
+export declare const cleanup: any;
+export declare const wrap: <T>(fn: (prev?: T) => T) => void;
+export declare const sample: <T>(fn: () => T) => T;
+export declare const root: <T>(fn: (dispose: () => void) => T) => T;
+export declare const insert: (parent: any, accessor: any) => void;
