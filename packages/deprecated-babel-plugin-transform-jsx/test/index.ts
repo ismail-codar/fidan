@@ -1,4 +1,4 @@
-import { format } from "prettier";
+import { format } from "../node_modules/@types/prettier";
 var assert = require("assert");
 var babel = require("@babel/core");
 var chalk = require("chalk");
@@ -6,7 +6,7 @@ var clear = require("clear");
 var diff = require("diff");
 import * as fs from "fs";
 var path = require("path");
-import "better-log/install";
+import "../node_modules/better-log/install";
 require("@babel/register");
 
 process.env["IS_TEST"] = "true";
