@@ -18,19 +18,19 @@ var template = (function() {
   custom(_el$, function() {
     return binding;
   });
-  r$.classList(_el$, {
+  _r$.classList(_el$, {
     selected: selected
   });
   Object.assign(_el$.style, {
     color: color
   });
-  r$.spread(_el$2, props);
-  r$.spread(_el$2, results);
+  _r$.spread(_el$2, props);
+  _r$.spread(_el$2, results);
   _el$2.title = welcoming;
   Object.assign(_el$2.style, {
     backgroundColor: color
   });
-  r$.classList(_el$2, {
+  _r$.classList(_el$2, {
     selected: selected
   });
   link = _el$3;

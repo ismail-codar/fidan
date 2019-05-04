@@ -14,8 +14,8 @@ var Child = function Child(props) {
       _el$4 = _el$3.nextSibling,
       _el$5 = _el$2.nextSibling;
     props.ref && props.ref(_el$2);
-    r$.insert(_el$2, props.name, null, _el$4);
-    r$.insert(_el$5, props.children);
+    _r$.insert(_el$2, props.name, null, _el$4);
+    _r$.insert(_el$5, props.children);
     return _el$;
   })();
 };
@@ -30,7 +30,7 @@ var template = function template(props) {
       _el$8 = _el$6.firstChild,
       _el$10 = _el$8.nextSibling,
       _el$11 = _el$10.nextSibling;
-    r$.insert(
+    _r$.insert(
       _el$6,
       Child(
         Object.assign(
@@ -39,8 +39,8 @@ var template = function template(props) {
           },
           props,
           {
-            ref: function ref(r$) {
-              return (childRef = r$);
+            ref: function ref(ref$) {
+              return (childRef = ref$);
             },
             children: [_tmpl$2.content.firstChild.cloneNode(true)]
           }
@@ -49,7 +49,7 @@ var template = function template(props) {
       null,
       _el$8
     );
-    r$.insert(
+    _r$.insert(
       _el$6,
       Child(
         Object.assign(
@@ -62,7 +62,7 @@ var template = function template(props) {
             children: [
               (function() {
                 var _el$9 = _tmpl$3.content.firstChild.cloneNode(true);
-                r$.insert(_el$9, state.content);
+                _r$.insert(_el$9, state.content);
                 return _el$9;
               })()
             ]
@@ -72,7 +72,7 @@ var template = function template(props) {
       null,
       _el$10
     );
-    r$.insert(
+    _r$.insert(
       _el$6,
       Context.Consumer({
         children: [

@@ -1,6 +1,6 @@
 import * as t from "@babel/types";
 import { GenerationResultType } from "./types";
-import { Attributes } from "./dom-expressions/Attributes";
+import { Attributes } from "./constants/Attributes";
 import { globalOptions } from ".";
 
 export function setAttr(elem, name, value) {

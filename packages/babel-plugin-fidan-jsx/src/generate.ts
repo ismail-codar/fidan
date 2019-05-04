@@ -1,10 +1,10 @@
 import * as t from "@babel/types";
 
 import { GenerationResultType } from "./types";
-import VoidElements from "./VoidElements";
+import VoidElements from "./constants/VoidElements";
 import { NodePath } from "babel-traverse";
 import { globalOptions } from ".";
-import { NonComposedEvents } from "./dom-expressions/NonComposedEvents";
+import { NonComposedEvents } from "./constants/NonComposedEvents";
 import { createTemplate, setAttrExpr, setAttr, createPlaceholder } from "./ast";
 import {
   getTagName,
@@ -80,8 +80,12 @@ function generateComponent(path, jsx, opts): GenerationResultType {
             t.objectProperty(
               t.identifier("ref"),
               t.arrowFunctionExpression(
-                [t.identifier("r$")],
-                t.assignmentExpression("=", valueExpression, t.identifier("r$"))
+                [t.identifier("ref$")],
+                t.assignmentExpression(
+                  "=",
+                  valueExpression,
+                  t.identifier("ref$")
+                )
               )
             )
           );

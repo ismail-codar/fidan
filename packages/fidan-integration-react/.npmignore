@@ -1,0 +1,11 @@
+.rts*
+.yalc
+.cache
+.babelrc
+dist
+src
+spec
+node_modules
+tsconfig.json
+yarn.lock
+yalc.lock

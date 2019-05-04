@@ -5,15 +5,15 @@ _tmpl$.innerHTML = "<ul></ul>";
 var data = value([]);
 var template = (function() {
   var _el$ = _tmpl$.content.firstChild.cloneNode(true);
-  r$.insert(
+  _r$.insert(
     _el$,
-    arrayMap(
+    _r$.arrayMap(
       data,
       _el$,
       function(item) {
         return (function() {
           var _el$2 = _tmpl$2.content.firstChild.cloneNode(true);
-          r$.insert(_el$2, item);
+          _r$.insert(_el$2, item);
           return _el$2;
         })();
       },

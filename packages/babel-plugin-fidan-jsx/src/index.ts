@@ -5,7 +5,7 @@ import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import { generateHTMLNode } from "./generate";
 import { createTemplate } from "./ast";
 
-export const globalOptions = { moduleName: "r$", delegateEvents: true };
+export const globalOptions = { moduleName: "_r$", delegateEvents: true };
 
 export default babel => {
   return {

@@ -25,4 +25,4 @@ var template = (function() {
   return _el$;
 })();
 
-r$.delegateEvents(["click"]);
+_r$.delegateEvents(["click"]);
