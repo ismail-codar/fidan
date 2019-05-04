@@ -9,7 +9,7 @@
     "watch": "microbundle watch",
     "start": "parcel src/_demo/index.html --no-cache",
     "build-demo": "parcel  build src/_demo/index.html --no-cache",
-    "yalc-link": "yalc link @fidanjs/runtime & @fidanjs/babel-plugin-fidan-jsx",
+    "local": "yarn build && yalc publish && yalc push",
     "test": "jasmine-ts"
   },
   "dependencies": {
