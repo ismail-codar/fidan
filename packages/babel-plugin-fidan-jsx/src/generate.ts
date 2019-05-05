@@ -5,7 +5,13 @@ import VoidElements from "./constants/VoidElements";
 import { NodePath } from "babel-traverse";
 import { globalOptions } from ".";
 import { NonComposedEvents } from "./constants/NonComposedEvents";
-import { createTemplate, setAttrExpr, setAttr, createPlaceholder } from "./ast";
+import {
+  createTemplate,
+  setAttrExpr,
+  setAttr,
+  createPlaceholder,
+  computeAttribute
+} from "./ast";
 import {
   getTagName,
   checkParens,
@@ -238,7 +244,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
               )
             )
           );
-        } else
+        } else {
           results.exprs.unshift(
             t.expressionStatement(
               t.assignmentExpression(
@@ -251,6 +257,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
               )
             )
           );
+        }
       } else if (key === "events") {
         (value.expression as t.ObjectExpression).properties.forEach(prop => {
           if (t.isObjectProperty(prop)) {
@@ -284,7 +291,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
         results.exprs.push(setAttrExpr(elem, key, value.expression));
       } else {
         results.exprs.push(
-          t.expressionStatement(setAttr(elem, key, value.expression))
+          t.expressionStatement(computeAttribute(elem, key, value.expression))
         );
       }
     } else {

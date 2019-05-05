@@ -2,6 +2,16 @@ import * as t from "@babel/types";
 import { GenerationResultType } from "./types";
 import { Attributes } from "./constants/Attributes";
 import { globalOptions } from ".";
+import generate from "@babel/generator";
+import { NodePath } from "babel-traverse";
+
+const errorReport = (e: Error, path: NodePath<any>, file) => {
+  const nodeCode = generate(path.node).code;
+  console.log("FILE: ", file.filename);
+  console.log("PART: ", nodeCode);
+  console.error("ERROR: ", e);
+  debugger;
+};
 
 export function setAttr(elem, name, value) {
   if (name === "style") {
@@ -49,6 +59,35 @@ export function setAttrExpr(elem, name, value) {
       [t.arrowFunctionExpression([], setAttr(elem, name, value))]
     )
   );
+}
+
+export function computeAttribute(elem, name, value) {
+  let isAttribute = name.indexOf("-") > -1,
+    attribute = Attributes[name];
+  if (attribute)
+    if (attribute.type === "attribute") isAttribute = true;
+    else name = attribute.alias;
+
+  let expression: any = null;
+  if (isAttribute) {
+    expression = t.callExpression(
+      t.memberExpression(elem, t.identifier("setAttribute")),
+      [t.stringLiteral(name), t.callExpression(value.arguments[0], [])]
+    );
+  } else {
+    expression = t.assignmentExpression(
+      "=",
+      t.memberExpression(elem, t.identifier(name)),
+      t.callExpression(value.arguments[0], [])
+    );
+  }
+  return t.callExpression(t.identifier("compute"), [
+    t.functionExpression(
+      t.identifier(""),
+      [],
+      t.blockStatement([t.expressionStatement(expression)])
+    )
+  ]);
 }
 
 export function createPlaceholder(path, results, tempPath, i) {
