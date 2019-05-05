@@ -69,25 +69,46 @@ export function computeAttribute(elem, name, value) {
     else name = attribute.alias;
 
   let expression: any = null;
+  const isComputeIdentifier =
+    t.isIdentifier(value) && value.name.startsWith("compute"); // TODO check definition
+  const isComputeFn =
+    t.isCallExpression(value) &&
+    t.isIdentifier(value.callee) &&
+    value.callee.name === "compute";
+  const valueExpression = isComputeFn ? value.arguments[0] : value;
+  let valueExpressionValue = null;
+  if (isComputeFn || isComputeIdentifier) {
+    valueExpressionValue = t.callExpression(valueExpression, []);
+  } else {
+    valueExpressionValue = value;
+  }
   if (isAttribute) {
     expression = t.callExpression(
       t.memberExpression(elem, t.identifier("setAttribute")),
-      [t.stringLiteral(name), t.callExpression(value.arguments[0], [])]
+      [t.stringLiteral(name), valueExpressionValue]
     );
   } else {
     expression = t.assignmentExpression(
       "=",
       t.memberExpression(elem, t.identifier(name)),
-      t.callExpression(value.arguments[0], [])
+      valueExpressionValue
     );
   }
-  return t.callExpression(t.identifier("compute"), [
-    t.functionExpression(
-      t.identifier(""),
-      [],
-      t.blockStatement([t.expressionStatement(expression)])
-    )
-  ]);
+  if (!isComputeFn && !isComputeIdentifier) {
+    return expression;
+  } else {
+    const args: any[] = [
+      t.functionExpression(
+        t.identifier(""),
+        [],
+        t.blockStatement([t.expressionStatement(expression)])
+      )
+    ];
+    if (t.isCallExpression(value) && value.arguments.length > 1) {
+      args.push(value.arguments[1]);
+    }
+    return t.callExpression(t.identifier("compute"), args);
+  }
 }
 
 export function createPlaceholder(path, results, tempPath, i) {

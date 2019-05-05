@@ -118,8 +118,9 @@ function transformAttributes(path, jsx, results) {
                     events.add(ev);
                     results.exprs.unshift(t.expressionStatement(t.assignmentExpression("=", t.memberExpression(t.identifier(elem.name), t.identifier(`__${ev}`)), valueExpression)));
                 }
-                else
+                else {
                     results.exprs.unshift(t.expressionStatement(t.assignmentExpression("=", t.memberExpression(t.identifier(elem.name), t.identifier(`on${ev}`)), valueExpression)));
+                }
             }
             else if (key === "events") {
                 value.expression.properties.forEach(prop => {
@@ -146,7 +147,7 @@ function transformAttributes(path, jsx, results) {
                 results.exprs.push(ast_1.setAttrExpr(elem, key, value.expression));
             }
             else {
-                results.exprs.push(t.expressionStatement(ast_1.setAttr(elem, key, value.expression)));
+                results.exprs.push(t.expressionStatement(ast_1.computeAttribute(elem, key, value.expression)));
             }
         }
         else {

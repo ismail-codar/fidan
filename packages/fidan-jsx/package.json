@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/jsx",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": "https://github.com/ismail-codar/fidan",
   "author": "ismail codar <icodar@gmail.com>",
   "license": "MIT",
@@ -10,13 +10,16 @@
     "start": "parcel src/_demo/index.html --no-cache",
     "build-demo": "parcel  build src/_demo/index.html --no-cache",
     "local": "yarn build && yalc publish && yalc push",
+    "yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/babel-plugin-fidan-jsx",
     "test": "jasmine-ts"
   },
   "dependencies": {
-    "@fidanjs/runtime": "^0.0.20",
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.2"
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.3",
+    "@fidanjs/runtime": "^0.0.20"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/plugin-syntax-jsx": "^7.2.0",
     "jasmine": "^3.3.1",
     "jasmine-spec-reporter": "^4.2.1",
     "jasmine-ts": "^0.3.0",

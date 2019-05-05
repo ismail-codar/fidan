@@ -9,7 +9,9 @@ compute(
       })()
     );
   },
-  () => [selected]
+  function() {
+    return [selected];
+  }
 );
 _el$;
 _tmpl$.innerHTML = "<div></div>";

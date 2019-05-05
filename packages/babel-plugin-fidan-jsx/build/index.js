@@ -59,7 +59,7 @@ exports.default = babel => {
                     }
                     if (!exports.globalOptions.isTest) {
                         const body = path.node.body;
-                        util_1.insertFidanImport(body, 0);
+                        util_1.insertFidanImport(body);
                     }
                     doNotTraverse = false;
                     // https://github.com/micromatch/anymatch#usage

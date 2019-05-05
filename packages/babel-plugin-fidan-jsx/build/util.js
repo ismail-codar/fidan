@@ -61,13 +61,8 @@ function detectExpressions(jsx, index) {
     }
 }
 exports.detectExpressions = detectExpressions;
-exports.insertFidanImport = (body, start) => {
-    body.splice(start, 0, 
-    // t.importDeclaration(
-    //   [t.importNamespaceSpecifier(t.identifier(globalOptions.moduleName))],
-    //   t.stringLiteral("@fidanjs/jsx")
-    // )
-    t.variableDeclaration("var", [
+exports.insertFidanImport = (body) => {
+    body.splice(0, 0, t.variableDeclaration("var", [
         t.variableDeclarator(t.identifier(_1.globalOptions.moduleName), t.callExpression(t.identifier("require"), [
             t.stringLiteral("@fidanjs/jsx")
         ]))
