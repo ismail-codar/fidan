@@ -5,7 +5,7 @@ export const jsxArrayMap = <T>(
   renderCallback: (data: T) => DocumentFragment,
   renderMode?: "reuse" | "reconcile"
 ) => {
-  return (parentElement, nextElement) => {
-    arrayMap(arr, parentElement, nextElement, renderCallback, renderMode);
+  return parentElement => {
+    arrayMap(arr, parentElement, null, renderCallback, renderMode);
   };
 };

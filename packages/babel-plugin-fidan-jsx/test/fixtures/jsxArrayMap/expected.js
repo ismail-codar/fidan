@@ -5,7 +5,7 @@ _tmpl$.innerHTML = "<ul></ul>";
 var data = value([]);
 var template = (function() {
   var _el$ = _tmpl$.content.firstChild.cloneNode(true);
-  _r$.insert(
+  _r$.spread(
     _el$,
     jsx1.jsxArrayMap(
       data,
@@ -17,7 +17,7 @@ var template = (function() {
         })();
       },
       "reconcile"
-    )(_el$)
+    )
   );
   return _el$;
 })();

@@ -36,3 +36,11 @@ export const insert = (parent, accessor) => {
     parent.textContent = accessor;
   }
 };
+
+export const spread = (node: HTMLElement, accessor: any) => {
+  if (typeof accessor === "function") {
+    accessor(node);
+  } else {
+    debugger;
+  }
+};
