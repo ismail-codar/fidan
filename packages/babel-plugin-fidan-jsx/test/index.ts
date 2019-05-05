@@ -57,7 +57,13 @@ function runTest(dir) {
   }
   var output = babel.transformFileSync(testFile, {
     plugins: [
-      pluginPath,
+      [
+        pluginPath,
+        {
+          moduleName: "_r$",
+          isTest: true
+        }
+      ],
       "@babel/plugin-syntax-dynamic-import",
       ["@babel/plugin-proposal-decorators", { legacy: true }],
       ["@babel/plugin-proposal-class-properties", { loose: true }],

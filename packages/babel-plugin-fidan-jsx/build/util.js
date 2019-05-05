@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const t = require("@babel/types");
+const _1 = require(".");
 function getTagName(tag) {
     if (t.isJSXMemberExpression(tag.openingElement.name)) {
         return `${tag.openingElement.name.object.name}.${tag.openingElement.name.property.name}`;
@@ -60,4 +61,16 @@ function detectExpressions(jsx, index) {
     }
 }
 exports.detectExpressions = detectExpressions;
+exports.insertFidanImport = (body, start) => {
+    body.splice(start, 0, 
+    // t.importDeclaration(
+    //   [t.importNamespaceSpecifier(t.identifier(globalOptions.moduleName))],
+    //   t.stringLiteral("@fidanjs/jsx")
+    // )
+    t.variableDeclaration("var", [
+        t.variableDeclarator(t.identifier(_1.globalOptions.moduleName), t.callExpression(t.identifier("require"), [
+            t.stringLiteral("@fidanjs/jsx")
+        ]))
+    ]));
+};
 //# sourceMappingURL=util.js.map

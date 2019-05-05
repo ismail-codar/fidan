@@ -1,4 +1,5 @@
 import * as t from "@babel/types";
+import { globalOptions } from ".";
 
 export function getTagName(tag) {
   if (t.isJSXMemberExpression(tag.openingElement.name)) {
@@ -58,3 +59,18 @@ export function detectExpressions(jsx, index) {
     }
   }
 }
+
+export const insertFidanImport = (body: t.BaseNode[]) => {
+  body.splice(
+    0,
+    0,
+    t.variableDeclaration("var", [
+      t.variableDeclarator(
+        t.identifier(globalOptions.moduleName),
+        t.callExpression(t.identifier("require"), [
+          t.stringLiteral("@fidanjs/jsx")
+        ])
+      )
+    ])
+  );
+};
