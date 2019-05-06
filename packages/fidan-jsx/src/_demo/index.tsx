@@ -3,14 +3,13 @@ var _r$ = require("..");
 
 const selected = value(false);
 
-setInterval(() => selected(!selected() as any), 1000);
-
 const div1 = (
   <div
     class={compute(() => {
       return selected() ? "selected" : "";
     })}
   >
+    <button onClick={() => selected(!selected.$val as any)}>Selected</button>
     {selected}
     <hr />
     TODO: Conditional <br />

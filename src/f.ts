@@ -53,8 +53,8 @@ export const value = <T>(
 
 export const compute = <T>(
   fn: (val: T, changedItem?) => any,
-  dependencies?: () => FidanValue<any>[]
-) => {
+  dependencies?: () => any[]
+): any => {
   autoTrackDependencies = dependencies ? null : [];
   const val = fn(undefined);
   const deps = autoTrackDependencies ? autoTrackDependencies : dependencies();

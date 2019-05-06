@@ -147,6 +147,9 @@ function transformAttributes(path, jsx, results) {
                 results.exprs.push(ast_1.setAttrExpr(elem, key, value.expression));
             }
             else {
+                // results.exprs.push(
+                //   t.expressionStatement(setAttr(elem, key, value.expression))
+                // );
                 results.exprs.push(t.expressionStatement(ast_1.computeAttribute(elem, key, value.expression)));
             }
         }

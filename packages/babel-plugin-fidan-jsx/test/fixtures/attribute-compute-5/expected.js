@@ -1,7 +1,10 @@
 const _tmpl$ = document.createElement("template");
 var _el$ = _tmpl$.content.firstChild.cloneNode(true);
-compute(function _() {
-  _el$.className = (function() {
+_r$.attr(
+  _el$,
+  "className",
+  false,
+  compute(function() {
     return classNames(
       {
         editing: editing(),
@@ -9,7 +12,7 @@ compute(function _() {
       },
       highlight()
     );
-  })();
-});
+  })
+);
 _el$;
 _tmpl$.innerHTML = "<div>test</div>";

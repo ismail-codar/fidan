@@ -6,6 +6,8 @@ import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import { generateHTMLNode } from "./generate";
 import { createTemplate } from "./ast";
 import { insertFidanImport } from "./util";
+import { NodePath } from "babel-traverse";
+import generate from "@babel/generator";
 
 export const globalOptions = {
   moduleName: "_r$",
@@ -13,6 +15,14 @@ export const globalOptions = {
   isTest: false
 };
 let doNotTraverse = false;
+
+const errorReport = (e: Error, path: NodePath<any>, file) => {
+  const nodeCode = generate(path.node).code;
+  console.log("FILE: ", file.filename);
+  console.log("PART: ", nodeCode);
+  console.error("ERROR: ", e);
+  debugger;
+};
 
 export default babel => {
   return {
@@ -39,17 +49,24 @@ export default babel => {
         } else path.replaceWith(result.exprs[0]);
       },
       JSXFragment: (path, { opts }) => {
-        if ("moduleName" in opts) globalOptions.moduleName = opts.moduleName;
-        if ("delegateEvents" in opts)
-          globalOptions.delegateEvents = opts.delegateEvents;
-        const result = generateHTMLNode(path, path.node, opts);
-        createTemplate(path, result, true);
-        if (!result.exprs.length && result.decl.declarations.length === 1)
-          path.replaceWith(result.decl.declarations[0].init);
-        else
-          path.replaceWithMultiple(
-            [result.decl].concat(result.exprs, t.expressionStatement(result.id))
-          );
+        try {
+          if ("moduleName" in opts) globalOptions.moduleName = opts.moduleName;
+          if ("delegateEvents" in opts)
+            globalOptions.delegateEvents = opts.delegateEvents;
+          const result = generateHTMLNode(path, path.node, opts);
+          createTemplate(path, result, true);
+          if (!result.exprs.length && result.decl.declarations.length === 1)
+            path.replaceWith(result.decl.declarations[0].init);
+          else
+            path.replaceWithMultiple(
+              [result.decl].concat(
+                result.exprs,
+                t.expressionStatement(result.id)
+              )
+            );
+        } catch (e) {
+          errorReport(e, path, this.file);
+        }
       },
       Program: {
         enter(path) {

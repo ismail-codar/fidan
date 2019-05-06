@@ -40,6 +40,24 @@ function computeAttribute(elem, name, value) {
             isAttribute = true;
         else
             name = attribute.alias;
+    const node = t.callExpression(t.memberExpression(t.identifier(_1.globalOptions.moduleName), t.identifier("attr")), [
+        elem,
+        t.stringLiteral(name),
+        t.booleanLiteral(isAttribute),
+        // t.arrowFunctionExpression([], value)
+        value
+    ]);
+    let code = generator_1.default(node).code;
+    return node;
+}
+exports.computeAttribute = computeAttribute;
+function computeAttribute1(elem, name, value) {
+    let isAttribute = name.indexOf("-") > -1, attribute = Attributes_1.Attributes[name];
+    if (attribute)
+        if (attribute.type === "attribute")
+            isAttribute = true;
+        else
+            name = attribute.alias;
     let expression = null;
     const isComputeIdentifier = t.isIdentifier(value) && value.name.startsWith("compute"); // TODO check definition
     const isComputeFn = t.isCallExpression(value) &&
@@ -72,7 +90,7 @@ function computeAttribute(elem, name, value) {
         return t.callExpression(t.identifier("compute"), args);
     }
 }
-exports.computeAttribute = computeAttribute;
+exports.computeAttribute1 = computeAttribute1;
 function createPlaceholder(path, results, tempPath, i) {
     const exprId = path.scope.generateUidIdentifier("el$");
     results.template += `<!--${exprId.name.slice(4)}-->`;

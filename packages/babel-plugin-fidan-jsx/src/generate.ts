@@ -290,6 +290,10 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
       } else if (!value || checkParens(value, path)) {
         results.exprs.push(setAttrExpr(elem, key, value.expression));
       } else {
+        // results.exprs.push(
+        //   t.expressionStatement(setAttr(elem, key, value.expression))
+        // );
+        // TODO cleanup others
         results.exprs.push(
           t.expressionStatement(computeAttribute(elem, key, value.expression))
         );
