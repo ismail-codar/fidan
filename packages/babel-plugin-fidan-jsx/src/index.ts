@@ -8,6 +8,7 @@ import { createTemplate } from "./ast";
 import { insertFidanImport } from "./util";
 import { NodePath } from "babel-traverse";
 import generate from "@babel/generator";
+import { currentFile } from "./export-registry";
 
 export const globalOptions = {
   moduleName: "_r$",
@@ -65,11 +66,12 @@ export default babel => {
               )
             );
         } catch (e) {
-          errorReport(e, path, this.file);
+          errorReport(e, path, currentFile.path);
         }
       },
       Program: {
         enter(path) {
+          currentFile.path = this.filename;
           globalOptions.isTest = false;
           if (this.opts.moduleName) {
             globalOptions.moduleName = this.opts.moduleName;

@@ -20,6 +20,7 @@ import {
   trimWhitespace,
   detectExpressions
 } from "./util";
+import { declarationNode } from "./export-registry";
 
 function generateComponent(path, jsx, opts): GenerationResultType {
   let props = [],
@@ -290,12 +291,22 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
       } else if (!value || checkParens(value, path)) {
         results.exprs.push(setAttrExpr(elem, key, value.expression));
       } else {
-        // results.exprs.push(
-        //   t.expressionStatement(setAttr(elem, key, value.expression))
-        // );
         // TODO cleanup others
+        let isCall = t.isCallExpression(value.expression);
+        if (!isCall && t.isIdentifier(value.expression)) {
+          const decl = declarationNode(path.scope, value.expression.name);
+          if (t.isVariableDeclarator(decl)) {
+            isCall = t.isCallExpression(decl.init); // attribute-compute-4
+          } else {
+            debugger;
+          }
+        }
         results.exprs.push(
-          t.expressionStatement(computeAttribute(elem, key, value.expression))
+          t.expressionStatement(
+            isCall
+              ? computeAttribute(elem, key, value.expression)
+              : setAttr(elem, key, value.expression)
+          )
         );
       }
     } else {

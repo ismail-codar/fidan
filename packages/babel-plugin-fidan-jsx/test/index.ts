@@ -1,4 +1,5 @@
 import { format } from "prettier";
+import { babelConfig } from "../src/export-registry";
 var assert = require("assert");
 var babel = require("@babel/core");
 var chalk = require("chalk");
@@ -15,7 +16,7 @@ process.env["IS_TEST"] = "true";
 
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
-// RUN_SINGLE_TEST = "attribute-compute-6";
+// RUN_SINGLE_TEST = "attribute-compute-7";
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve("../src");
@@ -55,22 +56,7 @@ function runTest(dir) {
   if (fs.existsSync(testFile) == false) {
     testFile = dir.path + "/actual.tsx";
   }
-  var output = babel.transformFileSync(testFile, {
-    plugins: [
-      [
-        pluginPath,
-        {
-          moduleName: "_r$",
-          isTest: true
-        }
-      ],
-      "@babel/plugin-syntax-dynamic-import",
-      ["@babel/plugin-proposal-decorators", { legacy: true }],
-      ["@babel/plugin-proposal-class-properties", { loose: true }],
-      "@babel/plugin-syntax-jsx"
-    ],
-    presets: ["@babel/preset-typescript"]
-  });
+  var output = babel.transformFileSync(testFile, babelConfig(pluginPath));
 
   var expected = fs.readFileSync(dir.path + "/expected.js", "utf-8");
 

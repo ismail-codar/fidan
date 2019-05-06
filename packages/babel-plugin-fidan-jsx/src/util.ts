@@ -1,5 +1,6 @@
 import * as t from "@babel/types";
 import { globalOptions } from ".";
+import { Scope, Binding } from "babel-traverse";
 
 export function getTagName(tag) {
   if (t.isJSXMemberExpression(tag.openingElement.name)) {
