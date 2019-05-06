@@ -8,13 +8,39 @@ import { createTemplate } from "./ast";
 import { insertFidanImport } from "./util";
 import { NodePath } from "babel-traverse";
 import generate from "@babel/generator";
-import { currentFile } from "./export-registry";
 
+const fileExtentions = [".js", ".jsx", ".ts", ".tsx"];
 export const globalOptions = {
   moduleName: "_r$",
   delegateEvents: true,
-  isTest: false
+  isTest: false,
+  babelConfig: (pluginPath: string) => ({
+    plugins: [
+      pluginPath
+        ? [
+            pluginPath,
+            {
+              moduleName: "_r$",
+              isTest: true
+            }
+          ]
+        : null,
+      "@babel/plugin-syntax-dynamic-import",
+      ["@babel/plugin-proposal-decorators", { legacy: true }],
+      ["@babel/plugin-proposal-class-properties", { loose: true }],
+      "@babel/plugin-syntax-jsx"
+    ].filter(p => p != null),
+    presets: ["@babel/preset-typescript"]
+  }),
+  fileExtentions: fileExtentions,
+  currentFile: {
+    path: ""
+  },
+  defaultPluginOptions: {
+    include: fileExtentions.map(ext => "**/*" + ext)
+  }
 };
+
 let doNotTraverse = false;
 
 const errorReport = (e: Error, path: NodePath<any>, file) => {
@@ -66,34 +92,39 @@ export default babel => {
               )
             );
         } catch (e) {
-          errorReport(e, path, currentFile.path);
+          errorReport(e, path, globalOptions.currentFile.path);
         }
       },
       Program: {
         enter(path) {
-          currentFile.path = this.filename;
+          globalOptions.currentFile.path = this.filename;
           globalOptions.isTest = false;
-          if (this.opts.moduleName) {
-            globalOptions.moduleName = this.opts.moduleName;
+          const pluginOptions = Object.assign(
+            globalOptions.defaultPluginOptions,
+            this.opts
+          );
+          if (pluginOptions.moduleName) {
+            globalOptions.moduleName = pluginOptions.moduleName;
           }
-          if (this.opts.isTest) {
+          if (pluginOptions.isTest) {
             globalOptions.isTest = true;
-          }
-
-          if (!globalOptions.isTest) {
-            const body: t.BaseNode[] = path.node.body;
-            insertFidanImport(body);
           }
 
           doNotTraverse = false;
           // https://github.com/micromatch/anymatch#usage
           if (
-            (this.opts.include &&
-              anymatch(this.opts.include, this.file.opts.filename) === false) ||
-            (this.opts.exclude &&
-              anymatch(this.opts.exclude, this.file.opts.filename) === true)
+            (pluginOptions.include &&
+              anymatch(pluginOptions.include, this.file.opts.filename) ===
+                false) ||
+            (pluginOptions.exclude &&
+              anymatch(pluginOptions.exclude, this.file.opts.filename) === true)
           ) {
             doNotTraverse = true;
+            return;
+          }
+
+          if (!globalOptions.isTest) {
+            insertFidanImport(path.node.body);
           }
         },
         exit: path => {

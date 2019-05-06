@@ -20,7 +20,7 @@ import {
   trimWhitespace,
   detectExpressions
 } from "./util";
-import { declarationNode } from "./export-registry";
+import { declarationInScope } from "./export-registry";
 
 function generateComponent(path, jsx, opts): GenerationResultType {
   let props = [],
@@ -294,7 +294,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
         // TODO cleanup others
         let isCall = t.isCallExpression(value.expression);
         if (!isCall && t.isIdentifier(value.expression)) {
-          const decl = declarationNode(path.scope, value.expression.name);
+          const decl = declarationInScope(path.scope, value.expression.name);
           if (t.isVariableDeclarator(decl)) {
             isCall = t.isCallExpression(decl.init); // attribute-compute-4
           } else {

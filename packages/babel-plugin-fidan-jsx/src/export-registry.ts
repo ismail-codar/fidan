@@ -3,37 +3,14 @@ import * as path from "path";
 import * as babel from "@babel/core";
 import * as t from "@babel/types";
 import { NodePath, Scope, Binding } from "babel-traverse";
+import { globalOptions } from ".";
 
-const fileExtentions = [".js", ".jsx", ".ts", ".tsx"];
 const registryData: {
   [key: string]: { fileName: string; nodes: any[] };
 } = {};
 
-export const currentFile = {
-  path: ""
-};
-
-export const babelConfig = (pluginPath: string) => ({
-  plugins: [
-    pluginPath
-      ? [
-          pluginPath,
-          {
-            moduleName: "_r$",
-            isTest: true
-          }
-        ]
-      : null,
-    "@babel/plugin-syntax-dynamic-import",
-    ["@babel/plugin-proposal-decorators", { legacy: true }],
-    ["@babel/plugin-proposal-class-properties", { loose: true }],
-    "@babel/plugin-syntax-jsx"
-  ].filter(p => p != null),
-  presets: ["@babel/preset-typescript"]
-});
-
 function buildBabelConfig(plugin) {
-  const config = babelConfig(null);
+  const config = globalOptions.babelConfig(null);
   return Object.assign({}, config, {
     plugins: [plugin].concat(config.plugins)
   });
@@ -111,7 +88,7 @@ const loadImportedFileExports = (fileName: string, importedFile: string) => {
   if (registryData[fileName]) return registryData[fileName];
   else {
     importedFile = path.resolve(path.dirname(fileName), importedFile);
-    fileExtentions.forEach(ext => {
+    globalOptions.fileExtentions.forEach(ext => {
       if (fs.existsSync(importedFile + ext)) {
         importedFile += ext;
       }
@@ -139,7 +116,7 @@ export const variableBindingInScope = (
   return null;
 };
 
-export const declarationNode = (scope: Scope, searchName: string) => {
+export const declarationInScope = (scope: Scope, searchName: string) => {
   const variableBinding = variableBindingInScope(scope, searchName);
   if (t.isVariableDeclarator(variableBinding.path.node)) {
     return variableBinding.path.node;
@@ -148,7 +125,7 @@ export const declarationNode = (scope: Scope, searchName: string) => {
     t.isImportDefaultSpecifier(variableBinding.path.node)
   ) {
     const exported = loadImportedFileExports(
-      currentFile.path,
+      globalOptions.currentFile.path,
       variableBinding.path.parent["source"].value
     );
     debugger;

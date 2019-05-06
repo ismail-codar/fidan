@@ -1,5 +1,5 @@
 import { format } from "prettier";
-import { babelConfig } from "../src/export-registry";
+import { globalOptions } from "../src/index";
 var assert = require("assert");
 var babel = require("@babel/core");
 var chalk = require("chalk");
@@ -56,7 +56,10 @@ function runTest(dir) {
   if (fs.existsSync(testFile) == false) {
     testFile = dir.path + "/actual.tsx";
   }
-  var output = babel.transformFileSync(testFile, babelConfig(pluginPath));
+  var output = babel.transformFileSync(
+    testFile,
+    globalOptions.babelConfig(pluginPath)
+  );
 
   var expected = fs.readFileSync(dir.path + "/expected.js", "utf-8");
 
