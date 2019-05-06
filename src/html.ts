@@ -28,7 +28,7 @@ let template = document.createElement("template");
 
 export const coditionalDom = (
   condition: () => boolean,
-  dependencies: () => FidanValue<any>[],
+  dependencies: FidanValue<any>[],
   htmlFragment: DocumentFragment
 ) => (parentElement: Element, nextElement: Element) => {
   const childs = Array.from(htmlFragment.children);
@@ -196,7 +196,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
             val => {
               element[attributeName] = val;
             },
-            () => [param]
+            [param]
           );
           element[attributeName] = param();
         } else {
@@ -204,7 +204,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
             val => {
               element.setAttribute(attributeName, val);
             },
-            () => [param]
+            [param]
           );
           element.setAttribute(attributeName, param());
         }

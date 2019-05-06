@@ -62,6 +62,6 @@ export const arrayMap = <T>(
         );
       }
     },
-    () => [arr]
+    [arr]
   );
 };

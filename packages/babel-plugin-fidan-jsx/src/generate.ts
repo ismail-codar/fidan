@@ -341,10 +341,7 @@ function transformChildren(path, jsx, opts, results) {
       tempPath = child.id.name;
       i++;
     } else if (child.exprs.length) {
-      if (
-        (t.isJSXFragment(jsx) && checkParens(jsxChild, path)) ||
-        checkLength(jsx.children)
-      ) {
+      if (t.isJSXFragment(jsx) || checkLength(jsx.children)) {
         let exprId = createPlaceholder(path, results, tempPath, i);
         const innerExpr = child.exprs[0];
         const methodName = t.isConditionalExpression(innerExpr)
@@ -359,8 +356,21 @@ function transformChildren(path, jsx, opts, results) {
               ),
               [
                 results.id,
-                methodName === "conditional"
-                  ? t.arrowFunctionExpression([], innerExpr)
+                t.isConditionalExpression(innerExpr)
+                  ? t.objectExpression([
+                      t.objectProperty(
+                        t.stringLiteral("test"),
+                        t.arrowFunctionExpression([], innerExpr.test)
+                      ),
+                      t.objectProperty(
+                        t.identifier("consequent"),
+                        innerExpr.consequent
+                      ),
+                      t.objectProperty(
+                        t.identifier("alternate"),
+                        innerExpr.alternate
+                      )
+                    ])
                   : innerExpr,
                 t.nullLiteral(),
                 exprId

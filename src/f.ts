@@ -52,11 +52,11 @@ export const value = <T>(val?: T): FidanValue<T> => {
 
 export const compute = <T>(
   fn: (val: T, changedItem?) => any,
-  dependencies?: () => any[]
+  dependencies?: any[]
 ): any => {
   autoTrackDependencies = dependencies ? null : [];
   const val = fn(undefined);
-  const deps = autoTrackDependencies ? autoTrackDependencies : dependencies();
+  const deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
   autoTrackDependencies = null;
   const cmp = value(val);
   cmp["compute"] = fn;
@@ -67,17 +67,19 @@ export const compute = <T>(
 export const beforeCompute = <T>(
   initalValue: T,
   fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
-  dependencies: () => FidanValue<any>[]
+  deps: FidanValue<any>[]
 ) => {
   const cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
-  const deps = dependencies();
   for (var i = 0; i < deps.length; i++) deps[i]["bc_depends"].push(cmp);
   return cmp;
 };
 
 const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
-  dataArray.size = value(dataArray.$val.length);
+  if (!dataArray.size) dataArray.size = value(dataArray.$val.length);
+  else dataArray.size(dataArray.$val.length);
+  if (dataArray.$val["$overrided"]) return;
+  dataArray.$val["$overrided"] = true;
   [
     "copyWithin",
     "fill",

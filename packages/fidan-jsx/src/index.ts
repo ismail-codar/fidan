@@ -10,18 +10,15 @@ export const insert = (
   marker?: Node
 ) => {
   if (typeof accessor === "object") {
-    marker.appendChild(accessor);
+    parent.insertBefore(accessor, marker);
   } else if (typeof accessor === "function") {
     const node = document.createTextNode("");
-    compute(
-      () => {
-        node.data = accessor();
-        if (!node.parentNode) {
-          parent.insertBefore(node, marker);
-        }
-      },
-      () => [accessor]
-    );
+    compute(() => {
+      node.data = accessor();
+      if (!node.parentNode) {
+        parent.insertBefore(node, marker);
+      }
+    }, [accessor]);
   } else {
     const node = document.createTextNode(accessor);
     parent.insertBefore(node, marker);
@@ -46,9 +43,9 @@ export const attr = (
 ) => {
   if (cmp.hasOwnProperty("$val")) {
     if (setAttr) {
-      compute(() => node.setAttribute(attributeName, cmp()), () => [cmp]);
+      compute(() => node.setAttribute(attributeName, cmp()), [cmp]);
     } else {
-      compute(() => (node[attributeName] = cmp()), () => [cmp]);
+      compute(() => (node[attributeName] = cmp()), [cmp]);
     }
   } else {
     if (typeof cmp === "function") {
@@ -64,20 +61,30 @@ export const attr = (
 
 export const conditional = (
   parent: Node & ParentNode,
-  accessor: any,
+  condition: {
+    test: () => boolean;
+    consequent: any;
+    alternate: any;
+  },
   init?: any,
   marker?: Node
 ) => {
-  var oldElement = null;
+  let oldElement = null;
+  let lastVal = false;
+  const conditionCompute = compute(condition.test);
   compute(() => {
-    let newElement = accessor();
-    if (newElement instanceof Node === false)
-      newElement = document.createTextNode(newElement || "");
-    if (oldElement) {
-      parent.replaceChild(newElement, oldElement);
-    } else {
-      parent.insertBefore(newElement, marker);
+    const val = !!conditionCompute();
+    if (val !== lastVal) {
+      let newElement = val ? condition.consequent : condition.alternate;
+      if (newElement instanceof Node === false)
+        newElement = document.createTextNode(newElement || "");
+      if (oldElement) {
+        parent.replaceChild(newElement, oldElement);
+      } else {
+        parent.insertBefore(newElement, marker);
+      }
+      oldElement = newElement;
     }
-    oldElement = newElement;
-  });
+    lastVal = val;
+  }, [conditionCompute]);
 };

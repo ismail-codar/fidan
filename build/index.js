@@ -57,7 +57,7 @@ var value = function (val) {
 var compute = function (fn, dependencies) {
   autoTrackDependencies = dependencies ? null : [];
   var val = fn(undefined);
-  var deps = autoTrackDependencies ? autoTrackDependencies : dependencies();
+  var deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
   autoTrackDependencies = null;
   var cmp = value(val);
   cmp["compute"] = fn;
@@ -66,10 +66,9 @@ var compute = function (fn, dependencies) {
 
   return cmp;
 };
-var beforeCompute = function (initalValue, fn, dependencies) {
+var beforeCompute = function (initalValue, fn, deps) {
   var cmp = value(fn(initalValue));
   cmp["beforeCompute"] = fn;
-  var deps = dependencies();
 
   for (var i = 0; i < deps.length; i++) { deps[i]["bc_depends"].push(cmp); }
 
@@ -77,7 +76,9 @@ var beforeCompute = function (initalValue, fn, dependencies) {
 };
 
 var overrideArrayMutators = function (dataArray) {
-  dataArray.size = value(dataArray.$val.length);
+  if (!dataArray.size) { dataArray.size = value(dataArray.$val.length); }else { dataArray.size(dataArray.$val.length); }
+  if (dataArray.$val["$overrided"]) { return; }
+  dataArray.$val["$overrided"] = true;
   ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
     dataArray.$val[method] = function () {
       var arr = dataArray.$val.slice(0);
@@ -431,27 +432,6 @@ function findGreatestIndexLEQ(seq, n) {
   return lo;
 }
 
-var coditionalDom = function (condition, dependencies, htmlFragment) { return function (parentElement, nextElement) {
-  var childs = Array.from(htmlFragment.children);
-  var inserted = false;
-  compute(function () {
-    if (condition()) {
-      if (!inserted) {
-        var tmpNextElement = nextElement;
-
-        for (var i = childs.length - 1; i >= 0; i--) {
-          var child = childs[i];
-          tmpNextElement = parentElement.insertBefore(child, tmpNextElement);
-        }
-
-        inserted = true;
-      }
-    } else {
-      childs.forEach(function (child) { return child.remove(); });
-      inserted = false;
-    }
-  }, dependencies);
-}; };
 var insertToDom = function (parentElement, index, itemElement) {
   var typeOf = typeof itemElement;
 
@@ -490,7 +470,7 @@ var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode
         // }
       });
     }
-  }, function () { return [arr]; });
+  }, [arr]);
 };
 
 var injectToProperty = function (obj, propertyKey, val) {
@@ -555,6 +535,27 @@ var htmlProps = {
 var _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 
 var template = document.createElement("template");
+var coditionalDom = function (condition, dependencies, htmlFragment) { return function (parentElement, nextElement) {
+  var childs = Array.from(htmlFragment.children);
+  var inserted = false;
+  compute(function () {
+    if (condition()) {
+      if (!inserted) {
+        var tmpNextElement = nextElement;
+
+        for (var i = childs.length - 1; i >= 0; i--) {
+          var child = childs[i];
+          tmpNextElement = parentElement.insertBefore(child, tmpNextElement);
+        }
+
+        inserted = true;
+      }
+    } else {
+      childs.forEach(function (child) { return child.remove(); });
+      inserted = false;
+    }
+  }, dependencies);
+}; };
 
 var putCommentToTagStart = function (htm, index, comment) {
   for (var i = index; i >= 0; i--) {
@@ -690,12 +691,12 @@ var updateNodesByCommentNodes = function (commentNodes, params) {
         if (htmlProps[attributeName]) {
           compute(function (val) {
             element[attributeName] = val;
-          }, function () { return [param]; });
+          }, [param]);
           element[attributeName] = param();
         } else {
           compute(function (val) {
             element.setAttribute(attributeName, val);
-          }, function () { return [param]; });
+          }, [param]);
           element.setAttribute(attributeName, param());
         }
       } else {
@@ -815,12 +816,12 @@ var htmlArrayMap = function (arr, renderCallback, options) {
 exports.value = value;
 exports.compute = compute;
 exports.beforeCompute = beforeCompute;
-exports.coditionalDom = coditionalDom;
 exports.insertToDom = insertToDom;
 exports.arrayMap = arrayMap;
 exports.injectToProperty = injectToProperty;
 exports.inject = inject;
 exports.debounce = debounce;
+exports.coditionalDom = coditionalDom;
 exports.html = html;
 exports.htmlArrayMap = htmlArrayMap;
 //# sourceMappingURL=index.js.map

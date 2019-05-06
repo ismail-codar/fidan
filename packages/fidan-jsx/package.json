@@ -5,7 +5,7 @@
   "author": "ismail codar <icodar@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "microbundle; rm -rf build/_demo --no-compress",
+    "build": "microbundle --no-compress; rm -rf build/_demo",
     "watch": "microbundle watch",
     "start": "parcel src/_demo/index.html --no-cache",
     "build-demo": "parcel  build src/_demo/index.html --no-cache",
