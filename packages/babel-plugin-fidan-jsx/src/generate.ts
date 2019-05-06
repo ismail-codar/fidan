@@ -346,14 +346,25 @@ function transformChildren(path, jsx, opts, results) {
         checkLength(jsx.children)
       ) {
         let exprId = createPlaceholder(path, results, tempPath, i);
+        const innerExpr = child.exprs[0];
+        const methodName = t.isConditionalExpression(innerExpr)
+          ? "conditional"
+          : "insert";
         results.exprs.push(
           t.expressionStatement(
             t.callExpression(
               t.memberExpression(
                 t.identifier(globalOptions.moduleName),
-                t.identifier("insert")
+                t.identifier(methodName)
               ),
-              [results.id, child.exprs[0], t.nullLiteral(), exprId]
+              [
+                results.id,
+                methodName === "conditional"
+                  ? t.arrowFunctionExpression([], innerExpr)
+                  : innerExpr,
+                t.nullLiteral(),
+                exprId
+              ]
             )
           )
         );

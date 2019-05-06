@@ -1,26 +1,7 @@
-import { compute, FidanValue } from "@fidanjs/runtime";
+import { compute, FidanValue, coditionalDom } from "@fidanjs/runtime";
 
 export * from "./events";
 export * from "./array-map";
-
-const nop: any = () => {};
-
-export const cleanup = nop;
-
-export const wrap = <T>(fn: (prev?: T) => T) => {
-  debugger;
-  compute(fn);
-};
-
-export const sample = <T>(fn: () => T) => {
-  return fn();
-};
-
-export const root = <T>(fn: (dispose: () => void) => T) => {
-  return fn(() => {
-    return null;
-  });
-};
 
 export const insert = (
   parent: Node,
@@ -51,7 +32,9 @@ export const spread = (node: HTMLElement, accessor: any) => {
   if (typeof accessor === "function") {
     accessor(node);
   } else {
-    debugger;
+    if (accessor instanceof Node === false)
+      accessor = document.createTextNode(accessor || "");
+    node.appendChild(accessor);
   }
 };
 
@@ -77,4 +60,24 @@ export const attr = (
       node[attributeName] = cmp;
     }
   }
+};
+
+export const conditional = (
+  parent: Node & ParentNode,
+  accessor: any,
+  init?: any,
+  marker?: Node
+) => {
+  var oldElement = null;
+  compute(() => {
+    let newElement = accessor();
+    if (newElement instanceof Node === false)
+      newElement = document.createTextNode(newElement || "");
+    if (oldElement) {
+      parent.replaceChild(newElement, oldElement);
+    } else {
+      parent.insertBefore(newElement, marker);
+    }
+    oldElement = newElement;
+  });
 };

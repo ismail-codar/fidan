@@ -26,12 +26,28 @@ const htmlProps = {
 let _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 let template = document.createElement("template");
 
-const isPromise = (obj): obj is Promise<any> => {
-  return (
-    !!obj &&
-    (typeof obj === "object" || typeof obj === "function") &&
-    typeof obj.then === "function"
-  );
+export const coditionalDom = (
+  condition: () => boolean,
+  dependencies: () => FidanValue<any>[],
+  htmlFragment: DocumentFragment
+) => (parentElement: Element, nextElement: Element) => {
+  const childs = Array.from(htmlFragment.children);
+  let inserted = false;
+  compute(() => {
+    if (condition()) {
+      if (!inserted) {
+        let tmpNextElement = nextElement;
+        for (var i = childs.length - 1; i >= 0; i--) {
+          const child = childs[i];
+          tmpNextElement = parentElement.insertBefore(child, tmpNextElement);
+        }
+        inserted = true;
+      }
+    } else {
+      childs.forEach(child => child.remove());
+      inserted = false;
+    }
+  }, dependencies);
 };
 
 const putCommentToTagStart = (

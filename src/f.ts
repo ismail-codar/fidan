@@ -2,9 +2,8 @@ import { FidanValue, FidanArray } from ".";
 
 let autoTrackDependencies: any[] = null;
 
-export const value = <T>(
-  val?: T
-): T extends Array<any> ? FidanArray<T> : FidanValue<T> => {
+// T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
+export const value = <T>(val?: T): FidanValue<T> => {
   const innerFn: any = (val?) => {
     if (val === undefined) {
       if (

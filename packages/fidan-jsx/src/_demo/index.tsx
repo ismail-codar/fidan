@@ -12,8 +12,7 @@ const div1 = (
     <button onClick={() => selected(!selected.$val as any)}>Selected</button>
     {selected}
     <hr />
-    TODO: Conditional <br />
-    {selected() ? "yes" : "no"} <br />
+    {selected() ? "yes" : <strong>no</strong>} <br />
   </div>
 );
 

@@ -1,4 +1,5 @@
-var autoTrackDependencies = null;
+var autoTrackDependencies = null; // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
+
 var value = function (val) {
   var innerFn = function (val) {
     if (val === undefined) {
@@ -513,6 +514,23 @@ var inject = function (obj) {
 
   return obj;
 };
+var debounce = function (func, wait, immediate) {
+  var timeout;
+  return function () {
+    var context = this;
+    var args = arguments;
+
+    var later = function () {
+      timeout = null;
+      if (!immediate) { func.apply(context, args); }
+    };
+
+    var callNow = immediate && !timeout;
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+    if (callNow) { func.apply(context, args); }
+  };
+};
 
 var COMMENT_TEXT = 1;
 var COMMENT_DOM = 2;
@@ -802,6 +820,7 @@ exports.insertToDom = insertToDom;
 exports.arrayMap = arrayMap;
 exports.injectToProperty = injectToProperty;
 exports.inject = inject;
+exports.debounce = debounce;
 exports.html = html;
 exports.htmlArrayMap = htmlArrayMap;
 //# sourceMappingURL=index.js.map
