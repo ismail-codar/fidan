@@ -5,8 +5,12 @@ var div1 = (function() {
     _el$2 = _el$.firstChild;
   _r$.conditional(
     _el$,
-    function() {
-      return selected() ? "yes" : "no";
+    {
+      test: function test() {
+        return selected();
+      },
+      consequent: "yes",
+      alternate: "no"
     },
     null,
     _el$2

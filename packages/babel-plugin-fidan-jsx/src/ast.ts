@@ -3,6 +3,7 @@ import { GenerationResultType } from "./types";
 import { Attributes } from "./constants/Attributes";
 import { globalOptions } from ".";
 import generate from "@babel/generator";
+import { canBeReactive } from "./util";
 
 export function setAttr(elem, name, value) {
   if (name === "style") {
@@ -64,7 +65,12 @@ export function computeAttribute(elem, name, value) {
       t.identifier(globalOptions.moduleName),
       t.identifier("attr")
     ),
-    [elem, t.stringLiteral(name), t.booleanLiteral(isAttribute), value]
+    [
+      elem,
+      t.stringLiteral(name),
+      t.booleanLiteral(isAttribute),
+      canBeReactive(value) ? value.callee : value
+    ]
   );
   return node;
 }

@@ -13,12 +13,17 @@ export const insert = (
     parent.insertBefore(accessor, marker);
   } else if (typeof accessor === "function") {
     const node = document.createTextNode("");
-    compute(() => {
+    if (accessor.hasOwnProperty("$val")) {
+      compute(() => {
+        node.data = accessor();
+        if (!node.parentNode) {
+          parent.insertBefore(node, marker);
+        }
+      });
+    } else {
       node.data = accessor();
-      if (!node.parentNode) {
-        parent.insertBefore(node, marker);
-      }
-    }, [accessor]);
+      parent.insertBefore(node, marker);
+    }
   } else {
     const node = document.createTextNode(accessor);
     parent.insertBefore(node, marker);

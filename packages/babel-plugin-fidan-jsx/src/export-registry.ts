@@ -25,7 +25,6 @@ const getDeclationsFromExports = (path: NodePath<t.Identifier>) => {
     }
   }
   if (t.isAssignmentExpression(parentPath.node)) {
-    debugger;
     if (t.isIdentifier(parentPath.node.right)) {
       const variableBindings = variableBindingInScope(
         parentPath.scope,
@@ -128,7 +127,6 @@ export const declarationInScope = (scope: Scope, searchName: string) => {
       globalOptions.currentFile.path,
       variableBinding.path.parent["source"].value
     );
-    debugger;
     return exported.nodes.find(node => {
       if (t.isVariableDeclarator(node) && t.isIdentifier(node.id)) {
         return node.id.name === searchName;

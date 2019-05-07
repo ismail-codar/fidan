@@ -18,7 +18,10 @@ import {
   toEventName,
   checkLength,
   trimWhitespace,
-  detectExpressions
+  detectExpressions,
+  isComponentTag,
+  isComponentName,
+  canBeReactive
 } from "./util";
 import { declarationInScope } from "./export-registry";
 
@@ -341,9 +344,12 @@ function transformChildren(path, jsx, opts, results) {
       tempPath = child.id.name;
       i++;
     } else if (child.exprs.length) {
+      // t.isJSXFragment(jsx) && checkParens(jsxChild, path) ||	 checkLength(jsx.children) --> fragments test
+      // t.isJSXFragment(jsx) || checkLength(jsx.children)
       if (t.isJSXFragment(jsx) || checkLength(jsx.children)) {
         let exprId = createPlaceholder(path, results, tempPath, i);
         const innerExpr = child.exprs[0];
+
         const methodName = t.isConditionalExpression(innerExpr)
           ? "conditional"
           : "insert";
@@ -371,6 +377,8 @@ function transformChildren(path, jsx, opts, results) {
                         innerExpr.alternate
                       )
                     ])
+                  : canBeReactive(innerExpr)
+                  ? innerExpr.callee
                   : innerExpr,
                 t.nullLiteral(),
                 exprId
@@ -380,7 +388,8 @@ function transformChildren(path, jsx, opts, results) {
         );
         tempPath = exprId.name;
         i++;
-      } else
+      } else {
+        const value = child.exprs[0];
         results.exprs.push(
           t.expressionStatement(
             t.callExpression(
@@ -388,10 +397,11 @@ function transformChildren(path, jsx, opts, results) {
                 t.identifier(globalOptions.moduleName),
                 t.identifier("insert")
               ),
-              [results.id, child.exprs[0]]
+              [results.id, canBeReactive(value) ? value.callee : value]
             )
           )
         );
+      }
     }
   });
 }

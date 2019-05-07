@@ -1,6 +1,7 @@
 import * as t from "@babel/types";
 import { globalOptions } from ".";
 import { Scope, Binding } from "babel-traverse";
+import VoidElements from "./constants/VoidElements";
 
 export function getTagName(tag) {
   if (t.isJSXMemberExpression(tag.openingElement.name)) {
@@ -18,7 +19,9 @@ export function checkParens(jsx, path) {
 }
 
 export function toEventName(name) {
-  return name.slice(2).toLowerCase();
+  name = name.slice(2).toLowerCase();
+  if (name === "doubleclick") name = "dblclick";
+  return name;
 }
 
 export function trimWhitespace(text) {
@@ -73,5 +76,31 @@ export const insertFidanImport = (body: t.BaseNode[]) => {
         ])
       )
     ])
+  );
+};
+
+export const isComponentName = (id: t.Expression) => {
+  let tagName = t.isIdentifier(id)
+    ? id.name
+    : t.isMemberExpression(id)
+    ? t.isIdentifier(id.property)
+      ? id.property.name
+      : id.property
+    : null;
+  return tagName !== tagName.toLowerCase();
+};
+
+export const isComponentTag = jsx => {
+  let tagName = getTagName(jsx);
+  return tagName !== tagName.toLowerCase();
+};
+
+export const canBeReactive = (
+  value: t.Expression
+): value is t.CallExpression => {
+  return (
+    t.isCallExpression(value) &&
+    value.arguments.length == 0 &&
+    !isComponentName(value.callee)
   );
 };
