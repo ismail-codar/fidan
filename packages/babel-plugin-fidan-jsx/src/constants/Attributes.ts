@@ -12,6 +12,17 @@ const Types = {
   PROPERTY: "property"
 };
 
+export const HtmlAttributes: AttributeInfo = {
+  htmlFor: {
+    type: Types.PROPERTY,
+    alias: "for"
+  },
+  className: {
+    type: Types.PROPERTY,
+    alias: "class"
+  }
+};
+
 export const Attributes: AttributeInfo = {
   href: {
     type: Types.ATTRIBUTE

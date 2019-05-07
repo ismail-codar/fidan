@@ -19,11 +19,10 @@ import {
   checkLength,
   trimWhitespace,
   detectExpressions,
-  isComponentTag,
-  isComponentName,
   canBeReactive
 } from "./util";
 import { declarationInScope } from "./export-registry";
+import { HtmlAttributes } from "./constants/Attributes";
 
 function generateComponent(path, jsx, opts): GenerationResultType {
   let props = [],
@@ -313,7 +312,9 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
         );
       }
     } else {
-      if (key === "className") key = "class";
+      if (HtmlAttributes[key]) {
+        key = HtmlAttributes[key].alias;
+      }
       results.template += ` ${key}`;
       if (value) results.template += `='${value.value}'`;
     }
