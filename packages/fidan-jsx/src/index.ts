@@ -67,7 +67,7 @@ export const attr = (
 export const conditional = (
   parent: Node & ParentNode,
   condition: {
-    test: () => boolean;
+    test: () => boolean | FidanValue<any>;
     consequent: any;
     alternate: any;
   },
@@ -76,7 +76,9 @@ export const conditional = (
 ) => {
   let oldElement = null;
   let lastVal = false;
-  const conditionCompute = compute(condition.test);
+  const conditionCompute = condition.test.hasOwnProperty("$val")
+    ? condition.test
+    : compute(condition.test);
   compute(() => {
     if (oldElement && parent.childElementCount === 0) {
       return;

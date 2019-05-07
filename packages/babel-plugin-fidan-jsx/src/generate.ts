@@ -367,7 +367,10 @@ function transformChildren(path, jsx, opts, results) {
                   ? t.objectExpression([
                       t.objectProperty(
                         t.stringLiteral("test"),
-                        t.arrowFunctionExpression([], innerExpr.test)
+                        t.isCallExpression(innerExpr.test) &&
+                          innerExpr.test.arguments.length > 0
+                          ? innerExpr.test // compute(..)
+                          : t.arrowFunctionExpression([], innerExpr.test)
                       ),
                       t.objectProperty(
                         t.identifier("consequent"),
