@@ -19,21 +19,18 @@ export const reactToDom = <T>(
     componentDidMount() {
       const props = this.props;
 
-      compute(
-        () => {
-          var newState = {};
-          for (var key in this.props) {
-            if (
-              typeof props[key] === "function" &&
-              props[key].hasOwnProperty("$val")
-            ) {
-              newState[key] = props[key]();
-            }
+      compute(() => {
+        var newState = {};
+        for (var key in this.props) {
+          if (
+            typeof props[key] === "function" &&
+            props[key].hasOwnProperty("$val")
+          ) {
+            newState[key] = props[key]();
           }
-          this.setState(newState);
-        },
-        () => this.dynamics
-      );
+        }
+        this.setState(newState);
+      }, this.dynamics);
     }
     constructor(props) {
       super(props);

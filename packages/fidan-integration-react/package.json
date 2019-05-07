@@ -1,19 +1,21 @@
 {
   "name": "@fidanjs/integration-react",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "repository": "https://github.com/ismail-codar/fidan/packages/fidan-integration-react",
   "author": "ismail codar <icodar@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build-lib": "microbundle; rm -rf build/_demo",
+    "build": "microbundle --no-compress; rm -rf build/_demo",
     "dev-lib": "microbundle watch",
     "start": "parcel src/_demo/index.html --no-cache",
     "build-demo": "parcel  build src/_demo/index.html --no-cache",
-    "yalc-link": "yalc link @fidanjs/runtime & @fidanjs/babel-plugin-fidan-jsx",
+    "local": "yarn build && yalc publish && yalc push",
+    "yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/jsx & yalc link @fidanjs/babel-plugin-fidan-jsx",
     "test": "jasmine-ts"
   },
   "dependencies": {
-    "@fidanjs/runtime": "latest"
+    "@fidanjs/runtime": "latest",
+    "@fidanjs/jsx": "latest"
   },
   "peerDependencies": {
     "react": "^16.8.6",
