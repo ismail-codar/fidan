@@ -78,8 +78,14 @@ export const conditional = (
   let lastVal = false;
   const conditionCompute = compute(condition.test);
   compute(() => {
+    if (oldElement && parent.childElementCount === 0) {
+      return;
+    }
     const val = !!conditionCompute();
     if (val !== lastVal) {
+      if (parent && parent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+        parent = marker.parentNode;
+      }
       let newElement = val ? condition.consequent : condition.alternate;
       if (newElement instanceof Node === false)
         newElement = document.createTextNode(newElement || "");
