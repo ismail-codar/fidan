@@ -18,7 +18,8 @@ export const injectToProperty = (
       set: v => val(v)
     });
   else {
-    descr.set["c_depends"].push(val);
+    // descr.get().c_depends.push(val);
+    // val["c_depends"].push(descr.get());
   }
 };
 

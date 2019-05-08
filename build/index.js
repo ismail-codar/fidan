@@ -483,9 +483,7 @@ var injectToProperty = function (obj, propertyKey, val) {
       return val;
     },
     set: function (v) { return val(v); }
-  }); }else {
-    descr.set["c_depends"].push(val);
-  }
+  }); }
 };
 var inject = function (obj) {
   for (var key in obj) {
