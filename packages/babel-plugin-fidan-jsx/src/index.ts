@@ -21,7 +21,8 @@ export const globalOptions = {
             pluginPath,
             {
               moduleName: "_r$",
-              isTest: true
+              isTest: true,
+              exclude: ["**/*.react*"]
             }
           ]
         : null,
