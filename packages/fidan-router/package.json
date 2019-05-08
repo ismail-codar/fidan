@@ -13,7 +13,7 @@
   "author": "ismail codar",
   "license": "ISC",
   "dependencies": {
-    "@fidanjs/runtime": "latest",
+    "@fidanjs/runtime": "^0.0.21",
     "route-recognizer": "^0.3.4"
   },
   "devDependencies": {

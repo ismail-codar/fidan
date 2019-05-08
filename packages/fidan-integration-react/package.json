@@ -14,8 +14,9 @@
     "test": "jasmine-ts"
   },
   "dependencies": {
-    "@fidanjs/runtime": "latest",
-    "@fidanjs/jsx": "latest"
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.6",
+    "@fidanjs/jsx": "^0.0.6",
+    "@fidanjs/runtime": "^0.0.21"
   },
   "peerDependencies": {
     "react": "^16.8.6",
