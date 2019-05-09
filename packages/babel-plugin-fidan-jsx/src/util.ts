@@ -2,6 +2,7 @@ import * as t from "@babel/types";
 import { globalOptions } from ".";
 import { Scope, Binding } from "babel-traverse";
 import VoidElements from "./constants/VoidElements";
+import { allSvgElements, htmlAndSvgElements } from "./svg";
 
 export function getTagName(tag) {
   if (t.isJSXMemberExpression(tag.openingElement.name)) {
@@ -102,5 +103,13 @@ export const canBeReactive = (
     t.isCallExpression(value) &&
     value.arguments.length == 0 &&
     !isComponentName(value.callee)
+  );
+};
+
+const isSvgElementTagName = (tagName, openedTags: string[]) => {
+  return (
+    (tagName != null && allSvgElements.indexOf(tagName) !== -1) ||
+    (htmlAndSvgElements.indexOf(tagName) !== -1 &&
+      allSvgElements.indexOf(openedTags[openedTags.length - 1]) !== -1)
   );
 };

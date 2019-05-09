@@ -6,21 +6,21 @@ export const injectToProperty = (
   propertyKey: string,
   val: FidanValue<any>
 ) => {
-  const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
-  if (descr.configurable)
-    Object.defineProperty(obj, propertyKey, {
-      configurable: false,
-      enumerable: true,
-      get: () => {
-        val();
-        return val;
-      },
-      set: v => val(v)
-    });
-  else {
-    // descr.get().c_depends.push(val);
-    // val["c_depends"].push(descr.get());
-  }
+  // const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
+  // if (descr.configurable)
+  Object.defineProperty(obj, propertyKey, {
+    configurable: true,
+    enumerable: true,
+    get: () => {
+      val();
+      return val;
+    },
+    set: v => (v.hasOwnProperty("$val") ? (val = v) : val(v))
+  });
+  // else {
+  //   // descr.get().c_depends.push(val);
+  //   // val["c_depends"].push(descr.get());
+  // }
 };
 
 export const inject = <T extends Object>(obj: T): T => {

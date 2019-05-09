@@ -1,6 +1,8 @@
 var autoTrackDependencies = null; // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
 
 var value = function (val) {
+  if (val && val.hasOwnProperty("$val")) { return val; } // throw "Fidan: Higher ordered signals is not supported.";
+
   var innerFn = function (val) {
     if (val === undefined) {
       if (autoTrackDependencies && autoTrackDependencies.indexOf(innerFn) === -1) {
@@ -474,16 +476,20 @@ var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode
 };
 
 var injectToProperty = function (obj, propertyKey, val) {
-  var descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
-  if (descr.configurable) { Object.defineProperty(obj, propertyKey, {
-    configurable: false,
+  // const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
+  // if (descr.configurable)
+  Object.defineProperty(obj, propertyKey, {
+    configurable: true,
     enumerable: true,
     get: function () {
       val();
       return val;
     },
-    set: function (v) { return val(v); }
-  }); }
+    set: function (v) { return v.hasOwnProperty("$val") ? val = v : val(v); }
+  }); // else {
+  //   // descr.get().c_depends.push(val);
+  //   // val["c_depends"].push(descr.get());
+  // }
 };
 var inject = function (obj) {
   for (var key in obj) {

@@ -4,6 +4,7 @@ let autoTrackDependencies: any[] = null;
 
 // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
 export const value = <T>(val?: T): FidanValue<T> => {
+  if (val && val.hasOwnProperty("$val")) return val as any;
   const innerFn: any = (val?) => {
     if (val === undefined) {
       if (
