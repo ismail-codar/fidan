@@ -117,6 +117,7 @@ export const variableBindingInScope = (
 
 export const declarationInScope = (scope: Scope, searchName: string) => {
   const variableBinding = variableBindingInScope(scope, searchName);
+  if (!variableBinding) return false;
   if (t.isVariableDeclarator(variableBinding.path.node)) {
     return variableBinding.path.node;
   } else if (

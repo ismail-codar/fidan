@@ -5,7 +5,7 @@ import * as anymatch from "anymatch";
 import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import { generateHTMLNode } from "./generate";
 import { createTemplate } from "./ast";
-import { insertFidanImport } from "./util";
+import { insertFidanImport, isSvgElementTagName } from "./util";
 import { NodePath } from "babel-traverse";
 import generate from "@babel/generator";
 
@@ -39,7 +39,9 @@ export const globalOptions = {
   },
   defaultPluginOptions: {
     include: fileExtentions.map(ext => "**/*" + ext)
-  }
+  },
+  openedTags: [],
+  isSvg: false
 };
 
 let doNotTraverse = false;
@@ -64,6 +66,9 @@ export default babel => {
           globalOptions.delegateEvents = opts.delegateEvents;
         const result = generateHTMLNode(path, path.node, opts);
         if (result.id) {
+          globalOptions.isSvg = isSvgElementTagName(
+            path.node.openingElement.name.name
+          );
           createTemplate(path, result);
           if (!result.exprs.length && result.decl.declarations.length === 1)
             path.replaceWith(result.decl.declarations[0].init);
@@ -81,6 +86,9 @@ export default babel => {
           if ("moduleName" in opts) globalOptions.moduleName = opts.moduleName;
           if ("delegateEvents" in opts)
             globalOptions.delegateEvents = opts.delegateEvents;
+          globalOptions.isSvg = isSvgElementTagName(
+            path.node.openingElement.name.name
+          );
           const result = generateHTMLNode(path, path.node, opts);
           createTemplate(path, result, true);
           if (!result.exprs.length && result.decl.declarations.length === 1)
@@ -95,6 +103,12 @@ export default babel => {
         } catch (e) {
           errorReport(e, path, globalOptions.currentFile.path);
         }
+      },
+      JSXOpeningElement(path: NodePath<t.JSXOpeningElement>, file) {
+        globalOptions.openedTags.push(path.node.name["name"]);
+      },
+      JSXClosingElement(path: NodePath<t.JSXClosingElement>, file) {
+        globalOptions.openedTags.pop();
       },
       Program: {
         enter(path) {

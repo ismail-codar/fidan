@@ -106,7 +106,8 @@ export const canBeReactive = (
   );
 };
 
-const isSvgElementTagName = (tagName, openedTags: string[]) => {
+export const isSvgElementTagName = tagName => {
+  const openedTags = globalOptions.openedTags;
   return (
     (tagName != null && allSvgElements.indexOf(tagName) !== -1) ||
     (htmlAndSvgElements.indexOf(tagName) !== -1 &&

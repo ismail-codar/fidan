@@ -3,7 +3,7 @@ import { GenerationResultType } from "./types";
 import { Attributes } from "./constants/Attributes";
 import { globalOptions } from ".";
 import generate from "@babel/generator";
-import { canBeReactive } from "./util";
+import { canBeReactive, isSvgElementTagName } from "./util";
 
 export function setAttr(elem, name, value) {
   if (name === "style") {
@@ -23,7 +23,7 @@ export function setAttr(elem, name, value) {
     );
   }
 
-  let isAttribute = name.indexOf("-") > -1,
+  let isAttribute = name.indexOf("-") > -1 || globalOptions.isSvg,
     attribute = Attributes[name];
   if (attribute)
     if (attribute.type === "attribute") isAttribute = true;
@@ -54,7 +54,7 @@ export function setAttrExpr(elem, name, value) {
 }
 
 export function computeAttribute(elem, name, value) {
-  let isAttribute = name.indexOf("-") > -1,
+  let isAttribute = name.indexOf("-") > -1 || globalOptions.isSvg,
     attribute = Attributes[name];
   if (attribute)
     if (attribute.type === "attribute") isAttribute = true;
@@ -109,7 +109,12 @@ export function createTemplate(
             )
           : t.memberExpression(
               t.memberExpression(
-                t.memberExpression(templateId, t.identifier("content")),
+                globalOptions.isSvg
+                  ? t.memberExpression(
+                      t.memberExpression(templateId, t.identifier("content")),
+                      t.identifier("firstChild")
+                    )
+                  : t.memberExpression(templateId, t.identifier("content")),
                 t.identifier("firstChild")
               ),
               t.identifier("cloneNode")
@@ -136,7 +141,11 @@ export function createTemplate(
         t.assignmentExpression(
           "=",
           t.memberExpression(templateId, t.identifier("innerHTML")),
-          t.stringLiteral(results.template)
+          t.stringLiteral(
+            globalOptions.isSvg && !results.template.startsWith("<svg")
+              ? `<svg>${results.template}</svg>`
+              : results.template
+          )
         )
       )
     );
