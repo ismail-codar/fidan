@@ -1,6 +1,6 @@
 const _tmpl$ = document.createElement("template");
 _tmpl$.innerHTML = "<!--2-->";
-var Main = function Main() {
+var Main = function Main(props) {
   return (function() {
     var _el$ = _tmpl$.content.cloneNode(true),
       _el$2 = _el$.firstChild;

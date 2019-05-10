@@ -5,7 +5,12 @@ import * as anymatch from "anymatch";
 import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import { generateHTMLNode } from "./generate";
 import { createTemplate } from "./ast";
-import { insertFidanImport, isSvgElementTagName } from "./util";
+import {
+  insertFidanImport,
+  isSvgElementTagName,
+  jsxParentComponent,
+  setComponentPropsToDom
+} from "./util";
 import { NodePath } from "babel-traverse";
 import generate from "@babel/generator";
 
@@ -72,13 +77,15 @@ export default babel => {
           createTemplate(path, result);
           if (!result.exprs.length && result.decl.declarations.length === 1)
             path.replaceWith(result.decl.declarations[0].init);
-          else
+          else {
+            setComponentPropsToDom(path, result);
             path.replaceWithMultiple(
               [result.decl].concat(
                 result.exprs,
                 t.expressionStatement(result.id)
               )
             );
+          }
         } else path.replaceWith(result.exprs[0]);
       },
       JSXFragment: (path, { opts }) => {
@@ -94,13 +101,15 @@ export default babel => {
           createTemplate(path, result, true);
           if (!result.exprs.length && result.decl.declarations.length === 1)
             path.replaceWith(result.decl.declarations[0].init);
-          else
+          else {
+            setComponentPropsToDom(path, result);
             path.replaceWithMultiple(
               [result.decl].concat(
                 result.exprs,
                 t.expressionStatement(result.id)
               )
             );
+          }
         } catch (e) {
           errorReport(e, path, globalOptions.currentFile.path);
         }

@@ -346,7 +346,7 @@ function transformChildren(path, jsx, opts, results) {
       tempPath = child.id.name;
       i++;
     } else if (child.exprs.length) {
-      // t.isJSXFragment(jsx) && checkParens(jsxChild, path) ||	 checkLength(jsx.children) --> fragments test
+      // t.isJSXFragment(jsx) && checkParens(jsxChild, path) ||	 checkLength(jsx.children) --> TODO fragments test
       // t.isJSXFragment(jsx) || checkLength(jsx.children)
       if (t.isJSXFragment(jsx) || checkLength(jsx.children)) {
         let exprId = createPlaceholder(path, results, tempPath, i);

@@ -1,6 +1,6 @@
 import * as t from "@babel/types";
 import { globalOptions } from ".";
-import { Scope, Binding } from "babel-traverse";
+import { Scope, Binding, NodePath } from "babel-traverse";
 import VoidElements from "./constants/VoidElements";
 import { allSvgElements, htmlAndSvgElements } from "./svg";
 import generate from "@babel/generator";
@@ -101,7 +101,7 @@ export const isComponentTag = jsx => {
   return isComponentName(tagName);
 };
 
-export const isComponentName = tagName =>
+export const isComponentName = (tagName: string) =>
   tagName.substr(0, 1) !== tagName.substr(0, 1).toLowerCase();
 
 export const canBeReactive = (
@@ -121,4 +121,67 @@ export const isSvgElementTagName = tagName => {
     (htmlAndSvgElements.indexOf(tagName) !== -1 &&
       allSvgElements.indexOf(openedTags[openedTags.length - 1]) !== -1)
   );
+};
+
+export const jsxParentComponent = (
+  path: NodePath<t.JSXFragment | t.JSXElement>
+): { componentName: string; params: any[] } => {
+  if (
+    !path.parentPath ||
+    !path.parentPath.parentPath ||
+    !path.parentPath.parentPath.parentPath ||
+    !path.parentPath.parentPath.parentPath.parentPath
+  )
+    return null;
+  const declarationNode = path.parentPath.parentPath.parentPath.parentPath.node;
+  let componentName: string = null;
+  if (t.isVariableDeclarator(declarationNode)) {
+    componentName = declarationNode.id["name"];
+    if (
+      isComponentName(componentName) &&
+      (t.isArrowFunctionExpression(declarationNode.init) ||
+        t.isFunctionExpression(declarationNode.init))
+    ) {
+      if (
+        declarationNode.init.params.length === 1 &&
+        t.isIdentifier(declarationNode.init.params[0])
+      ) {
+        return {
+          componentName,
+          params: declarationNode.init.params
+        };
+      }
+    }
+  }
+  if (t.isFunctionDeclaration(declarationNode)) {
+    const componentName = declarationNode.id["name"];
+    if (isComponentName(componentName)) {
+      if (
+        declarationNode.params.length === 1 &&
+        t.isIdentifier(declarationNode.params[0])
+      ) {
+        return {
+          componentName,
+          params: declarationNode.params
+        };
+      }
+    }
+  }
+  return null;
+};
+
+export const setComponentPropsToDom = (path, result) => {
+  const parentComponent = jsxParentComponent(path);
+  if (parentComponent && parentComponent.params.length === 1) {
+    //_el$.$props = props;
+    result.exprs.push(
+      t.expressionStatement(
+        t.assignmentExpression(
+          "=",
+          t.memberExpression(result.id, t.identifier("$props")),
+          parentComponent.params[0]
+        )
+      )
+    );
+  }
 };
