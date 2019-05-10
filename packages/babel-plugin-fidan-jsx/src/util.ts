@@ -3,6 +3,11 @@ import { globalOptions } from ".";
 import { Scope, Binding } from "babel-traverse";
 import VoidElements from "./constants/VoidElements";
 import { allSvgElements, htmlAndSvgElements } from "./svg";
+import generate from "@babel/generator";
+
+export const generateCode = node => {
+  return generate(node).code;
+};
 
 export function getTagName(tag) {
   if (t.isJSXMemberExpression(tag.openingElement.name)) {
@@ -80,7 +85,7 @@ export const insertFidanImport = (body: t.BaseNode[]) => {
   );
 };
 
-export const isComponentName = (id: t.Expression) => {
+export const isComponentNode = (id: t.Expression) => {
   let tagName = t.isIdentifier(id)
     ? id.name
     : t.isMemberExpression(id)
@@ -88,22 +93,25 @@ export const isComponentName = (id: t.Expression) => {
       ? id.property.name
       : id.property
     : null;
-  return tagName !== tagName.toLowerCase();
+  return isComponentName(tagName);
 };
 
 export const isComponentTag = jsx => {
   let tagName = getTagName(jsx);
-  return tagName !== tagName.toLowerCase();
+  return isComponentName(tagName);
 };
+
+export const isComponentName = tagName =>
+  tagName.substr(0, 1) !== tagName.substr(0, 1).toLowerCase();
 
 export const canBeReactive = (
   value: t.Expression
 ): value is t.CallExpression => {
-  return (
+  const reactive =
     t.isCallExpression(value) &&
     value.arguments.length == 0 &&
-    !isComponentName(value.callee)
-  );
+    !isComponentNode(value.callee);
+  return reactive;
 };
 
 export const isSvgElementTagName = tagName => {

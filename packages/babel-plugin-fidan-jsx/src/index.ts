@@ -86,9 +86,10 @@ export default babel => {
           if ("moduleName" in opts) globalOptions.moduleName = opts.moduleName;
           if ("delegateEvents" in opts)
             globalOptions.delegateEvents = opts.delegateEvents;
-          globalOptions.isSvg = isSvgElementTagName(
-            path.node.openingElement.name.name
-          );
+          if (path.node.openingElement)
+            globalOptions.isSvg = isSvgElementTagName(
+              path.node.openingElement.name.name
+            );
           const result = generateHTMLNode(path, path.node, opts);
           createTemplate(path, result, true);
           if (!result.exprs.length && result.decl.declarations.length === 1)

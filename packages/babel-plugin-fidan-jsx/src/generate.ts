@@ -19,7 +19,8 @@ import {
   checkLength,
   trimWhitespace,
   detectExpressions,
-  canBeReactive
+  canBeReactive,
+  isComponentName
 } from "./util";
 import { declarationInScope } from "./export-registry";
 import { HtmlAttributes } from "./constants/Attributes";
@@ -27,7 +28,7 @@ import { HtmlAttributes } from "./constants/Attributes";
 function generateComponent(path, jsx, opts): GenerationResultType {
   let props = [],
     runningObject = [],
-    exprs,
+    exprs: any[],
     dynamic = [],
     children = [];
 
@@ -420,8 +421,7 @@ export function generateHTMLNode(
     let tagName = getTagName(jsx),
       voidTag = VoidElements.indexOf(tagName) > -1;
     // if (tagName === "$") return generateFlow(jsx);
-    if (tagName !== tagName.toLowerCase())
-      return generateComponent(path, jsx, opts);
+    if (isComponentName(tagName)) return generateComponent(path, jsx, opts);
     let results = {
       id: undefined,
       template: `<${tagName}`,
