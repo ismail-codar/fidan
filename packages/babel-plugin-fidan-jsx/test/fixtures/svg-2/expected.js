@@ -32,7 +32,7 @@ var GraphNode = function GraphNode(props) {
       })
     );
     _r$.insert(_el$3, props.name);
-    _r$.attr(_el$4, "x", true, propX());
+    _r$.attr(_el$4, "x", true, propX);
     _r$.attr(
       _el$4,
       "y",
