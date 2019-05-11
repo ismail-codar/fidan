@@ -14,7 +14,7 @@ const GraphNode = props => {
     <g>
       <rect
         className="node"
-        width="60"
+        width={100}
         height="40"
         rx="5"
         ry="5"

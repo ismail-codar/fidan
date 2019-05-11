@@ -16,7 +16,7 @@ process.env["IS_TEST"] = "true";
 
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = null;
-RUN_SINGLE_TEST = "condition-2";
+// RUN_SINGLE_TEST = "svg-2";
 ////////////////////////////////////////////////////////////////////////////
 
 var pluginPath = require.resolve("../src");
@@ -67,9 +67,13 @@ function runTest(dir) {
   process.stdout.write("\n");
 
   function normalizeLines(str: string) {
-    str = format(str, {
-      parser: testFile.endsWith(".tsx") ? "typescript" : "babel"
-    });
+    try {
+      str = format(str, {
+        parser: testFile.endsWith(".tsx") ? "typescript" : "babel"
+      });
+    } catch (e) {
+      console.error(e);
+    }
     str = str.replace(/\r\n/g, "\n");
     str = str.replace(/; \/\//g, ";\n\\");
     str = str.replace(/\n\n/g, "\n");

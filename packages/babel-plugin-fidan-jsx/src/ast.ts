@@ -13,16 +13,6 @@ export function setAttr(elem, name, value) {
     );
   }
 
-  if (name === "classList") {
-    return t.callExpression(
-      t.memberExpression(
-        t.identifier(globalOptions.moduleName),
-        t.identifier("classList")
-      ),
-      [elem, value]
-    );
-  }
-
   let isAttribute = name.indexOf("-") > -1 || globalOptions.isSvg,
     attribute = Attributes[name];
   if (attribute)

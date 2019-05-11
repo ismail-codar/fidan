@@ -262,35 +262,6 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
             )
           );
         }
-      } else if (key === "events") {
-        (value.expression as t.ObjectExpression).properties.forEach(prop => {
-          if (t.isObjectProperty(prop)) {
-            results.exprs.push(
-              t.expressionStatement(
-                t.callExpression(
-                  t.memberExpression(elem, t.identifier("addEventListener")),
-                  [
-                    t.stringLiteral(prop.key.name || prop.key.value),
-                    prop.value as t.Expression
-                  ]
-                )
-              )
-            );
-          } else {
-            debugger;
-            throw "NotImplemented -> transformAttributes -> events -> " +
-              prop.toString();
-          }
-        });
-      } else if (key.startsWith("$")) {
-        results.exprs.unshift(
-          t.expressionStatement(
-            t.callExpression(t.identifier(key.slice(1)), [
-              elem,
-              t.arrowFunctionExpression([], value.expression as t.Expression)
-            ])
-          )
-        );
       } else if (!value || checkParens(value, path)) {
         results.exprs.push(setAttrExpr(elem, key, value.expression));
       } else {
