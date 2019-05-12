@@ -16,6 +16,7 @@ var Child = function Child(props) {
     props.ref && props.ref(_el$2);
     _r$.insert(_el$2, props.name, null, _el$4);
     _r$.insert(_el$5, props.children);
+    _el$.$props = props;
     return _el$;
   })();
 };

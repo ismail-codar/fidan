@@ -7,20 +7,11 @@ var props = {
   some: "stuff",
   no: "thing"
 };
-var binding = function binding(el, accessor) {
-  return (el.custom = accessor());
-};
 var link;
 var template = (function() {
   var _el$ = _tmpl$.content.firstChild.cloneNode(true),
     _el$2 = _el$.firstChild,
     _el$3 = _el$2.firstChild;
-  custom(_el$, function() {
-    return binding;
-  });
-  _r$.classList(_el$, {
-    selected: selected
-  });
   Object.assign(_el$.style, {
     color: color
   });
@@ -29,9 +20,6 @@ var template = (function() {
   _el$2.title = welcoming;
   Object.assign(_el$2.style, {
     backgroundColor: color
-  });
-  _r$.classList(_el$2, {
-    selected: selected
   });
   link = _el$3;
   _el$3.setAttribute("href", "/");

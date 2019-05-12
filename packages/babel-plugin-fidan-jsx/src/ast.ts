@@ -152,3 +152,46 @@ export function createTemplate(
   results.decl.unshift(decl);
   results.decl = t.variableDeclaration("const", results.decl);
 }
+
+export const insertOrConditional = (
+  results: GenerationResultType,
+  innerExpr,
+  exprId
+) => {
+  const methodName = t.isConditionalExpression(innerExpr)
+    ? "conditional"
+    : "insert";
+  results.exprs.push(
+    t.expressionStatement(
+      t.callExpression(
+        t.memberExpression(
+          t.identifier(globalOptions.moduleName),
+          t.identifier(methodName)
+        ),
+        [
+          results.id,
+          t.isConditionalExpression(innerExpr)
+            ? t.objectExpression([
+                t.objectProperty(
+                  t.stringLiteral("test"),
+                  t.isCallExpression(innerExpr.test) &&
+                    innerExpr.test.arguments.length > 0
+                    ? innerExpr.test // compute(..)
+                    : t.arrowFunctionExpression([], innerExpr.test)
+                ),
+                t.objectProperty(
+                  t.identifier("consequent"),
+                  innerExpr.consequent
+                ),
+                t.objectProperty(t.identifier("alternate"), innerExpr.alternate)
+              ])
+            : canBeReactive(innerExpr)
+            ? innerExpr.callee
+            : innerExpr,
+          t.nullLiteral(),
+          exprId
+        ]
+      )
+    )
+  );
+};

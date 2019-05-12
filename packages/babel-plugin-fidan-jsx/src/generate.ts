@@ -10,7 +10,8 @@ import {
   setAttrExpr,
   setAttr,
   createPlaceholder,
-  computeAttribute
+  computeAttribute,
+  insertOrConditional
 } from "./ast";
 import {
   getTagName,
@@ -24,6 +25,7 @@ import {
 } from "./util";
 import { declarationInScope } from "./export-registry";
 import { HtmlAttributes } from "./constants/Attributes";
+import generate from "@babel/generator";
 
 function generateComponent(path, jsx, opts): GenerationResultType {
   let props = [],
@@ -293,7 +295,7 @@ function transformAttributes(path: NodePath<any>, jsx, results) {
   });
 }
 
-function transformChildren(path, jsx, opts, results) {
+function transformChildren(path, jsx, opts, results: GenerationResultType) {
   let tempPath = results.id && results.id.name,
     i = 0;
   jsx.children.forEach((jsxChild, index) => {
@@ -319,49 +321,14 @@ function transformChildren(path, jsx, opts, results) {
     } else if (child.exprs.length) {
       // t.isJSXFragment(jsx) && checkParens(jsxChild, path) ||	 checkLength(jsx.children) --> TODO fragments test
       // t.isJSXFragment(jsx) || checkLength(jsx.children)
-      if (t.isJSXFragment(jsx) || checkLength(jsx.children)) {
+      const innerExpr = child.exprs[0];
+      if (
+        t.isJSXFragment(jsx) ||
+        t.isConditionalExpression(innerExpr) ||
+        checkLength(jsx.children)
+      ) {
         let exprId = createPlaceholder(path, results, tempPath, i);
-        const innerExpr = child.exprs[0];
-
-        const methodName = t.isConditionalExpression(innerExpr)
-          ? "conditional"
-          : "insert";
-        results.exprs.push(
-          t.expressionStatement(
-            t.callExpression(
-              t.memberExpression(
-                t.identifier(globalOptions.moduleName),
-                t.identifier(methodName)
-              ),
-              [
-                results.id,
-                t.isConditionalExpression(innerExpr)
-                  ? t.objectExpression([
-                      t.objectProperty(
-                        t.stringLiteral("test"),
-                        t.isCallExpression(innerExpr.test) &&
-                          innerExpr.test.arguments.length > 0
-                          ? innerExpr.test // compute(..)
-                          : t.arrowFunctionExpression([], innerExpr.test)
-                      ),
-                      t.objectProperty(
-                        t.identifier("consequent"),
-                        innerExpr.consequent
-                      ),
-                      t.objectProperty(
-                        t.identifier("alternate"),
-                        innerExpr.alternate
-                      )
-                    ])
-                  : canBeReactive(innerExpr)
-                  ? innerExpr.callee
-                  : innerExpr,
-                t.nullLiteral(),
-                exprId
-              ]
-            )
-          )
-        );
+        insertOrConditional(results, innerExpr, exprId);
         tempPath = exprId.name;
         i++;
       } else {

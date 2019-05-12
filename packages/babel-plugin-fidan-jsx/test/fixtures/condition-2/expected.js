@@ -16,6 +16,7 @@ var Main = function Main(props) {
       null,
       _el$2
     );
+    _el$.$props = props;
     return _el$;
   })();
 };
