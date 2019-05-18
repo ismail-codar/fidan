@@ -17,7 +17,7 @@ export const reuseNodes = (
 
       if (afterNode === undefined) afterNode = null;
 
-      while (node !== afterNode) {
+      while (node && node !== afterNode) {
         tmp = node.nextSibling;
         parent.removeChild(node);
         node = tmp;

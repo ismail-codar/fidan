@@ -102,7 +102,7 @@ var reuseNodes = function (parent, renderedValues, data, createFn, noOp, beforeN
           tmp;
       if (afterNode === undefined) { afterNode = null; }
 
-      while (node !== afterNode) {
+      while (node && node !== afterNode) {
         tmp = node.nextSibling;
         parent.removeChild(node);
         node = tmp;
@@ -157,7 +157,7 @@ function reconcile(parent, renderedValues, data, createFn, noOp, beforeNode, aft
           tmp;
       if (afterNode === undefined) { afterNode = null; }
 
-      while (node !== afterNode) {
+      while (node && node !== afterNode) {
         tmp = node.nextElementSibling;
         parent.removeChild(node);
         node = tmp;
@@ -448,6 +448,9 @@ var insertToDom = function (parentElement, index, itemElement) {
   }
 };
 var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode) {
+  // const prevElement = document.createDocumentFragment();
+  var prevElement = nextElement ? document.createTextNode("") : undefined;
+  nextElement && parentDom.insertBefore(prevElement, nextElement);
   beforeCompute(arr.$val, function (nextVal, beforeVal) {
     if (!renderMode) {
       var parentFragment = document.createDocumentFragment();
@@ -470,7 +473,7 @@ var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode
         //     prevItem[key](nextItem[key]());
         //   }
         // }
-      });
+      }, prevElement, nextElement);
     }
   }, [arr]);
 };

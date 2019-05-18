@@ -6,6 +6,6 @@ export const jsxArrayMap = <T>(
   renderMode?: "reuse" | "reconcile"
 ) => {
   return parentElement => {
-    arrayMap(arr, parentElement, null, renderCallback, renderMode);
+    arrayMap(arr, parentElement, undefined, renderCallback, renderMode);
   };
 };

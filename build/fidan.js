@@ -103,7 +103,7 @@ var fidan = (function (exports) {
             tmp;
         if (afterNode === undefined) { afterNode = null; }
 
-        while (node !== afterNode) {
+        while (node && node !== afterNode) {
           tmp = node.nextSibling;
           parent.removeChild(node);
           node = tmp;
@@ -158,7 +158,7 @@ var fidan = (function (exports) {
             tmp;
         if (afterNode === undefined) { afterNode = null; }
 
-        while (node !== afterNode) {
+        while (node && node !== afterNode) {
           tmp = node.nextElementSibling;
           parent.removeChild(node);
           node = tmp;
@@ -449,6 +449,9 @@ var fidan = (function (exports) {
     }
   };
   var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode) {
+    // const prevElement = document.createDocumentFragment();
+    var prevElement = nextElement ? document.createTextNode("") : undefined;
+    nextElement && parentDom.insertBefore(prevElement, nextElement);
     beforeCompute(arr.$val, function (nextVal, beforeVal) {
       if (!renderMode) {
         var parentFragment = document.createDocumentFragment();
@@ -471,7 +474,7 @@ var fidan = (function (exports) {
           //     prevItem[key](nextItem[key]());
           //   }
           // }
-        });
+        }, prevElement, nextElement);
       }
     }, [arr]);
   };

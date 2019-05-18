@@ -20,7 +20,7 @@ export function reconcile(
 
       if (afterNode === undefined) afterNode = null;
 
-      while (node !== afterNode) {
+      while (node && node !== afterNode) {
         tmp = node.nextElementSibling;
         parent.removeChild(node);
         node = tmp;

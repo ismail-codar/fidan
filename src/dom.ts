@@ -22,6 +22,9 @@ export const arrayMap = <T>(
   renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
   renderMode?: "reuse" | "reconcile"
 ) => {
+  // const prevElement = document.createDocumentFragment();
+  const prevElement = nextElement ? document.createTextNode("") : undefined;
+  nextElement && parentDom.insertBefore(prevElement, nextElement);
   beforeCompute(
     arr.$val,
     (nextVal, beforeVal) => {
@@ -58,7 +61,9 @@ export const arrayMap = <T>(
             //     prevItem[key](nextItem[key]());
             //   }
             // }
-          }
+          },
+          prevElement,
+          nextElement
         );
       }
     },

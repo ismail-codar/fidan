@@ -8,14 +8,12 @@ export * from "./events";
 export * from "./array-map";
 
 export const arrayMap = (
-  parent: Node,
+  parent: Node & ParentNode,
   arr: FidanValue<any[]>,
   renderCallback?: (item: any, idx?: number) => any,
-  marker?: Node
+  marker?: Element
 ) => {
-  const parentDom = document.createDocumentFragment();
-  fidanArrayMap(arr, parentDom, null, renderCallback, "reconcile");
-  parent.insertBefore(parentDom, marker);
+  fidanArrayMap(arr, parent, marker, renderCallback, "reconcile");
 };
 
 export const insert = (
