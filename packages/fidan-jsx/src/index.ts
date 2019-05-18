@@ -1,7 +1,22 @@
-import { compute, FidanValue, coditionalDom } from "@fidanjs/runtime";
+import {
+  compute,
+  FidanValue,
+  arrayMap as fidanArrayMap
+} from "@fidanjs/runtime";
 
 export * from "./events";
 export * from "./array-map";
+
+export const arrayMap = (
+  parent: Node,
+  arr: FidanValue<any[]>,
+  renderCallback?: (item: any, idx?: number) => any,
+  marker?: Node
+) => {
+  const parentDom = document.createDocumentFragment();
+  fidanArrayMap(arr, parentDom, null, renderCallback, "reconcile");
+  parent.insertBefore(parentDom, marker);
+};
 
 export const insert = (
   parent: Node,

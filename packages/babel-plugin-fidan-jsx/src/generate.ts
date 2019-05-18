@@ -324,6 +324,13 @@ function transformChildren(path, jsx, opts, results: GenerationResultType) {
       // t.isJSXFragment(jsx) || checkLength(jsx.children)
       const innerExpr = child.exprs[0];
       if (
+        t.isCallExpression(innerExpr) &&
+        t.isMemberExpression(innerExpr.callee) &&
+        innerExpr.callee.property.name === "map"
+      ) {
+        let exprId = createPlaceholder(path, results, tempPath, i);
+        arrayMapExpression(results, innerExpr, exprId);
+      } else if (
         t.isJSXFragment(jsx) ||
         t.isConditionalExpression(innerExpr) ||
         checkLength(jsx.children)
