@@ -46,7 +46,6 @@ export const attr = (
   setAttr: boolean,
   cmp: any
 ) => {
-  if (node.namespaceURI.endsWith("svg")) setAttr = true;
   if (cmp.hasOwnProperty("$val")) {
     if (setAttr) {
       compute(() => node.setAttribute(attributeName, cmp()), [cmp]);

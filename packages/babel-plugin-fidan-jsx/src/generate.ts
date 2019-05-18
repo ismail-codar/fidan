@@ -11,7 +11,8 @@ import {
   setAttr,
   createPlaceholder,
   computeAttribute,
-  insertOrConditional
+  insertOrConditional,
+  arrayMapExpression
 } from "./ast";
 import {
   getTagName,
@@ -328,7 +329,15 @@ function transformChildren(path, jsx, opts, results: GenerationResultType) {
         checkLength(jsx.children)
       ) {
         let exprId = createPlaceholder(path, results, tempPath, i);
-        insertOrConditional(results, innerExpr, exprId);
+        if (
+          t.isCallExpression(innerExpr) &&
+          t.isMemberExpression(innerExpr.callee) &&
+          innerExpr.callee.property.name === "map"
+        ) {
+          arrayMapExpression(results, innerExpr, exprId);
+        } else {
+          insertOrConditional(results, innerExpr, exprId);
+        }
         tempPath = exprId.name;
         i++;
       } else {

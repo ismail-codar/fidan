@@ -195,3 +195,26 @@ export const insertOrConditional = (
     )
   );
 };
+
+export const arrayMapExpression = (
+  results: GenerationResultType,
+  innerExpr: t.CallExpression,
+  exprId
+) => {
+  results.exprs.push(
+    t.expressionStatement(
+      t.callExpression(
+        t.memberExpression(
+          t.identifier(globalOptions.moduleName),
+          t.identifier("arrayMap")
+        ),
+        [
+          results.id,
+          innerExpr.callee["object"].callee,
+          innerExpr.arguments[0],
+          exprId
+        ]
+      )
+    )
+  );
+};
