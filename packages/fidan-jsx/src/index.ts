@@ -23,7 +23,13 @@ export const insert = (
   marker?: Node
 ) => {
   if (typeof accessor === "object") {
-    parent.insertBefore(accessor, marker);
+    if (Array.isArray(accessor)) {
+      accessor.forEach(item => {
+        parent.insertBefore(item, marker);
+      });
+    } else {
+      parent.insertBefore(accessor, marker);
+    }
   } else if (typeof accessor === "function") {
     const node = document.createTextNode("");
     if (accessor.hasOwnProperty("$val")) {

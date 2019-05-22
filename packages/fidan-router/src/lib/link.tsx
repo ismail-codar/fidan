@@ -1,15 +1,15 @@
-import { fidan } from '@fidanjs/runtime';
-import { transitionTo } from './router';
+import { transitionTo } from "./router";
 
-export const Link = (props: { to: string; children: any }) => {
-	const handleLinkClick: Fidan.MouseEventHandler<HTMLAnchorElement> = (e) => {
-		e.preventDefault();
-		transitionTo(props.to);
-	};
+export const Link = (props: { to: string; children?: any }) => {
+  const handleLinkClick = e => {
+    e.preventDefault();
+    transitionTo(props.to);
+    return false;
+  };
 
-	return (
-		<a onClick={handleLinkClick} href={props.to}>
-			{props.children}
-		</a>
-	);
+  return (
+    <a onClick={handleLinkClick} href={props.to}>
+      {props.children}
+    </a>
+  );
 };

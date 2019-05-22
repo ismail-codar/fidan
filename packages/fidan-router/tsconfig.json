@@ -1,20 +1,12 @@
 {
-    "compilerOptions": {
-      "target": "es2015",
-      "lib": ["es2015", "dom"],
-      "module": "es2015",
-      "moduleResolution": "node",
-      "sourceMap": true,
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true,
-      "removeComments": false,
-      "noImplicitAny": false,
-      "allowUnreachableCode": true,
-      "allowSyntheticDefaultImports": true,
-      "strictFunctionTypes": false,
-      "jsxFactory": "fidan.createElement",
-      "jsx": "react"
-    },
-    "exclude": ["node_modules", "build", "dist", "spec"]
-  }
-  
+  "compilerOptions": {
+    "module": "es2015",
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "lib": ["es6", "dom"],
+    "rootDir": "src",
+    "moduleResolution": "node"
+  },
+  "exclude": ["node_modules", "build", "dist", "spec"]
+}
