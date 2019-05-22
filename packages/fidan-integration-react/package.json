@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@fidanjs/babel-plugin-fidan-jsx": "^0.0.8",
-    "@fidanjs/jsx": "^0.0.8",
+    "@fidanjs/jsx": "^0.0.9",
     "@fidanjs/runtime": "^0.0.23"
   },
   "peerDependencies": {
