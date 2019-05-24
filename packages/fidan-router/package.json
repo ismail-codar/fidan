@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/router",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Fidanjs router",
   "scripts": {
     "build": "parcel build src/index.ts --out-dir build --no-cache --no-minify && tsc --outDir build --declaration --emitDeclarationOnly && rm -rf build/_demo",

@@ -15,7 +15,7 @@ export const transitionTo = (path: string) => {
 
 export const Router = (props: any) => {
   const childs: any[] = props.children;
-  const routerParent = <div className="fidan-router-root" /> as HTMLDivElement;
+  const routerParent = <div className="fidan-router-root" />;
   childs.forEach(child => {
     child["$routerParent"] = routerParent;
     routerParent.appendChild(child);

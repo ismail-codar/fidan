@@ -3,7 +3,7 @@ import { instance } from "./router";
 export const Route = (props: {
   exact?: boolean;
   path: string;
-  component: Element | ((props) => Element);
+  component: any | ((props) => any);
 }) => {
   instance.add([
     {
