@@ -375,7 +375,9 @@ export function generateHTMLNode(
     let tagName = getTagName(jsx),
       voidTag = VoidElements.indexOf(tagName) > -1;
     // if (tagName === "$") return generateFlow(jsx);
-    if (isComponentName(tagName)) return generateComponent(path, jsx, opts);
+    if (isComponentName(tagName)) {
+      return generateComponent(path, jsx, opts);
+    }
     let results = {
       id: undefined,
       template: `<${tagName}`,

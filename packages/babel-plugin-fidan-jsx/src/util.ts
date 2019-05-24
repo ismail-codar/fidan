@@ -101,8 +101,13 @@ export const isComponentTag = jsx => {
   return isComponentName(tagName);
 };
 
-export const isComponentName = (tagName: string) =>
-  tagName.substr(0, 1) !== tagName.substr(0, 1).toLowerCase();
+export const isComponentName = (tagName: string) => {
+  const idx = tagName.indexOf(".");
+  if (idx !== -1) {
+    tagName = tagName.substr(idx + 1);
+  }
+  return tagName.substr(0, 1) !== tagName.substr(0, 1).toLowerCase();
+};
 
 export const canBeReactive = (
   value: t.Expression

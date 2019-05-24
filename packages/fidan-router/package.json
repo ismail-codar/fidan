@@ -1,9 +1,9 @@
 {
   "name": "@fidanjs/router",
-  "version": "0.0.5",
+  "version": "0.0.7",
   "description": "Fidanjs router",
   "scripts": {
-    "build": "parcel build src/index.ts --target node --out-dir build --no-cache --no-minify && tsc --outDir build --declaration --emitDeclarationOnly && rm -rf build/_demo",
+    "build": "parcel build src/index.ts --out-dir build --no-cache --no-minify && tsc --outDir build --declaration --emitDeclarationOnly && rm -rf build/_demo",
     "local": "yarn build && yalc publish && yalc push",
     "start": "parcel src/_demo/index.html --no-cache",
     "yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/jsx & yalc link @fidanjs/babel-plugin-fidan-jsx"
@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.8"
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.9"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts"
