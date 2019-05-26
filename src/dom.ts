@@ -3,6 +3,21 @@ import { reuseNodes } from "./reuse-nodes";
 import { FidanValue } from ".";
 import reconcile from "./reconcile";
 
+export const htmlProps = {
+  id: true,
+  nodeValue: true,
+  textContent: true,
+  className: true,
+  innerHTML: true,
+  innerText: true,
+  tabIndex: true,
+  value: true,
+  checked: true,
+  disabled: true,
+  readonly: true,
+  contentEditable: true
+};
+
 export const insertToDom = (parentElement, index, itemElement) => {
   const typeOf = typeof itemElement;
   if (typeOf === "function") {

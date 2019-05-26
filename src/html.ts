@@ -1,5 +1,5 @@
 import { compute } from "./f";
-import { arrayMap } from "./dom";
+import { arrayMap, htmlProps } from "./dom";
 import { FidanValue } from ".";
 
 const COMMENT_TEXT = 1;
@@ -7,21 +7,6 @@ const COMMENT_DOM = 2;
 const COMMENT_FN = 4; // "function" && !isDynamic
 const COMMENT_HTM = 8;
 const COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
-
-const htmlProps = {
-  id: true,
-  nodeValue: true,
-  textContent: true,
-  className: true,
-  innerHTML: true,
-  innerText: true,
-  tabIndex: true,
-  value: true,
-  checked: true,
-  disabled: true,
-  readonly: true,
-  contentEditable: true
-};
 
 let _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 let template = document.createElement("template");

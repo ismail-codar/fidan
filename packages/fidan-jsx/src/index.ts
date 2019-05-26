@@ -1,6 +1,7 @@
 import {
   compute,
   FidanValue,
+  htmlProps,
   arrayMap as fidanArrayMap
 } from "@fidanjs/runtime";
 
@@ -53,7 +54,18 @@ export const spread = (node: HTMLElement, accessor: any) => {
   if (typeof accessor === "function") {
     accessor(node);
   } else {
-    if (accessor instanceof Node === false)
+    if (typeof accessor === "object") {
+      for (var key in accessor) {
+        accessor[key] != null &&
+          attr(
+            node,
+            key,
+            !htmlProps[key] || key.indexOf("-") !== -1,
+            accessor[key]
+          );
+      }
+      return;
+    } else if (accessor instanceof Node === false)
       accessor = document.createTextNode(accessor || "");
     node.appendChild(accessor);
   }

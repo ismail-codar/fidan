@@ -434,6 +434,20 @@ function findGreatestIndexLEQ(seq, n) {
   return lo;
 }
 
+var htmlProps = {
+  id: true,
+  nodeValue: true,
+  textContent: true,
+  className: true,
+  innerHTML: true,
+  innerText: true,
+  tabIndex: true,
+  value: true,
+  checked: true,
+  disabled: true,
+  readonly: true,
+  contentEditable: true
+};
 var insertToDom = function (parentElement, index, itemElement) {
   var typeOf = typeof itemElement;
 
@@ -525,20 +539,6 @@ var COMMENT_FN = 4; // "function" && !isDynamic
 
 var COMMENT_HTM = 8;
 var COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
-var htmlProps = {
-  id: true,
-  nodeValue: true,
-  textContent: true,
-  className: true,
-  innerHTML: true,
-  innerText: true,
-  tabIndex: true,
-  value: true,
-  checked: true,
-  disabled: true,
-  readonly: true,
-  contentEditable: true
-};
 var _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 
 var template = document.createElement("template");
@@ -823,6 +823,7 @@ var htmlArrayMap = function (arr, renderCallback, options) {
 exports.value = value;
 exports.compute = compute;
 exports.beforeCompute = beforeCompute;
+exports.htmlProps = htmlProps;
 exports.insertToDom = insertToDom;
 exports.arrayMap = arrayMap;
 exports.injectToProperty = injectToProperty;

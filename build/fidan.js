@@ -435,6 +435,20 @@ var fidan = (function (exports) {
     return lo;
   }
 
+  var htmlProps = {
+    id: true,
+    nodeValue: true,
+    textContent: true,
+    className: true,
+    innerHTML: true,
+    innerText: true,
+    tabIndex: true,
+    value: true,
+    checked: true,
+    disabled: true,
+    readonly: true,
+    contentEditable: true
+  };
   var insertToDom = function (parentElement, index, itemElement) {
     var typeOf = typeof itemElement;
 
@@ -526,20 +540,6 @@ var fidan = (function (exports) {
 
   var COMMENT_HTM = 8;
   var COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
-  var htmlProps = {
-    id: true,
-    nodeValue: true,
-    textContent: true,
-    className: true,
-    innerHTML: true,
-    innerText: true,
-    tabIndex: true,
-    value: true,
-    checked: true,
-    disabled: true,
-    readonly: true,
-    contentEditable: true
-  };
   var _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 
   var template = document.createElement("template");
@@ -824,6 +824,7 @@ var fidan = (function (exports) {
   exports.value = value;
   exports.compute = compute;
   exports.beforeCompute = beforeCompute;
+  exports.htmlProps = htmlProps;
   exports.insertToDom = insertToDom;
   exports.arrayMap = arrayMap;
   exports.injectToProperty = injectToProperty;
