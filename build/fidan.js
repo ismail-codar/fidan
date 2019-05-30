@@ -140,7 +140,7 @@ var fidan = (function (exports) {
       if (head) {
         noOp(item, renderedValues[i$1]);
       } else {
-        head = createFn(item);
+        head = createFn(item, i$1);
         mode ? parent.insertBefore(head, afterNode) : parent.appendChild(head);
       }
 
@@ -176,7 +176,7 @@ var fidan = (function (exports) {
           mode = afterNode !== undefined ? 1 : 0;
 
       for (var i = 0, len = data.length; i < len; i++) {
-        node$1 = createFn(data[i]);
+        node$1 = createFn(data[i], i);
         mode ? parent.insertBefore(node$1, afterNode) : parent.appendChild(node$1);
       }
 
@@ -289,7 +289,7 @@ var fidan = (function (exports) {
             mode$1 = afterNode ? 1 : 0;
 
         while (newStart <= newEnd) {
-          node$2 = createFn(data[newStart]);
+          node$2 = createFn(data[newStart], newStart);
           mode$1 ? parent.insertBefore(node$2, afterNode) : parent.appendChild(node$2);
           newStart++;
         }
@@ -341,7 +341,7 @@ var fidan = (function (exports) {
           mode$2 = afterNode ? 1 : 0;
 
       for (var i$4 = newStart; i$4 <= newEnd; i$4++) {
-        node$4 = createFn(data[i$4]);
+        node$4 = createFn(data[i$4], i$4);
         mode$2 ? parent.insertBefore(node$4, afterNode) : parent.appendChild(node$4);
       }
 
@@ -371,7 +371,7 @@ var fidan = (function (exports) {
         lisIdx--;
       } else {
         if (P[i$7] === -1) {
-          tmpD = createFn(data[i$7]);
+          tmpD = createFn(data[i$7], i$7);
         } else {
           tmpD = nodes[P[i$7]];
           noOp(tmpD, data[i$7]);
@@ -478,9 +478,9 @@ var fidan = (function (exports) {
         parentDom.appendChild(parentFragment);
       } else {
         var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
-        renderFunction(parentDom, beforeVal || [], nextVal || [], function (nextItem) {
+        renderFunction(parentDom, beforeVal || [], nextVal || [], function (nextItem, index) {
           // create
-          return renderCallback(nextItem);
+          return renderCallback(nextItem, index);
         }, function (nextItem, prevItem) {// update
           // for (var key in nextItem) {
           //   if (prevItem[key].hasOwnProperty("$val")) {

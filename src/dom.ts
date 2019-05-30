@@ -64,9 +64,9 @@ export const arrayMap = <T>(
           parentDom,
           beforeVal || [],
           nextVal || [],
-          nextItem => {
+          (nextItem, index) => {
             // create
-            return renderCallback(nextItem);
+            return renderCallback(nextItem, index);
           },
           (nextItem, prevItem) => {
             // update

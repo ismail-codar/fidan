@@ -210,7 +210,7 @@ export const arrayMapExpression = (
         ),
         [
           results.id,
-          innerExpr.callee["object"].callee,
+          innerExpr.callee["object"].callee || innerExpr.callee["object"],
           innerExpr.arguments[0],
           exprId
         ]

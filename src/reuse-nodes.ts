@@ -49,7 +49,7 @@ export const reuseNodes = (
     if (head) {
       noOp(item, renderedValues[i]);
     } else {
-      head = createFn(item);
+      head = createFn(item, i);
       mode ? parent.insertBefore(head, afterNode) : parent.appendChild(head);
     }
     head = head.nextSibling;
