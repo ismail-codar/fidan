@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/router",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Fidanjs router",
   "scripts": {
     "build": "parcel build src/index.ts --out-dir build --no-cache --no-minify && tsc --outDir build --declaration --emitDeclarationOnly && rm -rf build/_demo",
@@ -13,11 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "route-recognizer": "^0.3.4",
-    "@fidanjs/jsx": "^0.0.9"
+    "@fidanjs/jsx": "^0.0.11"
   },
   "devDependencies": {
     "@babel/core": "^7.4.5",
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.9"
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.10"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts"

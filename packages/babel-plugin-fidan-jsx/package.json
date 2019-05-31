@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/babel-plugin-fidan-jsx",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "fidan jsx compiler",
   "main": "build/index.js",
   "scripts": {

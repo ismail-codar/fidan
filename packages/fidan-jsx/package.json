@@ -1,6 +1,6 @@
 {
   "name": "@fidanjs/jsx",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "repository": "https://github.com/ismail-codar/fidan",
   "author": "ismail codar <icodar@gmail.com>",
   "license": "MIT",
@@ -14,8 +14,8 @@
     "test": "jasmine-ts"
   },
   "dependencies": {
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.9",
-    "@fidanjs/runtime": "^0.0.23"
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.10",
+    "@fidanjs/runtime": "^0.0.24"
   },
   "devDependencies": {
     "@babel/core": "^7.4.4",
