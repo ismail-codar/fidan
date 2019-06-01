@@ -326,6 +326,7 @@ function transformChildren(path, jsx, opts, results: GenerationResultType) {
       if (
         t.isCallExpression(innerExpr) &&
         t.isMemberExpression(innerExpr.callee) &&
+        t.isCallExpression(innerExpr.callee.object) &&
         innerExpr.callee.property.name === "map"
       ) {
         let exprId = createPlaceholder(path, results, tempPath, i);
@@ -339,6 +340,7 @@ function transformChildren(path, jsx, opts, results: GenerationResultType) {
         if (
           t.isCallExpression(innerExpr) &&
           t.isMemberExpression(innerExpr.callee) &&
+          t.isCallExpression(innerExpr.callee.object) &&
           innerExpr.callee.property.name === "map"
         ) {
           arrayMapExpression(results, innerExpr, exprId);
