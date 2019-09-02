@@ -28,7 +28,7 @@ export const insert = (
       accessor.forEach(item => {
         parent.insertBefore(item, marker);
       });
-    } else {
+    } else if (accessor instanceof Node) {
       parent.insertBefore(accessor, marker);
     }
   } else if (typeof accessor === "function") {
