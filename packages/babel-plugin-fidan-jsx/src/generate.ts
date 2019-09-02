@@ -175,7 +175,10 @@ function generateComponent(path, jsx, opts): GenerationResultType {
         [t.identifier(getTagName(jsx)), props[0], t.arrayExpression(dynamic)]
       )
     ];
-  } else exprs = [t.callExpression(t.identifier(getTagName(jsx)), props)];
+  } else {
+    if (props.length === 0) props.push(t.objectExpression([]));
+    exprs = [t.callExpression(t.identifier(getTagName(jsx)), props)];
+  }
   return { exprs, template: "" };
 }
 
