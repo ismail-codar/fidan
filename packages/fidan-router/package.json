@@ -13,11 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "route-recognizer": "^0.3.4",
-    "@fidanjs/jsx": "^0.0.11"
+    "@fidanjs/jsx": "latest",
+    "@fidanjs/babel-plugin-fidan-jsx": "latest"
   },
   "devDependencies": {
-    "@babel/core": "^7.4.5",
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.10"
+    "@babel/core": "^7.4.5"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts"
