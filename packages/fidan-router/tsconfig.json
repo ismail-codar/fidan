@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "jsx": "preserve",
+    "target": "es2015",
+    "lib": ["es2015", "dom"],
+    "module": "es2015",
+    "moduleResolution": "node",
     "sourceMap": true,
-    "rootDir": "src"
+    "jsx": "preserve"
   },
   "exclude": ["node_modules", "build", "dist", "spec"]
 }
