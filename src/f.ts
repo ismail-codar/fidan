@@ -1,11 +1,11 @@
-import { FidanValue, FidanArray } from ".";
+import { FidanValue, FidanArray, ComputionMethodArguments } from ".";
 
 let autoTrackDependencies: any[] = null;
 
 // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
 export const value = <T>(val?: T): FidanValue<T> => {
   if (val && val.hasOwnProperty("$val")) return val as any;
-  const innerFn: any = (val?) => {
+  const innerFn: any = (val?: T, opt?: ComputionMethodArguments<T>) => {
     if (val === undefined) {
       if (
         autoTrackDependencies &&
@@ -18,7 +18,7 @@ export const value = <T>(val?: T): FidanValue<T> => {
       let depends = innerFn["bc_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
-          depends[i].beforeCompute(val, innerFn["$val"], innerFn);
+          depends[i].beforeCompute(val, opt);
         }
       innerFn["$val"] = val;
       if (Array.isArray(val)) {
@@ -27,7 +27,7 @@ export const value = <T>(val?: T): FidanValue<T> => {
       depends = innerFn["c_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
-          depends[i](depends[i].compute(val));
+          depends[i](depends[i].compute(val, opt));
         }
     }
   };
@@ -52,14 +52,18 @@ export const value = <T>(val?: T): FidanValue<T> => {
 };
 
 export const compute = <T>(
-  fn: (val: T, changedItem?) => any,
+  fn: (val: T, opt?: ComputionMethodArguments<T>) => any,
   dependencies?: any[]
 ): any => {
   autoTrackDependencies = dependencies ? null : [];
-  const val = fn(undefined);
+  const cmp = value<T>();
+  const val = fn(undefined, { computedItem: cmp, method: null, args: null });
+  if (Array.isArray(val)) {
+    overrideArrayMutators(cmp as any);
+  }
+  cmp.$val = val;
   const deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
   autoTrackDependencies = null;
-  const cmp = value(val);
   cmp["compute"] = fn;
   for (var i = 0; i < deps.length; i++) deps[i]["c_depends"].push(cmp);
   return cmp;
@@ -67,10 +71,11 @@ export const compute = <T>(
 
 export const beforeCompute = <T>(
   initalValue: T,
-  fn: (nextValue?: T, prevValue?: T, changedItem?) => void,
+  fn: (nextValue?: T, opt?: ComputionMethodArguments<T>) => void,
   deps: FidanValue<any>[]
 ) => {
-  const cmp = value(fn(initalValue));
+  const cmp = value<T>(initalValue);
+  fn(initalValue, { computedItem: cmp, method: null, args: null });
   cmp["beforeCompute"] = fn;
   for (var i = 0; i < deps.length; i++) deps[i]["bc_depends"].push(cmp);
   return cmp;
@@ -92,13 +97,17 @@ const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
     "splice",
     "unshift"
   ].forEach(method => {
-    dataArray.$val[method] = function() {
+    dataArray.$val[method] = function () {
       const arr = dataArray.$val.slice(0);
       const size1 = arr.length;
       const ret = Array.prototype[method].apply(arr, arguments);
       const size2 = arr.length;
       if (size1 !== size2) dataArray.size(size2);
-      dataArray(arr);
+      dataArray(arr, {
+        method,
+        computedItem: dataArray,
+        args: [...arguments]
+      });
       return ret;
     };
   });

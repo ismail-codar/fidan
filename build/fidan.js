@@ -4,7 +4,7 @@ var fidan = (function (exports) {
   var value = function (val) {
     if (val && val.hasOwnProperty("$val")) { return val; }
 
-    var innerFn = function (val) {
+    var innerFn = function (val, opt) {
       if (val === undefined) {
         if (autoTrackDependencies && autoTrackDependencies.indexOf(innerFn) === -1) {
           autoTrackDependencies.push(innerFn);
@@ -14,7 +14,7 @@ var fidan = (function (exports) {
       } else {
         var depends = innerFn["bc_depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) {
-          depends[i].beforeCompute(val, innerFn["$val"], innerFn);
+          depends[i].beforeCompute(val, opt);
         } }
         innerFn["$val"] = val;
 
@@ -24,7 +24,7 @@ var fidan = (function (exports) {
 
         depends = innerFn["c_depends"];
         if (depends.length) { for (var i = 0; i < depends.length; i++) {
-          depends[i](depends[i].compute(val));
+          depends[i](depends[i].compute(val, opt));
         } }
       }
     };
@@ -59,10 +59,20 @@ var fidan = (function (exports) {
   };
   var compute = function (fn, dependencies) {
     autoTrackDependencies = dependencies ? null : [];
-    var val = fn(undefined);
+    var cmp = value();
+    var val = fn(undefined, {
+      computedItem: cmp,
+      method: null,
+      args: null
+    });
+
+    if (Array.isArray(val)) {
+      overrideArrayMutators(cmp);
+    }
+
+    cmp.$val = val;
     var deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
     autoTrackDependencies = null;
-    var cmp = value(val);
     cmp["compute"] = fn;
 
     for (var i = 0; i < deps.length; i++) { deps[i]["c_depends"].push(cmp); }
@@ -70,7 +80,12 @@ var fidan = (function (exports) {
     return cmp;
   };
   var beforeCompute = function (initalValue, fn, deps) {
-    var cmp = value(fn(initalValue));
+    var cmp = value(initalValue);
+    fn(initalValue, {
+      computedItem: cmp,
+      method: null,
+      args: null
+    });
     cmp["beforeCompute"] = fn;
 
     for (var i = 0; i < deps.length; i++) { deps[i]["bc_depends"].push(cmp); }
@@ -84,12 +99,19 @@ var fidan = (function (exports) {
     dataArray.$val["$overrided"] = true;
     ["copyWithin", "fill", "pop", "push", "reverse", "shift", "sort", "splice", "unshift"].forEach(function (method) {
       dataArray.$val[method] = function () {
+        var i = arguments.length, argsArray = Array(i);
+        while ( i-- ) argsArray[i] = arguments[i];
+
         var arr = dataArray.$val.slice(0);
         var size1 = arr.length;
         var ret = Array.prototype[method].apply(arr, arguments);
         var size2 = arr.length;
         if (size1 !== size2) { dataArray.size(size2); }
-        dataArray(arr);
+        dataArray(arr, {
+          method: method,
+          computedItem: dataArray,
+          args: [].concat( argsArray )
+        });
         return ret;
       };
     });
@@ -466,7 +488,9 @@ var fidan = (function (exports) {
     // const prevElement = document.createDocumentFragment();
     var prevElement = nextElement ? document.createTextNode("") : undefined;
     nextElement && parentDom.insertBefore(prevElement, nextElement);
-    beforeCompute(arr.$val, function (nextVal, beforeVal) {
+    beforeCompute(arr.$val, function (nextVal, opt) {
+      var beforeVal = opt.computedItem.$val;
+
       if (!renderMode) {
         var parentFragment = document.createDocumentFragment();
         parentDom.textContent = "";

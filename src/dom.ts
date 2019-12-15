@@ -42,7 +42,8 @@ export const arrayMap = <T>(
   nextElement && parentDom.insertBefore(prevElement, nextElement);
   beforeCompute(
     arr.$val,
-    (nextVal, beforeVal) => {
+    (nextVal, opt) => {
+      const beforeVal = opt.computedItem.$val;
       if (!renderMode) {
         const parentFragment = document.createDocumentFragment();
         parentDom.textContent = "";
