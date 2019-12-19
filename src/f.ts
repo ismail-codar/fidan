@@ -58,10 +58,10 @@ export const compute = <T>(
   autoTrackDependencies = dependencies ? null : [];
   const cmp = value<T>();
   const val = fn(undefined, { computedItem: cmp } as any);
+  cmp.$val = val;
   if (Array.isArray(val)) {
     overrideArrayMutators(cmp as any);
   }
-  cmp.$val = val;
   const deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
   autoTrackDependencies = null;
   cmp["compute"] = fn;

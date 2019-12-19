@@ -62,12 +62,12 @@ var compute = function (fn, dependencies) {
   var val = fn(undefined, {
     computedItem: cmp
   });
+  cmp.$val = val;
 
   if (Array.isArray(val)) {
     overrideArrayMutators(cmp);
   }
 
-  cmp.$val = val;
   var deps = autoTrackDependencies ? autoTrackDependencies : dependencies;
   autoTrackDependencies = null;
   cmp["compute"] = fn;
