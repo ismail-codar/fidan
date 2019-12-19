@@ -3,7 +3,7 @@ import { FidanValue, FidanArray, ComputionMethodArguments } from ".";
 let autoTrackDependencies: any[] = null;
 
 // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
-export const value = <T>(val?: T): FidanValue<T> => {
+export const value = <T>(val?: T): T extends Array<any> ? FidanArray<T> : FidanValue<T> => {
   if (val && val.hasOwnProperty("$val")) return val as any;
   const innerFn: any = (val?: T, opt?: ComputionMethodArguments<T>) => {
     if (val === undefined) {
@@ -57,7 +57,7 @@ export const compute = <T>(
 ): any => {
   autoTrackDependencies = dependencies ? null : [];
   const cmp = value<T>();
-  const val = fn(undefined, { computedItem: cmp, method: null, args: null });
+  const val = fn(undefined, { computedItem: cmp } as any);
   if (Array.isArray(val)) {
     overrideArrayMutators(cmp as any);
   }
@@ -75,7 +75,7 @@ export const beforeCompute = <T>(
   deps: FidanValue<any>[]
 ) => {
   const cmp = value<T>(initalValue);
-  fn(initalValue, { computedItem: cmp, method: null, args: null });
+  fn(initalValue, { computedItem: cmp } as any);
   cmp["beforeCompute"] = fn;
   for (var i = 0; i < deps.length; i++) deps[i]["bc_depends"].push(cmp);
   return cmp;

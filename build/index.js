@@ -60,9 +60,7 @@ var compute = function (fn, dependencies) {
   autoTrackDependencies = dependencies ? null : [];
   var cmp = value();
   var val = fn(undefined, {
-    computedItem: cmp,
-    method: null,
-    args: null
+    computedItem: cmp
   });
 
   if (Array.isArray(val)) {
@@ -81,9 +79,7 @@ var compute = function (fn, dependencies) {
 var beforeCompute = function (initalValue, fn, deps) {
   var cmp = value(initalValue);
   fn(initalValue, {
-    computedItem: cmp,
-    method: null,
-    args: null
+    computedItem: cmp
   });
   cmp["beforeCompute"] = fn;
 
@@ -556,6 +552,34 @@ var debounce = function (func, wait, immediate) {
     if (callNow) { func.apply(context, args); }
   };
 };
+var transformToDataArrayEvents = function (opt, events) {
+  /*
+    "copyWithin",
+    "fill",
+    "pop",
+    "push",
+    "reverse",
+    "shift",
+    "sort",
+    "splice",
+    "unshift"
+  */
+  var method = opt.method;
+  var computedItem = opt.computedItem;
+  var args = opt.args;
+
+  if (method === "push") {
+    events.onAdd(args);
+  } else if (method === "splice") {
+    var start = args[0];
+    var deleteCount = args[1];
+    var addItems = args.slice(2);
+    var arr = computedItem.$val;
+    events.onRemove(arr.slice(start, start + deleteCount));
+    events.onAdd(addItems);
+  } // TODO yukardaki diğer metodlar implemente edilecek.
+
+};
 
 var COMMENT_TEXT = 1;
 var COMMENT_DOM = 2;
@@ -853,6 +877,7 @@ exports.arrayMap = arrayMap;
 exports.injectToProperty = injectToProperty;
 exports.inject = inject;
 exports.debounce = debounce;
+exports.transformToDataArrayEvents = transformToDataArrayEvents;
 exports.coditionalDom = coditionalDom;
 exports.html = html;
 exports.htmlArrayMap = htmlArrayMap;

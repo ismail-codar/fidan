@@ -1,5 +1,5 @@
 import { value } from "./f";
-import { FidanValue } from ".";
+import { FidanValue, FidanArray, DataArrayEvents, ComputionMethodArguments } from ".";
 
 export const injectToProperty = (
   obj: Object,
@@ -33,10 +33,10 @@ export const inject = <T extends Object>(obj: T): T => {
 export const debounce = (func, wait, immediate?) => {
   let timeout;
 
-  return function() {
+  return function () {
     let context = this;
     let args = arguments;
-    let later = function() {
+    let later = function () {
       timeout = null;
       if (!immediate) func.apply(context, args);
     };
@@ -47,3 +47,34 @@ export const debounce = (func, wait, immediate?) => {
     if (callNow) func.apply(context, args);
   };
 };
+
+export const transformToDataArrayEvents = <T>(
+  opt: ComputionMethodArguments<T[]>,
+  events: DataArrayEvents<T>
+) => {
+  /*
+    "copyWithin",
+    "fill",
+    "pop",
+    "push",
+    "reverse",
+    "shift",
+    "sort",
+    "splice",
+    "unshift"
+  */
+
+  const { method, computedItem, args } = opt;
+
+  if (method === "push") {
+    events.onAdd(args)
+  } else if (method === "splice") {
+    const start = args[0]
+    const deleteCount = args[1]
+    const addItems = args.slice(2)
+    const arr: any[] = computedItem.$val
+    events.onRemove(arr.slice(start, start + deleteCount))
+    events.onAdd(addItems)
+  }
+  // TODO yukardaki diğer metodlar implemente edilecek.
+}

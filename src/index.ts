@@ -1,8 +1,14 @@
-export interface ComputionMethodArguments<T> {
+export interface DataArrayEvents<T> {
+  onAdd?: (args: T[]) => void
+  onRemove?: (args: T[]) => void
+  onUpdate?: (args: T[]) => void
+}
+
+export type ComputionMethodArguments<T> = T extends Array<any> ? {
   computedItem: FidanValue<T>,
   method: string,
   args: any[]
-}
+} : { computedItem: FidanValue<T> }
 
 export interface FidanValue<T> {
   (val?: T, opt?: ComputionMethodArguments<T>): T;
