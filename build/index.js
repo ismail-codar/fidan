@@ -1,5 +1,4 @@
-var autoTrackDependencies = null; // T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
-
+var autoTrackDependencies = null;
 var value = function (val) {
   if (val && val.hasOwnProperty("$val")) { return val; }
 

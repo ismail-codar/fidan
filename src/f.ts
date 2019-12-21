@@ -2,8 +2,7 @@ import { FidanValue, FidanArray, ComputionMethodArguments } from ".";
 
 let autoTrackDependencies: any[] = null;
 
-// T extends Array<any> ? FidanArray<T> : FidanValue<T> --> https://github.com/Microsoft/TypeScript/issues/30029
-export const value = <T>(val?: T): T extends Array<any> ? FidanArray<T> : FidanValue<T> => {
+export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? FidanArray<T> : unknown) => {
   if (val && val.hasOwnProperty("$val")) return val as any;
   const innerFn: any = (val?: T, opt?: ComputionMethodArguments<T>) => {
     if (val === undefined) {
