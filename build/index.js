@@ -76,10 +76,9 @@ var compute = function (fn, dependencies) {
   return cmp;
 };
 var beforeCompute = function (initalValue, fn, deps) {
-  var cmp = value(initalValue);
-  fn(initalValue, {
-    computedItem: cmp
-  });
+  var cmp = value(fn(initalValue, {
+    computedItem: {}
+  }));
   cmp["beforeCompute"] = fn;
 
   for (var i = 0; i < deps.length; i++) { deps[i]["bc_depends"].push(cmp); }

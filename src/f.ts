@@ -73,8 +73,7 @@ export const beforeCompute = <T>(
   fn: (nextValue?: T, opt?: ComputionMethodArguments<T>) => void,
   deps: FidanValue<any>[]
 ) => {
-  const cmp = value<T>(initalValue);
-  fn(initalValue, { computedItem: cmp } as any);
+  const cmp = value<T>(fn(initalValue, { computedItem: {} } as any) as any);
   cmp["beforeCompute"] = fn;
   for (var i = 0; i < deps.length; i++) deps[i]["bc_depends"].push(cmp);
   return cmp;
