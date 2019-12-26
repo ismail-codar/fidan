@@ -46,7 +46,7 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
     Object.defineProperty(innerFn, "name", { value: name });
     return innerFn;
   };
-  innerFn.toString = innerFn.toJSON = () => innerFn["$val"];
+  innerFn.toString = innerFn.toJSON = () => innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"];
   return innerFn;
 };
 

@@ -52,7 +52,7 @@ var fidan = (function (exports) {
       return innerFn;
     };
 
-    innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"]; };
+    innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"]; };
 
     return innerFn;
   };
