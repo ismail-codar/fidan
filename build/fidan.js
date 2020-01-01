@@ -12,6 +12,13 @@ var fidan = (function (exports) {
         return innerFn["$val"];
       } else {
         var depends = innerFn["bc_depends"];
+
+        if (!opt) {
+          opt = {
+            computedItem: innerFn
+          };
+        }
+
         if (depends.length) { for (var i = 0; i < depends.length; i++) {
           depends[i].beforeCompute(val, opt);
         } }
