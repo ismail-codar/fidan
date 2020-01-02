@@ -20,6 +20,17 @@ export const insert = (parent: Node, accessor: any, init?: any, marker?: Node) =
 			});
 		} else if (accessor instanceof Node) {
 			parent.insertBefore(accessor, marker);
+		} else if (accessor instanceof Promise) {
+			accessor
+				.then((accessorData) => {
+					parent.insertBefore(accessorData, marker);
+				})
+				.catch((err) => {
+					const errElement = document.createElement('span');
+					errElement.className = 'fidan-async-error';
+					errElement.innerHTML = err.toString();
+					parent.insertBefore(errElement, marker);
+				});
 		}
 	} else if (typeof accessor === 'function') {
 		const node = document.createTextNode('');
