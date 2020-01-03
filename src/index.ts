@@ -8,13 +8,13 @@ export type ComputionMethodArguments<T> = T extends Array<any> ? {
   computedItem: FidanValue<T>,
   method: string,
   args: any[]
-} : { computedItem: FidanValue<T> }
+} : { computedItem: FidanValue<any> }
 
 export interface FidanValue<T> {
   (val?: T, opt?: ComputionMethodArguments<T>): T;
   $val: T;
   debugName: (name: string) => FidanValue<T>;
-  depends: (dependencies: () => FidanValue<any>[]) => FidanValue<T>;
+  depends: (deps: (FidanValue<any> | Function)[]) => FidanValue<T>;
 }
 
 export interface FidanArray<T extends Array<any>> extends FidanValue<T> {

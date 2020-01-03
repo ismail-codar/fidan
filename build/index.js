@@ -29,7 +29,8 @@ var value = function (val) {
 
       depends = innerFn["c_depends"];
       if (depends.length) { for (var i = 0; i < depends.length; i++) {
-        depends[i](depends[i].compute(val, opt));
+        var dependFn = depends[i].compute ? depends[i].compute : depends[i];
+        dependFn(val, opt);
       } }
     }
   };
@@ -43,9 +44,7 @@ var value = function (val) {
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
 
-  innerFn.depends = function (dependencies) {
-    var deps = dependencies();
-
+  innerFn.depends = function (deps) {
     for (var i = 0; i < deps.length; i++) { innerFn["c_depends"].push(deps[i]); }
 
     return innerFn;

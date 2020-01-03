@@ -31,7 +31,8 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
       depends = innerFn["c_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
-          depends[i](depends[i].compute(val, opt));
+          const dependFn = depends[i].compute ? depends[i].compute : depends[i];
+          dependFn(val, opt);
         }
     }
   };
@@ -42,8 +43,7 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
   }
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
-  innerFn.depends = (dependencies: () => FidanValue<any>[]): FidanValue<T> => {
-    const deps = dependencies();
+  innerFn.depends = (deps:(FidanValue<any> | Function)[]): any => {
     for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
     return innerFn;
   };
