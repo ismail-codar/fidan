@@ -1,5 +1,11 @@
 import { instance } from "./router";
 
+const insertToDom = (viewParent, rendered) => {
+  if (viewParent.firstChild)
+  viewParent.replaceChild(rendered, viewParent.firstChild);
+else viewParent.appendChild(rendered);
+}
+
 export const Route = (props: {
   exact?: boolean;
   path: string;
@@ -12,14 +18,18 @@ export const Route = (props: {
         const viewParent = view["$routerParent"];
         if (viewParent) {
           //  activateContext(props["$context"]);
-          const rendered =
+          let rendered =
             typeof props.component === "function"
               ? props.component(props)
               : props.component;
           //   deactivateContext(props["$context"]);
-          if (viewParent.firstChild)
-            viewParent.replaceChild(rendered, viewParent.firstChild);
-          else viewParent.appendChild(rendered);
+          if (rendered instanceof Promise) {
+            rendered.then(_rendered => {
+              insertToDom(viewParent,_rendered)
+            })
+          } else {
+            insertToDom(viewParent,rendered)
+          }
         }
       }
     }
