@@ -147,12 +147,14 @@ function generateComponent(path, jsx, opts): GenerationResultType {
             []
           )
         );
-    } else children.push(child.exprs[0]);
+    } else {
+      children.push(child.exprs[0])
+    }
   });
 
   if (children.length)
     runningObject.push(
-      t.objectProperty(t.identifier("children"), t.arrayExpression(children))
+      t.objectProperty(t.identifier("children"), children.length === 1 ? children[0] : t.arrayExpression(children))
     );
 
   if (runningObject.length) props.push(t.objectExpression(runningObject));

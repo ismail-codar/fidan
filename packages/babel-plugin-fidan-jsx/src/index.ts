@@ -87,7 +87,9 @@ export default babel => {
               )
             );
           }
-        } else path.replaceWith(result.exprs[0]);
+        } else {
+          path.replaceWith(result.exprs[0])
+        }
       },
       JSXFragment: (path, { opts }) => {
         try {
