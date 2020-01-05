@@ -15,11 +15,6 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
       return innerFn["$val"];
     } else {
       let depends = innerFn["bc_depends"];
-      if (!opt) {
-        opt = {
-          computedItem: innerFn 
-        } as any;
-      }
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
           depends[i].beforeCompute(val, opt);

@@ -11,13 +11,6 @@ var value = function (val) {
       return innerFn["$val"];
     } else {
       var depends = innerFn["bc_depends"];
-
-      if (!opt) {
-        opt = {
-          computedItem: innerFn
-        };
-      }
-
       if (depends.length) { for (var i = 0; i < depends.length; i++) {
         depends[i].beforeCompute(val, opt);
       } }
@@ -57,7 +50,7 @@ var value = function (val) {
     return innerFn;
   };
 
-  innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"]; };
+  innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"] && innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"]; };
 
   return innerFn;
 };
@@ -526,7 +519,7 @@ var injectToProperty = function (obj, propertyKey, val) {
       val();
       return val;
     },
-    set: function (v) { return v.hasOwnProperty("$val") ? val = v : val(v); }
+    set: function (v) { return v.hasOwnProperty('$val') ? val = v : val(v); }
   }); // else {
   //   // descr.get().c_depends.push(val);
   //   // val["c_depends"].push(descr.get());
@@ -558,23 +551,30 @@ var debounce = function (func, wait, immediate) {
 };
 var transformToDataArrayEvents = function (opt, events) {
   /*
-    "copyWithin",
-    "fill",
-    "pop",
-    "push",
-    "reverse",
-    "shift",
-    "sort",
-    "splice",
-    "unshift"
+  "copyWithin",
+  "fill",
+  "pop",
+  "push",
+  "reverse",
+  "shift",
+  "sort",
+  "splice",
+  "unshift"
   */
   var method = opt.method;
   var computedItem = opt.computedItem;
   var args = opt.args;
 
-  if (method === "push") {
-    events.onAdd(args);
-  } else if (method === "splice") {
+  if (!method) {
+    var vals = computedItem.$val;
+
+    if (vals) {
+      events.onRemove(vals);
+      events.onAdd(vals);
+    }
+  } else if (method === 'push') {
+    args && events.onAdd(args);
+  } else if (method === 'splice') {
     var start = args[0];
     var deleteCount = args[1];
     var addItems = args.slice(2);
