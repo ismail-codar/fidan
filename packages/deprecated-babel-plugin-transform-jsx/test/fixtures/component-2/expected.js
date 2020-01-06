@@ -9,7 +9,7 @@ var DemoView = function DemoView(props) {
   var data$ = props.data$;
   return fidan.createElement("div", null, function _(element) {
     element = fidan.createTextNode(element);
-    fidan.compute(function _2() {
+    fidan.computed(function _2() {
       element.textContent = data$.$val;
     }, data$);
   });

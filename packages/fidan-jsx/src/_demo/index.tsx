@@ -5,7 +5,7 @@ const selected = value(false);
 
 const div1 = (
   <div
-    class={compute(() => {
+    class={computed(() => {
       return selected() ? "selected" : "";
     })}
   >

@@ -1,3 +1,3 @@
 const Main = () => {
-  return <>{a.compute(() => size() > 0) ? "More" : "One"}</>;
+  return <>{a.computed(() => size() > 0) ? "More" : "One"}</>;
 };

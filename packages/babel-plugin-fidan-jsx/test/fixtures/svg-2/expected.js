@@ -7,7 +7,7 @@ var GraphNode = function GraphNode(props) {
   var propY = value(props.y);
   injectToProperty(props, "x", propX);
   injectToProperty(props, "y", propY);
-  compute(function() {
+  computed(function() {
     console.log(propX(), propY());
   });
   return (function() {
@@ -20,7 +20,7 @@ var GraphNode = function GraphNode(props) {
       _el$2,
       "x",
       true,
-      compute(function() {
+      computed(function() {
         return propX() - props.width / 2;
       })
     );
@@ -28,7 +28,7 @@ var GraphNode = function GraphNode(props) {
       _el$2,
       "y",
       true,
-      compute(function() {
+      computed(function() {
         return propY() - props.height / 2;
       })
     );
@@ -38,7 +38,7 @@ var GraphNode = function GraphNode(props) {
       _el$4,
       "y",
       true,
-      compute(function() {
+      computed(function() {
         return propY() + 10;
       })
     );

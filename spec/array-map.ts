@@ -35,7 +35,7 @@ var table1 = fidan.createElement('div', null, function(element) {
 	fidan.arrayMap(state.data$ as any, element, function(d: IDataRow, i: number) {
 		return fidan.createElement('span', {}, function(element) {
 			element = fidan.createTextNode(element);
-			fidan.compute(function() {
+			fidan.computed(function() {
 				element.textContent = d.label$.$val;
 			}, d.label$);
 		});
@@ -47,7 +47,7 @@ var table2 = fidan.createElement('div', null, function(element) {
 	updateList.push({
 		path: [ 0 ],
 		update: function(element, dataItem, i) {
-			fidan.compute(function() {
+			fidan.computed(function() {
 				element.textContent = dataItem.label$.$val;
 			}, dataItem.label$);
 		}

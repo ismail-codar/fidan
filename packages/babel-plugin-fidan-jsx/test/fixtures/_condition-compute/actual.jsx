@@ -1,5 +1,5 @@
 <span>
-  {compute(() => {
+  {computed(() => {
     return node.childsType() === "choice" ? (
       <span> | </span>
     ) : (

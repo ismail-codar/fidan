@@ -1,6 +1,6 @@
 // original: https://github.com/ryansolid/babel-plugin-jsx-dom-expressions/blob/master/src/index.js
 import * as t from "@babel/types";
-import * as anymatch from "anymatch";
+import anymatch from "anymatch";
 
 import SyntaxJSX from "@babel/plugin-syntax-jsx";
 import { generateHTMLNode } from "./generate";

@@ -1,4 +1,4 @@
-const computeSelected = compute(
+const computeSelected = computed(
   () => (selected() ? "selected" : ""),
   () => [selected]
 );

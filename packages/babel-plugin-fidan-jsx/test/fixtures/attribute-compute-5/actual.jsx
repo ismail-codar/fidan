@@ -1,5 +1,5 @@
 <div
-  className={compute(() =>
+  className={computed(() =>
     classNames(
       {
         editing: editing(),

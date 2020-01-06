@@ -6,7 +6,7 @@ fidan.createElement(
       "th",
       {
         className: function _(element) {
-          fidan.compute(function _2() {
+          fidan.computed(function _2() {
             element.className = classNames({
               active: sortKey$.$val == col
             });

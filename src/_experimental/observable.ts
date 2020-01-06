@@ -7,7 +7,7 @@
 
 // export const toObservable = <T>(data: FidanValue<any>, Observable): T => {
 //   return new Observable(observer => {
-//     const cmp = compute(() => {
+//     const cmp = computed(() => {
 //       observer.next(data());
 //     }, data);
 //   }) as any;

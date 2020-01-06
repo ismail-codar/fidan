@@ -65,7 +65,7 @@ import { value, compute, html } from "@fidanjs/runtime";
 
 var A = value(1); // A adında reaktif bir değişkenin değeri 1
 var B = value(2); // B adında reaktif bir değişkenin değeri 2
-var C = compute(() => A() + B()); // C değişkeni ise A ve B nin toplamını döndürür
+var C = computed(() => A() + B()); // C değişkeni ise A ve B nin toplamını döndürür
 
 /* Aşağıda javascript in template literal özelliği kullanılarak 
 kodlanmış bir html template vardır. 

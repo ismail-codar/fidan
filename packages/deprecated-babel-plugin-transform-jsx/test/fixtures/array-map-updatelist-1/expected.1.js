@@ -14,7 +14,7 @@ var ListView = function ListView(props) {
 					update: function(element, data, i) {
 						const item$ = data[i];
 						element = fidan.createTextNode(element);
-						fidan.compute(
+						fidan.computed(
 							function() {
 								element.textContent = item$.$val.text$.$val;
 							},

@@ -3,6 +3,6 @@ var todoCtrl1 = {
 	filterBy(filter) {}
 };
 var filterType1$ = '';
-fidan.compute(() => {
+fidan.computed(() => {
 	todoCtrl1.filterBy(filterType1$);
 }, filterType1$);

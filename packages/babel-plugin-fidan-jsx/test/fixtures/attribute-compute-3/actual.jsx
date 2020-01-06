@@ -1,5 +1,5 @@
 <div
-  aria-selected={compute(
+  aria-selected={computed(
     () => (selected() ? "selected" : ""),
     () => [selected]
   )}

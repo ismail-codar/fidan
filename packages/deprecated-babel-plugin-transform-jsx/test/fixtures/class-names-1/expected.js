@@ -5,7 +5,7 @@ fidan.createElement(
   "div",
   {
     className: function _(element) {
-      fidan.compute(
+      fidan.computed(
         function _2() {
           element.className = classNames(
             {

@@ -26,7 +26,7 @@ var InputElement1 = fidan.createElement(
 );
 var InputElement2 = fidan.createElement(Input_, {
   value: function _(element) {
-    fidan.compute(function _2() {
+    fidan.computed(function _2() {
       element.value = value$.$val;
     }, value$);
   }
@@ -38,7 +38,7 @@ var InputElement3 = fidan.createElement(Input, {
 });
 var InputElement4 = fidan.createElement(Input_, {
   value: function _4(element) {
-    fidan.compute(function _5() {
+    fidan.computed(function _5() {
       element.value = value$.$val + 1;
     }, value$);
   }

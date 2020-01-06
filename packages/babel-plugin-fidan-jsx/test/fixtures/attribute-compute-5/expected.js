@@ -4,7 +4,7 @@ _r$.attr(
   _el$,
   "className",
   false,
-  compute(function() {
+  computed(function() {
     return classNames(
       {
         editing: editing(),

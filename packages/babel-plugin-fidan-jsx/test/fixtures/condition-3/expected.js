@@ -7,7 +7,7 @@ var Main = function Main() {
     _r$.conditional(
       _el$,
       {
-        test: a.compute(function() {
+        test: a.computed(function() {
           return size() > 0;
         }),
         consequent: "More",

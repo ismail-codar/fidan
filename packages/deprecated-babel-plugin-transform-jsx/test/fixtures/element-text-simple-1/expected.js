@@ -10,7 +10,7 @@ var a$ = fidan.value(1111);
 var DemoView = function DemoView() {
   return fidan.createElement("div", null, function _(element) {
     element = fidan.createTextNode(element);
-    fidan.compute(function _2() {
+    fidan.computed(function _2() {
       element.textContent = a$.$val;
     }, a$);
   });

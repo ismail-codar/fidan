@@ -4,7 +4,7 @@ _r$.attr(
   _el$,
   "aria-selected",
   true,
-  compute(function() {
+  computed(function() {
     return selected() ? "selected" : "";
   })
 );

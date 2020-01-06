@@ -1,1 +1,1 @@
-<div aria-selected={compute(() => (selected() ? "selected" : ""))} />;
+<div aria-selected={computed(() => (selected() ? "selected" : ""))} />;

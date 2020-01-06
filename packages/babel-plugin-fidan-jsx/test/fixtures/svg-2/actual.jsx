@@ -6,7 +6,7 @@ const GraphNode = props => {
   injectToProperty(props, "x", propX);
   injectToProperty(props, "y", propY);
 
-  compute(() => {
+  computed(() => {
     console.log(propX(), propY());
   });
 
@@ -18,12 +18,12 @@ const GraphNode = props => {
         height="40"
         rx="5"
         ry="5"
-        x={compute(() => propX() - props.width / 2)}
-        y={compute(() => propY() - props.height / 2)}
+        x={computed(() => propX() - props.width / 2)}
+        y={computed(() => propY() - props.height / 2)}
       >
         <title>{props.name}</title>
       </rect>
-      <text className="label" x={propX()} y={compute(() => propY() + 10)}>
+      <text className="label" x={propX()} y={computed(() => propY() + 10)}>
         {props.name}
       </text>
     </g>

@@ -123,7 +123,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (param.hasOwnProperty("$val")) {
         if (htmlProps[attributeName]) {
-          compute(
+          computed(
             val => {
               element[attributeName] = val;
             },
@@ -131,7 +131,7 @@ const updateNodesByCommentNodes = (element: Node, params: any[]) => {
           ).debugName("[" + attributeName + "]");
           element[attributeName] = param();
         } else {
-          compute(
+          computed(
             val => {
               element.setAttribute(attributeName, val);
             },

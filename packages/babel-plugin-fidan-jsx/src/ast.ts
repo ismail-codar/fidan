@@ -176,7 +176,7 @@ export const insertOrConditional = (
                   t.stringLiteral("test"),
                   t.isCallExpression(innerExpr.test) &&
                     innerExpr.test.arguments.length > 0
-                    ? innerExpr.test // compute(..)
+                    ? innerExpr.test // computed(..)
                     : t.arrowFunctionExpression([], innerExpr.test)
                 ),
                 t.objectProperty(

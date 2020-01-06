@@ -1,5 +1,5 @@
 <div
-  class={compute(() => {
+  class={computed(() => {
     return selected() ? "selected" : "";
   })}
 />;

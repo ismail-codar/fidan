@@ -5,7 +5,7 @@ fidan.createElement(Component, {
 });
 fidan.createElement(Component_, {
   className: function _(element) {
-    fidan.compute(function _2() {
+    fidan.computed(function _2() {
       element.className = classNames({
         entered: props.open$.$val === true
       });
@@ -14,7 +14,7 @@ fidan.createElement(Component_, {
 });
 fidan.createElement("div", {
   className: function _3(element) {
-    fidan.compute(function _4() {
+    fidan.computed(function _4() {
       element.className = classNames({
         entered: props.open$.$val === true
       });

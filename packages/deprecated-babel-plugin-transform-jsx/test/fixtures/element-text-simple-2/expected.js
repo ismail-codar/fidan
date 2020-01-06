@@ -4,7 +4,7 @@ var a$ = fidan.value(1),
   }, a$);
 fidan.createElement("div", null, function _2(element) {
   element = fidan.createTextNode(element);
-  fidan.compute(function _3() {
+  fidan.computed(function _3() {
     element.textContent = b$.$val;
   }, b$);
 });

@@ -1,4 +1,4 @@
-import { compute, FidanValue, htmlProps, arrayMap as fidanArrayMap } from '@fidanjs/runtime';
+import { computed, FidanValue, htmlProps, arrayMap as fidanArrayMap } from '@fidanjs/runtime';
 
 export * from './events';
 export * from './array-map';
@@ -35,7 +35,7 @@ export const insert = (parent: Node, accessor: any, init?: any, marker?: Node) =
 	} else if (typeof accessor === 'function') {
 		const node = document.createTextNode('');
 		if (accessor.hasOwnProperty('$val')) {
-			compute(() => {
+			computed(() => {
 				node.data = accessor();
 				if (!node.parentNode) {
 					parent.insertBefore(node, marker);
@@ -68,9 +68,9 @@ export const spread = (node: HTMLElement, accessor: any) => {
 export const attr = (node: Element, attributeName: string, setAttr: boolean, cmp: any) => {
 	if (cmp.hasOwnProperty('$val')) {
 		if (setAttr) {
-			compute(() => node.setAttribute(attributeName, cmp()), [ cmp ]);
+			computed(() => node.setAttribute(attributeName, cmp()), [ cmp ]);
 		} else {
-			compute(() => (node[attributeName] = cmp()), [ cmp ]);
+			computed(() => (node[attributeName] = cmp()), [ cmp ]);
 		}
 	} else {
 		if (typeof cmp === 'function') {
@@ -96,8 +96,8 @@ export const conditional = (
 ) => {
 	let oldElement = null;
 	let lastVal = false;
-	const conditionCompute = condition.test.hasOwnProperty('$val') ? condition.test : compute(condition.test);
-	compute(
+	const conditionCompute = condition.test.hasOwnProperty('$val') ? condition.test : computed(condition.test);
+	computed(
 		() => {
 			if (oldElement && parent.childElementCount === 0) {
 				return;

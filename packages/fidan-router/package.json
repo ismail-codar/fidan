@@ -1,25 +1,26 @@
 {
-  "name": "@fidanjs/router",
-  "version": "0.0.10",
-  "description": "Fidanjs router",
-  "scripts": {
-    "build": "microbundle --no-compress; rm -rf build/_demo",
-    "local": "yarn build && yalc publish && yalc push",
-    "start": "parcel src/_demo/index.html --no-cache",
-    "yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/jsx & yalc link @fidanjs/babel-plugin-fidan-jsx"
-  },
-  "keywords": [],
-  "author": "ismail codar",
-  "license": "ISC",
-  "dependencies": {
-    "route-recognizer": "^0.3.4",
-    "@fidanjs/jsx": "latest",
-    "@fidanjs/babel-plugin-fidan-jsx": "latest",
-    "microbundle": "0.12.0-next.6"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.7.7"
-  },
-  "main": "build/index.js",
-  "types": "build/index.d.ts"
+	"name": "@fidanjs/router",
+	"version": "0.0.10",
+	"description": "Fidanjs router",
+	"scripts": {
+		"build": "microbundle --no-compress; rm -rf build/_demo",
+		"local": "yarn build && yalc publish && yalc push",
+		"start": "parcel src/_demo/index.html --no-cache",
+		"yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/jsx & yalc link @fidanjs/babel-plugin-fidan-jsx"
+	},
+	"keywords": [],
+	"author": "ismail codar",
+	"license": "ISC",
+	"dependencies": {
+		"route-recognizer": "^0.3.4",
+		"@fidanjs/jsx": "latest",
+		"@babel/plugin-syntax-jsx": "^7.7.4",
+		"microbundle": "0.12.0-next.6"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.7.7",
+		"@fidanjs/babel-plugin-fidan-jsx": "latest"
+	},
+	"main": "build/index.js",
+	"types": "build/index.d.ts"
 }

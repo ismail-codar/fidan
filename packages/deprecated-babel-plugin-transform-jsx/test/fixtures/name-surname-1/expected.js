@@ -4,7 +4,7 @@ var employee = {
   },
   div = fidan.createElement("div", null, function _(element) {
     element = fidan.createTextNode(element);
-    fidan.compute(
+    fidan.computed(
       function _2() {
         element.textContent =
           employee.firstName$.$val + " " + employee.lastName$.$val;
