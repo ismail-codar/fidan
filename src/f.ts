@@ -38,19 +38,20 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
   }
   innerFn["bc_depends"] = [];
   innerFn["c_depends"] = [];
-  innerFn.depends = (deps:(FidanValue<any> | Function)[]): any => {
-    for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
-    return innerFn;
-  };
   innerFn.debugName = (name: string) => {
     Object.defineProperty(innerFn, "name", { value: name });
     return innerFn;
   };
   innerFn.toString = innerFn.toJSON = () => innerFn["$val"] && innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"];
+  innerFn.depends = (deps:(FidanValue<any> | Function)[]): any => {
+    for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
+    innerFn(innerFn()); //trigger to c_depends
+    return innerFn;
+  };
   return innerFn;
 };
 
-export const compute = <T>(
+export const computed = <T>(
   fn: (val: T, opt?: ComputionMethodArguments<T>) => any,
   dependencies?: any[]
 ): any => {

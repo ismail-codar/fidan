@@ -1,33 +1,33 @@
 {
-  "name": "@fidanjs/jsx",
-  "version": "0.0.12",
-  "repository": "https://github.com/ismail-codar/fidan",
-  "author": "ismail codar <icodar@gmail.com>",
-  "license": "MIT",
-  "scripts": {
-    "build": "microbundle --no-compress; rm -rf build/_demo",
-    "watch": "microbundle watch",
-    "start": "parcel src/_demo/index.html --no-cache",
-    "build-demo": "parcel  build src/_demo/index.html --no-cache",
-    "local": "yarn build && yalc publish && yalc push",
-    "yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/babel-plugin-fidan-jsx",
-    "test": "jasmine-ts"
-  },
-  "dependencies": {
-    "@fidanjs/babel-plugin-fidan-jsx": "latest",
-    "@fidanjs/runtime": "latest"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.4.4",
-    "@babel/plugin-syntax-jsx": "^7.2.0",
-    "jasmine": "^3.3.1",
-    "jasmine-spec-reporter": "^4.2.1",
-    "jasmine-ts": "^0.3.0",
-    "microbundle": "^0.9.0",
-    "parcel-bundler": "^1.11.0",
-    "ts-node": "^8.0.2"
-  },
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
-  "source": "src/index.ts"
+	"name": "@fidanjs/jsx",
+	"version": "0.0.12",
+	"repository": "https://github.com/ismail-codar/fidan",
+	"author": "ismail codar <icodar@gmail.com>",
+	"license": "MIT",
+	"scripts": {
+		"build": "microbundle --no-compress; rm -rf build/_demo",
+		"watch": "microbundle watch",
+		"start": "parcel src/_demo/index.html --no-cache",
+		"build-demo": "parcel  build src/_demo/index.html --no-cache",
+		"local": "yarn build && yalc publish && yalc push",
+		"yalc-link": "yalc link @fidanjs/runtime & yalc link @fidanjs/babel-plugin-fidan-jsx",
+		"test": "jasmine-ts"
+	},
+	"dependencies": {
+		"@fidanjs/babel-plugin-fidan-jsx": "latest",
+		"@fidanjs/runtime": "latest"
+	},
+	"devDependencies": {
+		"@babel/core": "^7.7.7",
+		"@babel/plugin-syntax-jsx": "^7.7.4",
+		"jasmine": "^3.5.0",
+		"jasmine-spec-reporter": "^4.2.1",
+		"jasmine-ts": "^0.3.0",
+		"microbundle": "0.12.0-next.6",
+		"parcel-bundler": "^1.12.4",
+		"ts-node": "^8.5.4"
+	},
+	"main": "build/index.js",
+	"types": "build/index.d.ts",
+	"source": "src/index.ts"
 }

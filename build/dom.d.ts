@@ -1,4 +1,4 @@
-import { FidanValue } from ".";
+import { FidanValue } from '.';
 export declare const htmlProps: {
     id: boolean;
     nodeValue: boolean;

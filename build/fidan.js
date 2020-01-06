@@ -38,12 +38,6 @@ var fidan = (function (exports) {
     innerFn["bc_depends"] = [];
     innerFn["c_depends"] = [];
 
-    innerFn.depends = function (deps) {
-      for (var i = 0; i < deps.length; i++) { innerFn["c_depends"].push(deps[i]); }
-
-      return innerFn;
-    };
-
     innerFn.debugName = function (name) {
       Object.defineProperty(innerFn, "name", {
         value: name
@@ -53,9 +47,17 @@ var fidan = (function (exports) {
 
     innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"] && innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"]; };
 
+    innerFn.depends = function (deps) {
+      for (var i = 0; i < deps.length; i++) { innerFn["c_depends"].push(deps[i]); }
+
+      innerFn(innerFn()); //trigger to c_depends
+
+      return innerFn;
+    };
+
     return innerFn;
   };
-  var compute = function (fn, dependencies) {
+  var computed = function (fn, dependencies) {
     autoTrackDependencies = dependencies ? null : [];
     var cmp = value();
     var val = fn(undefined, {
@@ -467,10 +469,10 @@ var fidan = (function (exports) {
   var insertToDom = function (parentElement, index, itemElement) {
     var typeOf = typeof itemElement;
 
-    if (typeOf === "function") {
+    if (typeOf === 'function') {
       itemElement(parentElement);
     } else {
-      if (typeOf !== "object") {
+      if (typeOf !== 'object') {
         itemElement = document.createTextNode(itemElement);
       }
 
@@ -479,14 +481,14 @@ var fidan = (function (exports) {
   };
   var arrayMap = function (arr, parentDom, nextElement, renderCallback, renderMode) {
     // const prevElement = document.createDocumentFragment();
-    var prevElement = nextElement ? document.createTextNode("") : undefined;
+    var prevElement = nextElement ? document.createTextNode('') : undefined;
     nextElement && parentDom.insertBefore(prevElement, nextElement);
     beforeCompute(arr.$val, function (nextVal, opt) {
       var beforeVal = opt.computedItem.$val;
 
       if (!renderMode) {
         var parentFragment = document.createDocumentFragment();
-        parentDom.textContent = "";
+        parentDom.textContent = '';
 
         for (var i = 0; i < nextVal.length; i++) {
           insertToDom(parentFragment, i, renderCallback(nextVal[i], i));
@@ -494,7 +496,7 @@ var fidan = (function (exports) {
 
         parentDom.appendChild(parentFragment);
       } else {
-        var renderFunction = renderMode === "reconcile" ? reconcile : reuseNodes;
+        var renderFunction = renderMode === 'reconcile' ? reconcile : reuseNodes;
         renderFunction(parentDom, beforeVal || [], nextVal || [], function (nextItem, index) {
           // create
           return renderCallback(nextItem, index);
@@ -594,11 +596,11 @@ var fidan = (function (exports) {
   var COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
   var _templateMode = false; // TODO kaldırılacak yerine başka bir yöntem geliştirilecek
 
-  var template = document.createElement("template");
+  var template = document.createElement('template');
   var coditionalDom = function (condition, dependencies, htmlFragment) { return function (parentElement, nextElement) {
     var childs = Array.from(htmlFragment.children);
     var inserted = false;
-    compute(function () {
+    computed(function () {
       if (condition()) {
         if (!inserted) {
           var tmpNextElement = nextElement;
@@ -620,7 +622,7 @@ var fidan = (function (exports) {
   var putCommentToTagStart = function (htm, index, comment) {
     for (var i = index; i >= 0; i--) {
       var item = htm[i];
-      var p = item.lastIndexOf("<");
+      var p = item.lastIndexOf('<');
 
       if (p !== -1) {
         htm[i] = item.substr(0, p) + comment + item.substr(p); // htm[i] =
@@ -651,38 +653,38 @@ var fidan = (function (exports) {
         break;
       }
 
-      var isDynamic = param && param.hasOwnProperty("$val");
+      var isDynamic = param && param.hasOwnProperty('$val');
 
       if (isDynamic) {
-        if (param["$indexes"] === undefined) {
-          param["$indexes"] = [];
+        if (param['$indexes'] === undefined) {
+          param['$indexes'] = [];
         }
 
-        param["$indexes"].push(index);
+        param['$indexes'].push(index);
       }
 
       if (item.endsWith('="')) {
-        i = item.lastIndexOf(" ") + 1;
+        i = item.lastIndexOf(' ') + 1;
         attributeName = item.substr(i, item.length - i - 2);
         putCommentToTagStart(htm, index, ("<!-- cmt_" + COMMENT_DOM + "_" + index + "_" + attributeName + " -->"));
       } else {
-        var commentType = typeof param === "function" && !isDynamic ? COMMENT_FN : typeof param === "object" && param ? COMMENT_HTM : COMMENT_TEXT;
+        var commentType = typeof param === 'function' && !isDynamic ? COMMENT_FN : typeof param === 'object' && param ? COMMENT_HTM : COMMENT_TEXT;
         htm[index] = item + "<!-- cmt_" + commentType + "_" + index + " -->";
       }
     }
 
     template = template.cloneNode(false);
-    template.innerHTML = htm.join("");
+    template.innerHTML = htm.join('');
     /**
-      .replace(/\n/g, "")
-      .replace(/  /g, " ")
-      .replace(/  /g, "")
-      .replace(/> /g, ">")
-      .replace(/ </g, "<");
-       */
+    .replace(/\n/g, "")
+    .replace(/  /g, " ")
+    .replace(/  /g, "")
+    .replace(/> /g, ">")
+    .replace(/ </g, "<");
+     */
 
     var element = template.content;
-    element["$params"] = params;
+    element['$params'] = params;
 
     if (!_templateMode) {
       var commentNodes = [];
@@ -697,7 +699,7 @@ var fidan = (function (exports) {
     var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_COMMENT, {
       acceptNode: function (node) {
         var nodeValue = node.nodeValue.trim();
-        return nodeValue.startsWith("cmt_") ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+        return nodeValue.startsWith('cmt_') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
       }
     }, false);
 
@@ -712,23 +714,23 @@ var fidan = (function (exports) {
       var commentValue = commentNode.nodeValue;
       var element = null;
       var attributeName = null;
-      var i1 = commentValue.indexOf("_") + 1;
-      var i2 = commentValue.indexOf("_", i1);
+      var i1 = commentValue.indexOf('_') + 1;
+      var i2 = commentValue.indexOf('_', i1);
       var commentType = parseInt(commentValue.substr(i1, i2 - i1));
-      i1 = commentValue.indexOf("_", i2) + 1;
-      i2 = commentValue.indexOf("_", i1);
+      i1 = commentValue.indexOf('_', i2) + 1;
+      i2 = commentValue.indexOf('_', i1);
 
       if (i2 === -1) {
-        i2 = commentValue.indexOf(" ", i1);
+        i2 = commentValue.indexOf(' ', i1);
       }
 
       var paramIndex = parseInt(commentValue.substr(i1, i2 - i1));
       var param = params[paramIndex];
-      var isDynamic = param && param.hasOwnProperty("$val");
+      var isDynamic = param && param.hasOwnProperty('$val');
 
       if (commentType & COMMENT_TEXT_OR_DOM) {
         if (commentType === COMMENT_TEXT) {
-          attributeName = "textContent";
+          attributeName = 'textContent';
           element = document.createTextNode(isDynamic ? param.$val : param);
           commentNode.parentElement.insertBefore(element, commentNode.nextSibling);
 
@@ -745,16 +747,16 @@ var fidan = (function (exports) {
         } // commentType !== COMMENT_FN && commentNode.remove();
 
 
-        if (attributeName.startsWith("on")) {
+        if (attributeName.startsWith('on')) {
           element.addEventListener(attributeName.substr(2), param);
         } else if (isDynamic) {
           if (htmlProps[attributeName]) {
-            compute(function (val) {
+            computed(function (val) {
               element[attributeName] = val;
             }, [param]);
             element[attributeName] = param();
           } else {
-            compute(function (val) {
+            computed(function (val) {
               element.setAttribute(attributeName, val);
             }, [param]);
             element.setAttribute(attributeName, param());
@@ -762,7 +764,7 @@ var fidan = (function (exports) {
         } else {
           if (htmlProps[attributeName]) {
             element[attributeName] = param;
-          } else if (typeof param === "function") {
+          } else if (typeof param === 'function') {
             param(element);
           } else {
             element.setAttribute(attributeName, param);
@@ -805,10 +807,10 @@ var fidan = (function (exports) {
             _templateMode = true;
             renderNode = renderCallback(data);
             _templateMode = false;
-            params = renderNode["$params"];
+            params = renderNode['$params'];
 
             for (var key in data) {
-              var indexes = data[key]["$indexes"];
+              var indexes = data[key]['$indexes'];
               if (indexes) { for (var i = 0; i < indexes.length; i++) {
                 dataParamIndexes.push(indexes[i], key);
               } }
@@ -874,7 +876,7 @@ var fidan = (function (exports) {
   // };
 
   exports.value = value;
-  exports.compute = compute;
+  exports.computed = computed;
   exports.beforeCompute = beforeCompute;
   exports.htmlProps = htmlProps;
   exports.insertToDom = insertToDom;
