@@ -108,12 +108,7 @@ export const conditional = (
 					parent = marker.parentNode;
 				}
 				let newElement = val ? condition.consequent : condition.alternate;
-				if (newElement instanceof Node === false) newElement = document.createTextNode(newElement || '');
-				if (oldElement) {
-					parent.replaceChild(newElement, oldElement);
-				} else {
-					parent.insertBefore(newElement, marker);
-				}
+				insert(parent, newElement, init, marker);
 				oldElement = newElement;
 			}
 			lastVal = val;
