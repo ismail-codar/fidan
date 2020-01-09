@@ -28,6 +28,7 @@ export const insert = (parent: Node, accessor: any, init?: any, marker?: Node) =
 				.catch((err) => {
 					const errElement = document.createElement('span');
 					errElement.className = 'fidan-async-error';
+					console.error(err);
 					errElement.innerHTML = err.toString();
 					parent.insertBefore(errElement, marker);
 				});
