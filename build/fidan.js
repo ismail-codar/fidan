@@ -26,7 +26,7 @@ var fidan = (function (exports) {
           if (depends[i].compute) {
             depends[i](depends[i].compute(), depends[i]);
           } else {
-            depends[i](depends[i]());
+            depends[i]();
           }
         } }
       }
