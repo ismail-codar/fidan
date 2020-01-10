@@ -26,8 +26,11 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
       depends = innerFn["c_depends"];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
-          const dependFn = depends[i].compute ? depends[i].compute : depends[i];
-          dependFn(val, opt);
+          if (depends[i].compute) {
+            depends[i](depends[i].compute(), depends[i]);
+          } else {
+            depends[i](depends[i]());
+          }
         }
     }
   };
