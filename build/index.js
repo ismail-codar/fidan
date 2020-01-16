@@ -25,7 +25,7 @@ var value = function (val) {
         if (depends[i].compute) {
           depends[i](depends[i].compute(), depends[i]);
         } else {
-          depends[i]();
+          depends[i](innerFn.$val, innerFn);
         }
       } }
     }
