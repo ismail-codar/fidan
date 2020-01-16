@@ -14,7 +14,7 @@ export interface FidanValue<T> {
     (val?: T, opt?: ComputionMethodArguments<T>): T;
     $val: T;
     debugName: (name: string) => FidanValue<T>;
-    depends: (deps: (FidanValue<any> | (() => any))[]) => FidanValue<T>;
+    depends: (deps: (FidanValue<any> | ((val: any, computedItem?: FidanValue<any>) => any))[]) => FidanValue<T>;
 }
 export interface FidanArray<T extends Array<any>> extends FidanValue<T> {
     size: FidanValue<number>;
