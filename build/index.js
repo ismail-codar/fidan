@@ -49,7 +49,10 @@ var value = function (val) {
 
   innerFn.toString = innerFn.toJSON = function () { return innerFn["$val"] && innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"]; };
 
-  innerFn.depends = function (deps) {
+  innerFn.depends = function () {
+    var deps = [], len = arguments.length;
+    while ( len-- ) deps[ len ] = arguments[ len ];
+
     for (var i = 0; i < deps.length; i++) { innerFn["c_depends"].push(deps[i]); }
 
     innerFn(innerFn()); //trigger to c_depends

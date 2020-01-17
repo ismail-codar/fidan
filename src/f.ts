@@ -46,7 +46,7 @@ export const value = <T>(val?: T): FidanValue<T> & (T extends Array<any> ? Fidan
     return innerFn;
   };
   innerFn.toString = innerFn.toJSON = () => innerFn["$val"] && innerFn["$val"].toJSON ? innerFn["$val"].toJSON() : innerFn["$val"];
-  innerFn.depends = (deps:(FidanValue<any> | Function)[]): any => {
+  innerFn.depends = (...deps:(FidanValue<any> | Function)[]): any => {
     for (var i = 0; i < deps.length; i++) innerFn["c_depends"].push(deps[i]);
     innerFn(innerFn()); //trigger to c_depends
     return innerFn;
