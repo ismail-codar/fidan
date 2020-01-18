@@ -103,12 +103,13 @@ export const conditional = (
 			if (oldElement && parent.childElementCount === 0) {
 				return;
 			}
-			const val = !!conditionCompute();
+			const val = conditionCompute();
 			if (val !== lastVal) {
 				if (parent && parent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
 					parent = marker.parentNode;
 				}
-				let newElement = val ? condition.consequent : condition.alternate;
+				let newElement = val ? condition.consequent() : condition.alternate();
+				oldElement && oldElement.remove();
 				insert(parent, newElement, init, marker);
 				oldElement = newElement;
 			}
