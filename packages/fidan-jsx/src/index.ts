@@ -39,15 +39,18 @@ export const insert = (parent: Node, accessor: any, init?: any, marker?: Node) =
 		if (accessor.hasOwnProperty('$val')) {
 			let oldNode = null;
 			accessor.depends((val) => {
-				if (val === undefined) val = accessorVal;
-				if (node instanceof Text) node.data = val;
-				else node = val;
-				if (!oldNode) {
-					parent.insertBefore(node, marker);
+				if (node instanceof Text) {
+					node.data = val;
+					!node.parentNode && parent.insertBefore(node, marker);
 				} else {
-					parent.replaceChild(node, oldNode);
+					node = val;
+					if (!oldNode) {
+						parent.insertBefore(node, marker);
+					} else {
+						parent.replaceChild(node, oldNode);
+					}
+					oldNode = node;
 				}
-				oldNode = node;
 			});
 		} else {
 			if (node instanceof Text) node.data = accessorVal;
