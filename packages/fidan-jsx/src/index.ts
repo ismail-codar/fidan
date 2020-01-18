@@ -34,16 +34,23 @@ export const insert = (parent: Node, accessor: any, init?: any, marker?: Node) =
 				});
 		}
 	} else if (typeof accessor === 'function') {
-		const node = document.createTextNode('');
+		const accessorVal = accessor();
+		let node = accessorVal instanceof Node ? accessorVal : document.createTextNode('');
 		if (accessor.hasOwnProperty('$val')) {
-			computed(() => {
-				node.data = accessor();
-				if (!node.parentNode) {
+			let oldNode = null;
+			accessor.depends((val) => {
+				if (val === undefined) val = accessorVal;
+				if (node instanceof Text) node.data = val;
+				else node = val;
+				if (!oldNode) {
 					parent.insertBefore(node, marker);
+				} else {
+					parent.replaceChild(node, oldNode);
 				}
+				oldNode = node;
 			});
 		} else {
-			node.data = accessor();
+			if (node instanceof Text) node.data = accessorVal;
 			parent.insertBefore(node, marker);
 		}
 	} else if (accessor !== undefined) {
