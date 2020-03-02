@@ -12,3 +12,6 @@ Easiest, strong and high performance way for building web user interfaces.
 ## Acknowledgement
 
 Some ideas are inspired from [surplus](https://github.com/adamhaile/surplus)
+
+## Benchmark
+https://krausest.github.io/js-framework-benchmark/current.html (fidan-v0.0.23-keyed)
