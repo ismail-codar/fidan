@@ -1,14 +1,13 @@
 import { format } from 'prettier';
 import { globalOptions } from '../src/index';
-var assert = require('assert');
-var babel = require('@babel/core');
-var chalk = require('chalk');
-var clear = require('clear');
-var diff = require('diff');
+import * as babel from '@babel/core';
+import * as chalk from 'chalk';
+import * as clear from 'clear';
+import * as diff from 'diff';
 import * as fs from 'fs';
-var path = require('path');
+import * as path from 'path';
 import '../node_modules/better-log/install';
-require('@babel/register');
+import '@babel/register';
 
 process.env['IS_TEST'] = 'true';
 
@@ -19,7 +18,9 @@ var RUN_SINGLE_TEST = null;
 // RUN_SINGLE_TEST = 'children-1';
 ////////////////////////////////////////////////////////////////////////////
 
-var pluginPath = require.resolve('../src');
+// var pluginPath = require.resolve('../src');
+var pluginPath = path.resolve(__dirname, '../src/index.ts');
+console.log('xxx', pluginPath);
 var exitCode = 0;
 
 function runTests() {
@@ -112,17 +113,17 @@ function runTest(dir) {
 }
 
 if (process.argv.indexOf('--watch') >= 0) {
-	require('watch').watchTree(__dirname + '/..', function() {
-		delete require.cache[pluginPath];
-		clear();
-		console.log('Press Ctrl+C to stop watching...');
-		console.log('================================');
-		try {
-			runTests();
-		} catch (e) {
-			console.error(chalk.magenta(e.stack));
-		}
-	});
+	// require('watch').watchTree(__dirname + '/..', function() {
+	// 	delete require.cache[pluginPath];
+	// 	clear();
+	// 	console.log('Press Ctrl+C to stop watching...');
+	// 	console.log('================================');
+	// 	try {
+	// 		runTests();
+	// 	} catch (e) {
+	// 		console.error(chalk.magenta(e.stack));
+	// 	}
+	// });
 } else {
 	runTests();
 	process.exit(exitCode);

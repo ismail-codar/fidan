@@ -1,1 +1,0 @@
-buttonBgColors[props.color$.$val];

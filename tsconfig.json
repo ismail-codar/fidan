@@ -11,7 +11,8 @@
     "noImplicitAny": false,
     "allowUnreachableCode": true,
     "allowSyntheticDefaultImports": true,
-    "strictFunctionTypes": false
+    "strictFunctionTypes": false,
+    "jsx": "preserve"
   },
   "exclude": ["node_modules", "build", "spec", "packages", "bench"]
 }

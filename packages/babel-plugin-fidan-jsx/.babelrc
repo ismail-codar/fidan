@@ -1,4 +1,10 @@
 {
-  "presets": ["@babel/preset-env"],
-  "plugins": []
+    "presets": [],
+    "plugins": [
+        ["./src/jsx-to-template-literal/index.ts", {
+            "tag": "html",
+            "lowercaseEventNames": true,
+            "eventNamesPrefix": "on-"
+        }]
+    ]
 }

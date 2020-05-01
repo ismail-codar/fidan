@@ -1,1 +1,0 @@
-todoItem.completed$(!todoItem.completed$);

@@ -1,1 +1,0 @@
-var id = id$.$val;
