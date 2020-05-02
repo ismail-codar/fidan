@@ -1,3 +1,5 @@
+import { html } from '../html';
+
 var a = 1;
 var b = 2;
 var tmpNumA = 0;
@@ -17,21 +19,12 @@ const max = a > b ? 'a' : 'b';
 const max2 = max.toUpperCase();
 const tmpNumAStr = tmpNumA + '';
 
-var view = (
-	<div>
-		a: {a}
-		<br />
-		b: {b}
-		<br />
-		a+b: {a + b}
-		<br />
-		max: {max}
-		<br />
-		max2: {max2}
-		<br />
-		<input type="number" onChange={handleAChange} />
-		<br />
-		<input type="number" onChange={handleBChange} />
-		tmpNumAStr: {tmpNumAStr}
-	</div>
-);
+var view = html`<div>
+  a: ${a}<br />b: ${b}<br />a+b: ${a + b}<br />max: ${max}<br />max2: ${max2}<br /><input
+    type="number"
+    on-change="${handleAChange}"
+  /><br /><input type="number" onchange="${handleBChange}" />tmpNumAStr:
+  ${tmpNumAStr}
+</div>`;
+
+console.log(view);

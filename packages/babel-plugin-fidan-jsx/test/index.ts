@@ -20,7 +20,6 @@ var RUN_SINGLE_TEST = null;
 
 // var pluginPath = require.resolve('../src');
 var pluginPath = path.resolve(__dirname, '../src/index.ts');
-console.log('xxx', pluginPath);
 var exitCode = 0;
 
 function runTests() {

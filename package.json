@@ -10,7 +10,8 @@
 		"build-all": "yarn build & yarn build-browser",
 		"local": "yarn build-all && yalc publish && yalc push",
 		"test": "jasmine-ts",
-		"dev": "microbundle watch"
+		"dev": "microbundle watch",
+		"test2": "parcel src/_experimental/test2.html --no-cache"
 	},
 	"keywords": [],
 	"author": "",
