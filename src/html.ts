@@ -1,3 +1,5 @@
+const _tmpl$ = document.createElement('template');
+
 export const html = (literals, ...vars) => {
 	let raw = literals.raw,
 		result = '',
@@ -13,5 +15,8 @@ export const html = (literals, ...vars) => {
 		i++;
 	}
 	result += raw[raw.length - 1];
-	return result;
+
+	_tmpl$.innerHTML = result;
+
+	return _tmpl$.content;
 };

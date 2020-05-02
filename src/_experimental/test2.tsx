@@ -20,11 +20,12 @@ const max2 = max.toUpperCase();
 const tmpNumAStr = tmpNumA + '';
 
 var view = html`<div>
-  a: ${a}<br />b: ${b}<br />a+b: ${a + b}<br />max: ${max}<br />max2: ${max2}<br /><input
-    type="number"
+  a: ${a}<br />b: ${b}<br />a+b: ${a + b}<br />max: ${max}<br />max2: ${max2}<br />
+  <input
+    type="number" value="0"
     on-change="${handleAChange}"
-  /><br /><input type="number" onchange="${handleBChange}" />tmpNumAStr:
+  /><br /><input type="number" value="0" onchange="${handleBChange}" />tmpNumAStr:
   ${tmpNumAStr}
 </div>`;
 
-console.log(view);
+document.body.appendChild(view);
