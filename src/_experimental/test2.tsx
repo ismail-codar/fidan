@@ -22,7 +22,7 @@ const tmpNumAStr = tmpNumA + '';
 var view = html`<div>
   a: ${a}<br />b: ${b}<br />a+b: ${a + b}<br />max: ${max}<br />max2: ${max2}<br />
   <input
-    type="number" value="${a}"
+    type="number" value="${a}" name="a"
     onchange="${handleAChange}"
   /><br /><input type="number" value="0" onchange="${handleBChange}" />tmpNumAStr:
   ${tmpNumAStr}
