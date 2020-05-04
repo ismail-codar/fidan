@@ -1,5 +1,3 @@
-const _tmpl$ = document.createElement('template');
-
 export const html = (literals, ...vars) => {
 	let raw = literals.raw,
 		result = '',
@@ -33,39 +31,5 @@ export const html = (literals, ...vars) => {
 		i++;
 	}
 	result += raw[raw.length - 1];
-
-	console.log(result);
-
-	// _tmpl$ = _tmpl$.cloneNode(false) as HTMLTemplateElement;
-	_tmpl$.innerHTML = result;
-
-	const commentNodes = [];
-	walkForCommentNodes(_tmpl$.content, commentNodes);
-	if (commentNodes.length !== vars.length) {
-		console.info(result);
-		throw 'html parse error';
-	}
-	console.log(commentNodes.map((c) => c));
-	console.log(vars);
-
-	return _tmpl$.content;
-};
-
-const walkForCommentNodes = (element, commentNodes) => {
-	var treeWalker = document.createTreeWalker(
-		element,
-		NodeFilter.SHOW_COMMENT,
-		{
-			acceptNode: function(node) {
-				console.log(node);
-				var nodeValue = node.nodeValue;
-				return nodeValue.startsWith('$cmt_') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-			}
-		},
-		false
-	);
-
-	while (treeWalker.nextNode()) {
-		commentNodes.push(treeWalker.currentNode);
-	}
+	return { result, vars };
 };
