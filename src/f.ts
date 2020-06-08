@@ -5,33 +5,28 @@ let autoTracks: any[] = null;
 export const value = <T>(val?: T): FidanValueFn<T> => {
 	if (val && val.hasOwnProperty('$val')) return val as any;
 	const innerFn: any = (val?: T, opt?: ComputionMethodArguments<T>) => {
+		const currentVal = Array.isArray(innerFn['$val']) ? innerFn['$val'].slice(0) : innerFn['$val'];
 		if (val === undefined) {
 			if (autoTracks && autoTracks.indexOf(innerFn) === -1) {
 				autoTracks.push(innerFn);
 			}
-			return Array.isArray(innerFn['$val']) ? innerFn['$val'].slice(0) : innerFn['$val'];
+			return currentVal;
 		} else {
-			let depends: FidanValue<any>[] = innerFn['bc_depends'];
-			if (depends.length)
-				for (var i = 0; i < depends.length; i++) {
-					depends[i].beforeCompute(val, { caller: innerFn });
-				}
-			innerFn['$val'] = val;
-
-			depends = innerFn['c_depends'];
+			let depends: FidanValue<any>[] = innerFn['c_depends'];
 			if (depends.length)
 				for (var i = 0; i < depends.length; i++) {
 					if (depends[i].compute) {
-						depends[i](depends[i].compute(undefined, { caller: innerFn }), { caller: depends[i] });
+						depends[i](depends[i].compute(val, { caller: innerFn }), { caller: depends[i] });
 					} else {
 						depends[i](innerFn.$val, innerFn);
 					}
 				}
+
+			innerFn['$val'] = val;
 		}
 	};
 
 	innerFn['$val'] = val;
-	innerFn['bc_depends'] = [];
 	innerFn['c_depends'] = [];
 	innerFn.debugName = (name: string) => {
 		Object.defineProperty(innerFn, 'name', { value: name });
@@ -59,22 +54,11 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 export const computed = <T>(fn: (val: T, opt?: ComputionMethodArguments<T>) => any, dependencies?: any[]): any => {
 	autoTracks = dependencies ? null : [];
 	const cmp = value<T>();
-	const val = fn(undefined, { computedItem: cmp } as any);
+	const val = fn(undefined, { caller: cmp } as any);
 	cmp.$val = val;
 	const deps = autoTracks ? autoTracks : dependencies;
 	autoTracks = null;
 	cmp['compute'] = fn;
 	for (var i = 0; i < deps.length; i++) deps[i]['c_depends'].push(cmp);
-	return cmp;
-};
-
-export const beforeCompute = <T>(
-	initalValue: T,
-	fn: (nextValue?: T, opt?: ComputionMethodArguments<T>) => void,
-	deps: FidanValue<any>[]
-) => {
-	const cmp = value<T>(fn(initalValue, { caller: {} } as any) as any);
-	cmp['beforeCompute'] = fn;
-	for (var i = 0; i < deps.length; i++) deps[i]['bc_depends'].push(cmp);
 	return cmp;
 };

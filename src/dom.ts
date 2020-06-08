@@ -1,4 +1,4 @@
-import { beforeCompute, computed } from './f';
+import { computed } from './f';
 import { reuseNodes } from './reuse-nodes';
 import { FidanValue } from '.';
 import reconcile from './reconcile';
@@ -40,10 +40,13 @@ export const arrayMap = <T>(
 	// const prevElement = document.createDocumentFragment();
 	const prevElement = nextElement ? document.createTextNode('') : undefined;
 	nextElement && parentDom.insertBefore(prevElement, nextElement);
-	beforeCompute(
-		arr.$val,
-		(nextVal, opt) => {
-			const beforeVal = opt.caller.$val;
+	computed<any[]>(
+		(nextVal, { caller }) => {
+			const beforeVal = caller.$val;
+			if (!beforeVal && !nextVal) {
+				return;
+			}
+			// console.log(beforeVal, nextVal, beforeVal === nextVal);
 			if (!renderMode) {
 				const parentFragment = document.createDocumentFragment();
 				parentDom.textContent = '';
@@ -78,4 +81,9 @@ export const arrayMap = <T>(
 		},
 		[ arr ]
 	);
+	// console.log('_computed', _computed.c_depends);
+	// console.log('arr', arr['c_depends']);
+	const nextVal = arr.$val.slice(0);
+	arr.$val = [];
+	arr(nextVal);
 };
