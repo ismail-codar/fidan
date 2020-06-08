@@ -4,12 +4,12 @@
 import { computed } from './f';
 import { htmlProps, arrayMap } from './dom';
 
-const COMMENT_TEXT = 1;
-const COMMENT_DOM = 2;
-const COMMENT_FN = 4; // "function" && !isDynamic
-const COMMENT_HTM = 8;
-const COMMENT_ARRAY = 16;
-const COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
+const TEXT = 1;
+const DOM = 2;
+const FN = 4; // "function" && !isDynamic
+const HTM = 8;
+const ARRAY = 16;
+const TEXT_OR_DOM = TEXT | DOM;
 
 let template = document.createElement('template');
 
@@ -94,17 +94,15 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 		const isDynamic = param && param.hasOwnProperty('$val');
 
 		const attrIdx = commentValue.indexOf('_');
-		const commentType =
+		const paramType =
 			attrIdx !== -1
-				? COMMENT_DOM
+				? DOM
 				: typeof param === 'function' && !isDynamic
-					? COMMENT_FN
-					: Array.isArray(param)
-						? COMMENT_ARRAY
-						: typeof param === 'object' && param ? COMMENT_HTM : COMMENT_TEXT;
+					? FN
+					: Array.isArray(param) ? ARRAY : typeof param === 'object' && param ? HTM : TEXT;
 
-		if (commentType & COMMENT_TEXT_OR_DOM) {
-			if (commentType === COMMENT_TEXT) {
+		if (paramType & TEXT_OR_DOM) {
+			if (paramType === TEXT) {
 				attributeName = 'textContent';
 				element = document.createTextNode(isDynamic ? param.$val : param);
 				commentNode.parentElement.insertBefore(element, commentNode.nextSibling);
@@ -115,11 +113,11 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 						}
 					}
 				}
-			} else if (commentType === COMMENT_DOM) {
+			} else if (paramType === DOM) {
 				attributeName = commentValue.substr(attrIdx + 1);
 				element = commentNode.nextElementSibling;
 			}
-			commentType !== COMMENT_FN && commentNode.remove();
+			paramType !== FN && commentNode.remove();
 			if (attributeName.startsWith('on')) {
 				(element as Element).addEventListener(attributeName.substr(2), param);
 			} else if (isDynamic) {
@@ -147,7 +145,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 					element.setAttribute(attributeName, param);
 				}
 			}
-		} else if (commentType === COMMENT_FN) {
+		} else if (paramType === FN) {
 			if (commentNode.parentElement) {
 				param(commentNode.parentElement, commentNode.nextElementSibling);
 				commentNode.remove();
@@ -158,13 +156,13 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 					commentNode.remove();
 				});
 			}
-		} else if (commentType === COMMENT_ARRAY) {
+		} else if (paramType === ARRAY) {
 			const fragment = document.createDocumentFragment();
 			param.forEach((p) => {
 				fragment.appendChild(p);
 			});
 			commentNode.parentElement.insertBefore(fragment, commentNode.nextSibling);
-		} else if (commentType === COMMENT_HTM) {
+		} else if (paramType === HTM) {
 			if (param.renderFn) {
 				arrayMap(
 					param.arr,

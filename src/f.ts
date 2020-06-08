@@ -9,12 +9,12 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 			if (autoTracks && autoTracks.indexOf(innerFn) === -1) {
 				autoTracks.push(innerFn);
 			}
-			return innerFn['$val'];
+			return Array.isArray(innerFn['$val']) ? innerFn['$val'].slice(0) : innerFn['$val'];
 		} else {
-			let depends = innerFn['bc_depends'];
+			let depends: FidanValue<any>[] = innerFn['bc_depends'];
 			if (depends.length)
 				for (var i = 0; i < depends.length; i++) {
-					depends[i].beforeCompute(val, opt);
+					depends[i].beforeCompute(val, { caller: innerFn });
 				}
 			innerFn['$val'] = val;
 
@@ -22,7 +22,7 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 			if (depends.length)
 				for (var i = 0; i < depends.length; i++) {
 					if (depends[i].compute) {
-						depends[i](depends[i].compute(), depends[i]);
+						depends[i](depends[i].compute(undefined, { caller: innerFn }), { caller: depends[i] });
 					} else {
 						depends[i](innerFn.$val, innerFn);
 					}
@@ -73,7 +73,7 @@ export const beforeCompute = <T>(
 	fn: (nextValue?: T, opt?: ComputionMethodArguments<T>) => void,
 	deps: FidanValue<any>[]
 ) => {
-	const cmp = value<T>(fn(initalValue, { computedItem: {} } as any) as any);
+	const cmp = value<T>(fn(initalValue, { caller: {} } as any) as any);
 	cmp['beforeCompute'] = fn;
 	for (var i = 0; i < deps.length; i++) deps[i]['bc_depends'].push(cmp);
 	return cmp;

@@ -5,16 +5,18 @@ export interface DataArrayEvents<T> {
   }
   
   export type ComputionMethodArguments<T> = T extends Array<any> ? {
-    computedItem: FidanValue<T>,
+    caller: FidanValue<T>,
     method: string,
     args: any[]
-  } : { computedItem: FidanValue<any> }
+  } : { caller: FidanValue<any> }
   
   export interface FidanValue<T> {
     (val?: T, opt?: ComputionMethodArguments<T>): T;
     $val: T;
     debugName: (name: string) => FidanValue<T>;
-    depends: (...deps: (FidanValue<any> | ((val:any, computedItem?:FidanValue<any>)=>any))[]) => FidanValue<T>;
+    depends: (...deps: (FidanValue<any> | ((val: any, computedItem?: FidanValue<any>) => any))[]) => FidanValue<T>;
+    beforeCompute: (val?: T, opt?: ComputionMethodArguments<T>)=>void,
+    compute: (val?: T, opt?: ComputionMethodArguments<T>)=>T
   }
   
   export interface FidanArray<T extends Array<any>> extends FidanValue<T> {

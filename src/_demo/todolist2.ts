@@ -1,13 +1,12 @@
 import { value } from '../f';
 import { html } from '../html';
-import { FidanValue, FidanArray } from '..';
 
 interface ITodo {
 	title: string;
 	completed?: boolean;
 }
 
-const todos: FidanArray<ITodo[]> = value([
+const todos = value([
 	{
 		title: 'item 1'
 	},
