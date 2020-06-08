@@ -11,7 +11,7 @@
 		"local": "yarn build-all && yalc publish && yalc push",
 		"test": "jasmine-ts",
 		"dev": "microbundle watch",
-		"test2": "parcel src/_experimental/test2.html --no-cache"
+		"demo": "parcel src/_demo/counter/index.html --no-cache"
 	},
 	"keywords": [],
 	"author": "",
