@@ -35,7 +35,7 @@ export const arrayMap = <T>(
 	parentDom: Node & ParentNode,
 	nextElement: Element,
 	renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
-	renderMode?: 'reuse' | 'reconcile'
+	renderMode: 'reuse' | 'reconcile' = 'reconcile'
 ) => {
 	// const prevElement = document.createDocumentFragment();
 	const prevElement = nextElement ? document.createTextNode('') : undefined;

@@ -1,6 +1,6 @@
-import { value } from '../../f';
-import { html } from '../../html';
-import { FidanValue } from '../..';
+import { value } from '../f';
+import { html } from '../html';
+import { FidanValue } from '..';
 
 const count: FidanValue<number> = value(0).debugName('count');
 

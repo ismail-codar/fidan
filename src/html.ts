@@ -2,13 +2,16 @@
 // https://github.com/ismail-codar/fidan/blob/master/src/html.ts
 
 import { computed } from './f';
-import { htmlProps } from './dom';
+import { htmlProps, arrayMap } from './dom';
 
 const COMMENT_TEXT = 1;
 const COMMENT_DOM = 2;
 const COMMENT_FN = 4; // "function" && !isDynamic
 const COMMENT_HTM = 8;
+const COMMENT_ARRAY = 16;
 const COMMENT_TEXT_OR_DOM = COMMENT_TEXT | COMMENT_DOM;
+
+let template = document.createElement('template');
 
 export const html = (literals, ...vars): DocumentFragment => {
 	let raw = literals.raw,
@@ -52,17 +55,14 @@ export const html = (literals, ...vars): DocumentFragment => {
 	}
 	result += extra;
 
-	console.log(result, vars);
-
-	let template = document.createElement('template');
 	template = template.cloneNode(false) as HTMLTemplateElement;
 	template.innerHTML = result;
 
 	const element = template.content;
 	const commentNodes = [];
 	walkForCommentNodes(element, commentNodes);
-	console.log(commentNodes);
 	updateNodesByCommentNodes(commentNodes, vars);
+
 	return element;
 };
 
@@ -99,7 +99,9 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 				? COMMENT_DOM
 				: typeof param === 'function' && !isDynamic
 					? COMMENT_FN
-					: typeof param === 'object' && param ? COMMENT_HTM : COMMENT_TEXT;
+					: Array.isArray(param)
+						? COMMENT_ARRAY
+						: typeof param === 'object' && param ? COMMENT_HTM : COMMENT_TEXT;
 
 		if (commentType & COMMENT_TEXT_OR_DOM) {
 			if (commentType === COMMENT_TEXT) {
@@ -116,29 +118,25 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 			} else if (commentType === COMMENT_DOM) {
 				attributeName = commentValue.substr(attrIdx + 1);
 				element = commentNode.nextElementSibling;
-			} else {
-				debugger;
 			}
-			// commentType !== COMMENT_FN && commentNode.remove();
+			commentType !== COMMENT_FN && commentNode.remove();
 			if (attributeName.startsWith('on')) {
 				(element as Element).addEventListener(attributeName.substr(2), param);
 			} else if (isDynamic) {
 				if (htmlProps[attributeName]) {
 					computed(
-						(val) => {
-							element[attributeName] = val;
+						() => {
+							element[attributeName] = param();
 						},
 						[ param ]
 					);
-					element[attributeName] = param();
 				} else {
 					computed(
-						(val) => {
-							element.setAttribute(attributeName, val);
+						() => {
+							element.setAttribute(attributeName, param());
 						},
 						[ param ]
 					);
-					element.setAttribute(attributeName, param());
 				}
 			} else {
 				if (htmlProps[attributeName]) {
@@ -152,16 +150,32 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 		} else if (commentType === COMMENT_FN) {
 			if (commentNode.parentElement) {
 				param(commentNode.parentElement, commentNode.nextElementSibling);
-				// commentNode.remove();
+				commentNode.remove();
 			} else {
 				//conditionalDom can be place on root
 				window.requestAnimationFrame(() => {
 					param(commentNode.parentElement, commentNode.nextElementSibling);
-					// commentNode.remove();
+					commentNode.remove();
 				});
 			}
+		} else if (commentType === COMMENT_ARRAY) {
+			const fragment = document.createDocumentFragment();
+			param.forEach((p) => {
+				fragment.appendChild(p);
+			});
+			commentNode.parentElement.insertBefore(fragment, commentNode.nextSibling);
 		} else if (commentType === COMMENT_HTM) {
-			commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
+			if (param.renderFn) {
+				arrayMap(
+					param.arr,
+					commentNode.parentElement,
+					commentNode.nextSibling as any,
+					param.renderFn,
+					param.renderMode
+				);
+			} else {
+				commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
+			}
 		}
 	}
 };

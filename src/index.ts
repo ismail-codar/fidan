@@ -19,7 +19,10 @@ export interface DataArrayEvents<T> {
   
   export interface FidanArray<T extends Array<any>> extends FidanValue<T> {
     size: FidanValue<number>;
+    map: (item:any, index?:number, renderMode?: 'reuse' | 'reconcile')=>any
   }
+
+  export type FidanValueFn<T> = FidanValue<T> & (T extends Array<any> ? FidanArray<T> : unknown)
   
   export * from "./f";
   export * from "./dom";
