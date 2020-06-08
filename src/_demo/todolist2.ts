@@ -1,27 +1,32 @@
 import { value } from '../f';
 import { html } from '../html';
+import { FidanValue } from '..';
 
 interface ITodo {
-	title: string;
-	completed?: boolean;
+	title: FidanValue<string>;
+	completed: FidanValue<boolean>;
 }
 
-const todos = value([
+const todos = value<ITodo[]>([
 	{
-		title: value('item 1')
+		title: value('item 1'),
+		completed: value(false)
 	},
 	{
-		title: value('item 2')
+		title: value('item 2'),
+		completed: value(false)
 	},
 	{
-		title: value('item 3')
+		title: value('item 3'),
+		completed: value(false)
 	}
 ]);
 
 setTimeout(() => {
 	const arr = todos().slice(0);
 	arr.push({
-		title: value('item 4')
+		title: value('item 4'),
+		completed: value(false)
 	});
 	todos(arr);
 
