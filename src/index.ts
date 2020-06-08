@@ -27,6 +27,5 @@ export interface DataArrayEvents<T> {
   export type FidanValueFn<T> = FidanValue<T> & (T extends Array<any> ? FidanArray<T> : unknown)
   
   export * from "./f";
-  export * from "./dom";
   export * from "./util";
   export * from "./html";

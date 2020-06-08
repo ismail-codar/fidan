@@ -4,13 +4,13 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 	// Fast path for clear
 	if (data.length === 0) {
 		if (beforeNode !== undefined || afterNode !== undefined) {
-			let node = beforeNode !== undefined ? beforeNode.nextElementSibling : parent.firstElementChild,
+			let node = beforeNode !== undefined ? beforeNode.nextSibling : parent.firstElementChild,
 				tmp;
 
 			if (afterNode === undefined) afterNode = null;
 
 			while (node && node !== afterNode) {
-				tmp = node.nextElementSibling;
+				tmp = node.nextSibling;
 				parent.removeChild(node);
 				node = tmp;
 			}
@@ -38,9 +38,9 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 		newEnd = data.length - 1,
 		a,
 		b,
-		prevStartNode = beforeNode ? beforeNode.nextElementSibling : parent.firstElementChild,
+		prevStartNode = beforeNode ? beforeNode.nextSibling : parent.firstElementChild,
 		newStartNode = prevStartNode,
-		prevEndNode = afterNode ? afterNode.previousElementSibling : parent.lastElementChild,
+		prevEndNode = afterNode ? afterNode.previousSibling : parent.lastElementChild,
 		newEndNode = prevEndNode;
 
 	fixes: while (loop) {
@@ -53,7 +53,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 			noOp(prevStartNode, b);
 			prevStart++;
 			newStart++;
-			newStartNode = prevStartNode = prevStartNode.nextElementSibling;
+			newStartNode = prevStartNode = prevStartNode.nextSibling;
 			if (prevEnd < prevStart || newEnd < newStart) break fixes;
 			a = renderedValues[prevStart];
 			b = data[newStart];
@@ -66,7 +66,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 			prevEnd--;
 			newEnd--;
 			afterNode = prevEndNode;
-			newEndNode = prevEndNode = prevEndNode.previousElementSibling;
+			newEndNode = prevEndNode = prevEndNode.previousSibling;
 			if (prevEnd < prevStart || newEnd < newStart) break fixes;
 			a = renderedValues[prevEnd];
 			b = data[newEnd];
@@ -77,7 +77,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 		while (a === b) {
 			loop = true;
 			noOp(prevEndNode, b);
-			_node = prevEndNode.previousElementSibling;
+			_node = prevEndNode.previousSibling;
 			parent.insertBefore(prevEndNode, newStartNode);
 			newEndNode = prevEndNode = _node;
 			newStart++;
@@ -92,7 +92,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 		while (a === b) {
 			loop = true;
 			noOp(prevStartNode, b);
-			_node = prevStartNode.nextElementSibling;
+			_node = prevStartNode.nextSibling;
 			parent.insertBefore(prevStartNode, afterNode);
 			prevStart++;
 			afterNode = newEndNode = prevStartNode;
@@ -112,7 +112,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 				if (prevEnd === 0) {
 					parent.removeChild(prevEndNode);
 				} else {
-					next = prevEndNode.previousElementSibling;
+					next = prevEndNode.previousSibling;
 					parent.removeChild(prevEndNode);
 					prevEndNode = next;
 				}
@@ -159,13 +159,13 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 	// Fast path for full replace
 	if (reusingNodes === 0) {
 		if (beforeNode !== undefined || afterNode !== undefined) {
-			let node = beforeNode !== undefined ? beforeNode.nextElementSibling : parent.firstElementChild,
+			let node = beforeNode !== undefined ? beforeNode.nextSibling : parent.firstElementChild,
 				tmp;
 
 			if (afterNode === undefined) afterNode = null;
 
 			while (node !== afterNode) {
-				tmp = node.nextElementSibling;
+				tmp = node.nextSibling;
 				parent.removeChild(node);
 				node = tmp;
 				prevStart++;
@@ -192,7 +192,7 @@ export function reconcile(parent, renderedValues, data, createFn, noOp, beforeNo
 	let tmpC = prevStartNode;
 	for (let i = prevStart; i <= prevEnd; i++) {
 		nodes[i] = tmpC;
-		tmpC = tmpC.nextElementSibling;
+		tmpC = tmpC.nextSibling;
 	}
 
 	for (let i = 0; i < toRemove.length; i++) parent.removeChild(nodes[toRemove[i]]);

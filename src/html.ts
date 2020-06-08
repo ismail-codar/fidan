@@ -2,7 +2,9 @@
 // https://github.com/ismail-codar/fidan/blob/master/src/html.ts
 
 import { computed } from './f';
-import { htmlProps, arrayMap } from './dom';
+import { FidanValue } from '.';
+import reconcile from './reconcile';
+import { reuseNodes } from './reuse-nodes';
 
 const TEXT = 1;
 const DOM = 2;
@@ -10,6 +12,21 @@ const FN = 4; // "function" && !isDynamic
 const HTM = 8;
 const ARRAY = 16;
 const TEXT_OR_DOM = TEXT | DOM;
+
+export const htmlProps = {
+	id: true,
+	nodeValue: true,
+	textContent: true,
+	className: true,
+	innerHTML: true,
+	innerText: true,
+	tabIndex: true,
+	value: true,
+	checked: true,
+	disabled: true,
+	readonly: true,
+	contentEditable: true
+};
 
 let template = document.createElement('template');
 
@@ -176,4 +193,38 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 			}
 		}
 	}
+};
+
+export const arrayMap = <T>(
+	arr: FidanValue<T[]>,
+	parentDom: Node & ParentNode,
+	nextElement: Element,
+	renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
+	renderMode: 'reuse' | 'reconcile' = 'reconcile'
+) => {
+	const prevElement = nextElement ? document.createTextNode('') : undefined;
+	nextElement && parentDom.insertBefore(prevElement, nextElement);
+	computed<any[]>(
+		(nextVal, { caller }) => {
+			const beforeVal = caller.$val;
+			const renderFunction: (parent, renderedValues, data, createFn, noOp, beforeNode?, afterNode?) => void =
+				renderMode === 'reconcile' ? reconcile : reuseNodes;
+			renderFunction(
+				parentDom,
+				beforeVal || [],
+				nextVal || [],
+				(nextItem, index) => {
+					let rendered = renderCallback(nextItem, index) as any;
+					return rendered instanceof Node ? rendered : document.createTextNode(rendered);
+				},
+				() => {},
+				prevElement,
+				nextElement
+			);
+		},
+		[ arr ]
+	);
+	const nextVal = arr.$val.slice(0);
+	arr.$val = [];
+	arr(nextVal);
 };

@@ -8,23 +8,27 @@ interface ITodo {
 
 const todos = value([
 	{
-		title: 'item 1'
+		title: value('item 1')
 	},
 	{
-		title: 'item 2'
+		title: value('item 2')
 	},
 	{
-		title: 'item 3'
+		title: value('item 3')
 	}
 ]);
 
 setTimeout(() => {
-	const arr = todos();
+	const arr = todos().slice(0);
 	arr.push({
-		title: 'item 4'
+		title: value('item 4')
 	});
 	todos(arr);
-}, 2000);
+
+	setTimeout(() => {
+		todos()[1].title('item 2 x');
+	}, 1000);
+}, 1000);
 
 const app = html`
   <div>

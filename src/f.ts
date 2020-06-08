@@ -5,13 +5,12 @@ let autoTracks: any[] = null;
 export const value = <T>(val?: T): FidanValueFn<T> => {
 	if (val && val.hasOwnProperty('$val')) return val as any;
 	const innerFn: any = (val?: T, opt?: ComputionMethodArguments<T>) => {
-		const currentVal = Array.isArray(innerFn['$val']) ? innerFn['$val'].slice(0) : innerFn['$val'];
 		if (val === undefined) {
-			if (autoTracks && autoTracks.indexOf(innerFn) === -1) {
-				autoTracks.push(innerFn);
-			}
-			return currentVal;
+			if (autoTracks && autoTracks.indexOf(innerFn) === -1) autoTracks.push(innerFn);
+			return innerFn['$val'];
 		} else {
+			const updateAfter = Array.isArray(val);
+			if (!updateAfter) innerFn['$val'] = val;
 			let depends: FidanValue<any>[] = innerFn['c_depends'];
 			if (depends.length)
 				for (var i = 0; i < depends.length; i++) {
@@ -21,8 +20,7 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 						depends[i](innerFn.$val, innerFn);
 					}
 				}
-
-			innerFn['$val'] = val;
+			if (updateAfter) innerFn['$val'] = val;
 		}
 	};
 
@@ -53,7 +51,7 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 
 export const computed = <T>(fn: (val: T, opt?: ComputionMethodArguments<T>) => any, dependencies?: any[]): any => {
 	autoTracks = dependencies ? null : [];
-	const cmp = value<T>();
+	const cmp = value<T>(undefined);
 	const val = fn(undefined, { caller: cmp } as any);
 	cmp.$val = val;
 	const deps = autoTracks ? autoTracks : dependencies;
