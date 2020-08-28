@@ -1,7 +1,8 @@
 import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
-import jsxToTemplateLiteral from './jsx-to-template-literal';
 import jsx from '@babel/plugin-syntax-jsx';
+import jsxToTemplateLiteral from './jsx-to-template-literal';
+import taggedTemplateVariables from './tagged-template-variables';
 
 const fileExtentions = [ '.js', '.jsx', '.ts', '.tsx' ];
 export const globalOptions = {
@@ -25,6 +26,7 @@ export default (babel) => {
 		visitor: {
 			Program: (path: NodePath<t.Program>, state: { key; filename; file }) => {
 				path.traverse(jsxToTemplateLiteral(babel).visitor, state);
+				path.traverse(taggedTemplateVariables(babel).visitor, state);
 				debugger;
 			}
 		}
