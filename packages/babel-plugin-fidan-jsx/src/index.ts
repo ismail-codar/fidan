@@ -1,27 +1,12 @@
+import * as t from 'babel-types';
+import { NodePath } from 'babel-traverse';
+import jsxToTemplateLiteral from './jsx-to-template-literal';
+
 const fileExtentions = [ '.js', '.jsx', '.ts', '.tsx' ];
 export const globalOptions = {
 	moduleName: '_r$',
 	delegateEvents: true,
 	isTest: false,
-	babelConfig: (pluginPath: string) => ({
-		plugins: [
-			pluginPath
-				? [
-						pluginPath,
-						{
-							moduleName: '_r$',
-							isTest: true,
-							exclude: [ '**/*.react*' ]
-						}
-					]
-				: null,
-			'@babel/plugin-syntax-dynamic-import',
-			[ '@babel/plugin-proposal-decorators', { legacy: true } ],
-			[ '@babel/plugin-proposal-class-properties', { loose: true } ],
-			'@babel/plugin-syntax-jsx'
-		].filter((p) => p != null),
-		presets: [ '@babel/preset-typescript' ]
-	}),
 	fileExtentions: fileExtentions,
 	currentFile: {
 		path: ''
@@ -34,5 +19,10 @@ export const globalOptions = {
 };
 
 export default (babel) => {
-	return {};
+	return {
+		inherits: jsxToTemplateLiteral,
+		visitor: {
+			Program: (path: NodePath<t.Program>, state: { key; filename; file }) => {}
+		}
+	};
 };

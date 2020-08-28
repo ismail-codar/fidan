@@ -1,7 +1,7 @@
 {
     "presets": [],
     "plugins": [
-        ["./src/jsx-to-template-literal/index.ts", {
+        ["./src/index.ts", {
             "tag": "html",
             "lowercaseEventNames": true,
             "eventNamesPrefix": "on-"

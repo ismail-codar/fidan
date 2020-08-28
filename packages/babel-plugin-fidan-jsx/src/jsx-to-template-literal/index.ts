@@ -167,7 +167,7 @@ function replaceNode(path, state) {
 	path.replaceWith(tag ? t.taggedTemplateExpression(t.identifier(tag), literal) : literal);
 }
 
-module.exports = declare((api, options) => {
+export default declare((api, options) => {
 	api.assertVersion(7);
 
 	return {

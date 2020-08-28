@@ -18,8 +18,6 @@ var RUN_SINGLE_TEST = null;
 // RUN_SINGLE_TEST = 'children-1';
 ////////////////////////////////////////////////////////////////////////////
 
-// var pluginPath = require.resolve('../src');
-var pluginPath = path.resolve(__dirname, '../src/index.ts');
 var exitCode = 0;
 
 function runTests() {
@@ -56,7 +54,7 @@ function runTest(dir) {
 	if (fs.existsSync(testFile) == false) {
 		testFile = dir.path + '/actual.tsx';
 	}
-	var output = babel.transformFileSync(testFile, globalOptions.babelConfig(pluginPath));
+	var output = babel.transformFileSync(testFile);
 
 	var expected = fs.readFileSync(dir.path + '/expected.js', 'utf-8');
 
