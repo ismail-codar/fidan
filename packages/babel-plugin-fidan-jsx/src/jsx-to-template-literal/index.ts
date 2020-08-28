@@ -1,7 +1,6 @@
 // https://github.com/johanholmerin/babel-plugin-jsx-to-template-literal
 
 const { declare } = require('@babel/helper-plugin-utils');
-const jsx = require('@babel/plugin-syntax-jsx').default;
 const generator = require('@babel/generator').default;
 const { types: t } = require('@babel/core');
 
@@ -171,7 +170,6 @@ export default declare((api, options) => {
 	api.assertVersion(7);
 
 	return {
-		inherits: jsx,
 		visitor: {
 			JSXElement: replaceNode,
 			JSXFragment: replaceNode
