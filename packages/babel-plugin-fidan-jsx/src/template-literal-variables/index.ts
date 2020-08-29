@@ -1,9 +1,9 @@
 import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
-import { globalOptions } from '../common';
+import { globalData } from '../common';
 
 export default (babel) => {
-	const templateLiteralExpressionPaths = globalOptions.templateLiteralExpressionPaths;
+	const templateLiteralExpressionPaths = globalData.templateLiteralExpressionPaths;
 	return {
 		visitor: {
 			TaggedTemplateExpression: (path: NodePath<t.TaggedTemplateExpression>, state: { key; filename; file }) => {

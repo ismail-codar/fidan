@@ -1,14 +1,14 @@
 import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
 import jsx from '@babel/plugin-syntax-jsx';
-import { globalOptions } from './common';
+import { globalData } from './common';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
 import templateLiteralVariables from './template-literal-variables';
 import modifiy from './modifiy';
 import check from './check';
 
 export default (babel) => {
-	const templateLiteralExpressionPaths = globalOptions.templateLiteralExpressionPaths;
+	const templateLiteralExpressionPaths = globalData.templateLiteralExpressionPaths;
 
 	return {
 		inherits: jsx,
@@ -19,8 +19,8 @@ export default (babel) => {
 			},
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
 				if (t.isIdentifier(path.node.id)) {
-					const isVariableDynamic = check.isNodeDynamic(path.node.id.name);
-					if (isVariableDynamic) {
+					const isDynamic = check.isNodeDynamic(path.node.id.name);
+					if (isDynamic) {
 						path.node.init = modifiy.fidanValueInit(path.node.init);
 					}
 				} else {
@@ -31,8 +31,8 @@ export default (babel) => {
 				if (!check.isFidanCall(path.node)) {
 					path.node.arguments.forEach((arg, index) => {
 						if (t.isIdentifier(arg)) {
-							const isArgumentDynamic = check.isNodeDynamic(arg.name);
-							if (isArgumentDynamic) {
+							const isDynamic = check.isNodeDynamic(arg.name);
+							if (isDynamic) {
 								path.node.arguments[index] = modifiy.fidanValAccess(arg);
 							}
 						} else {
