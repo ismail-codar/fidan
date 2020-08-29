@@ -17,6 +17,16 @@ const memberVal = (node: t.Node) => {
 	} else return t.memberExpression(node as any, t.identifier('$val'));
 };
 
+const fidanValAccess = (node: t.Node) => {
+	let name = null;
+	if (t.isIdentifier(node)) {
+		name = node.name;
+	} else {
+		debugger;
+	}
+	return t.callExpression(t.identifier(name), []);
+};
+
 // const fidanCall = (left: t.Expression | t.RestElement | t.LVal, right: t.Expression, operator: string) => {
 // 	if (operator === '=') return t.callExpression(left as any, [ right ]);
 // 	else {
@@ -39,5 +49,6 @@ const insertFidanImport = (body: t.Node[], start: number) => {
 export default {
 	fidanValueInit,
 	memberVal,
+	fidanValAccess,
 	insertFidanImport
 };

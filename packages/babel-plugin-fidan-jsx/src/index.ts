@@ -2,48 +2,37 @@ import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
 import jsx from '@babel/plugin-syntax-jsx';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
+import templateLiteralVariables from './template-literal-variables';
 import modifiy from './modifiy';
-
-const fileExtentions = [ '.js', '.jsx', '.ts', '.tsx' ];
-export const globalOptions = {
-	moduleName: '_r$',
-	delegateEvents: true,
-	isTest: false,
-	fileExtentions: fileExtentions,
-	currentFile: {
-		path: ''
-	},
-	defaultPluginOptions: {
-		include: fileExtentions.map((ext) => '**/*' + ext)
-	},
-	openedTags: [],
-	isSvg: false
-};
+import { globalOptions } from './common';
 
 export default (babel) => {
+	const templateLiteralExpressionPaths = globalOptions.templateLiteralExpressionPaths;
+
 	return {
 		inherits: jsx,
 		visitor: {
-			Program: (path: NodePath<t.Program>, state: { key; filename; file }) => {
+			Program(path: NodePath<t.Program>, state: { key; filename; file }) {
 				path.traverse(jsxToTemplateLiteral(babel).visitor, state);
+				path.traverse(templateLiteralVariables(babel).visitor, state);
 			},
-			TaggedTemplateExpression: (path: NodePath<t.TaggedTemplateExpression>, state: { key; filename; file }) => {
-				path.node.quasi.expressions.forEach((exp) => {
-					if (t.isIdentifier(exp)) {
-						const binding = path.scope.bindings[exp.name];
-						const bindingPathNode = binding.path.node;
-						if (t.isVariableDeclarator(bindingPathNode)) {
-							bindingPathNode.init = modifiy.fidanValueInit(bindingPathNode.init);
+			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
+				templateLiteralExpressionPaths.forEach((tpath: NodePath<t.TaggedTemplateExpression>) => {
+					tpath.node.quasi.expressions.forEach((expr) => {
+						if (t.isIdentifier(path.node.id) && t.isIdentifier(expr)) {
+							if (path.node.id.name === expr.name) {
+								path.node.init = modifiy.fidanValueInit(path.node.init);
+							}
 						} else {
 							debugger;
 						}
-						binding.referencePaths.filter((item) => item !== path).forEach((referencePath: NodePath) => {
-							referencePath.node = modifiy.memberVal(referencePath.node);
-						});
-					} else if (t.isBinaryExpression(exp)) {
-						debugger;
-					} else if (t.isCallExpression(exp)) {
-						debugger;
+					});
+				});
+			},
+			CallExpression(path: NodePath<t.CallExpression>) {
+				path.node.arguments.forEach((arg, index) => {
+					if (t.isIdentifier(arg)) {
+						path.node.arguments[index] = modifiy.fidanValAccess(arg);
 					} else {
 						debugger;
 					}

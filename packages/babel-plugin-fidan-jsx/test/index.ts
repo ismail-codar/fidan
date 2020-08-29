@@ -1,5 +1,4 @@
 import { format } from 'prettier';
-import { globalOptions } from '../src/index';
 import * as babel from '@babel/core';
 import * as chalk from 'chalk';
 import * as clear from 'clear';
