@@ -13,9 +13,10 @@ process.env['IS_TEST'] = 'true';
 // TODO https://github.com/stryker-mutator/robobar-example
 
 ////////////////////////////////////////////////////////////////////////////
-var RUN_SINGLE_TEST = null;
-RUN_SINGLE_TEST = 'test3';
-////////////////////////////////////////////////////////////////////////////
+var RUN_SINGLE_TEST = process.argv[2];
+if (!RUN_SINGLE_TEST) {
+	RUN_SINGLE_TEST = 'test1';
+}
 
 var exitCode = 0;
 
