@@ -9,13 +9,15 @@ const isFidanCall = (node: t.CallExpression) => {
 };
 
 const isNodeDynamic = (name: string) => {
-	return globalData.templateLiteralExpressionPaths.find((tpath: NodePath<t.TaggedTemplateExpression>) => {
+	return globalData.dynamicPaths.find((tpath: NodePath<t.TaggedTemplateExpression>) => {
 		return tpath.node.quasi.expressions.find((expr) => {
 			if (t.isIdentifier(expr)) {
 				if (name === expr.name) {
 					return true;
 				} else {
 					console.log(tpath);
+					// c dinamiktir
+					// TODO c  nin deklaration ı callExpression ise argumanlarında da name var ise return true
 					debugger;
 				}
 			} else {

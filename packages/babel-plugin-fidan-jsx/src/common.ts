@@ -15,5 +15,5 @@ export const globalData = {
 	},
 	openedTags: [],
 	isSvg: false,
-	templateLiteralExpressionPaths: [] as NodePath<t.Node>[]
+	dynamicPaths: [] as NodePath<t.Node>[]
 };
