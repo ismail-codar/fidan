@@ -26,7 +26,30 @@ export default (babel) => {
 						debugger;
 					}
 				} else if (!t.isArrowFunctionExpression(path.node.init)) {
-					debugger;
+					const isDynamic = check.isPathDynamic(path);
+					if (isDynamic) {
+						if (t.isBinaryExpression(path.node.init)) {
+							path.node.init = modifiy.fidanComputedBinaryExpressionInit(path.node.init);
+						} else if (t.isCallExpression(path.node.init)) {
+							debugger;
+						} else {
+							debugger;
+						}
+					}
+				}
+			},
+			BinaryExpression(path: NodePath<t.BinaryExpression>) {
+				if (t.isIdentifier(path.node.left)) {
+					const isDynamic = check.isPathDynamic(path, path.node.left.name);
+					if (isDynamic) {
+						path.node.left = modifiy.fidanValAccess(path.node.left);
+					}
+				}
+				if (t.isIdentifier(path.node.right)) {
+					const isDynamic = check.isPathDynamic(path, path.node.right.name);
+					if (isDynamic) {
+						path.node.right = modifiy.fidanValAccess(path.node.right);
+					}
 				}
 			},
 			CallExpression(path: NodePath<t.CallExpression>) {

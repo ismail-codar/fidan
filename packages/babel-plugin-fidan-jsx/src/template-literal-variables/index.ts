@@ -13,7 +13,6 @@ const findRelatedPaths = (path: NodePath<t.Node>, expr: t.Expression) => {
 			} else if (t.isBinaryExpression(bindingNodePath.node.init)) {
 				findRelatedPaths(bindingNodePath, bindingNodePath.node.init.left);
 				findRelatedPaths(bindingNodePath, bindingNodePath.node.init.right);
-				debugger;
 			} else if (t.isCallExpression(bindingNodePath.node.init)) {
 				debugger;
 			} else if (!t.isLiteral(bindingNodePath.node.init)) {
@@ -39,9 +38,6 @@ export default (babel) => {
 		visitor: {
 			TaggedTemplateExpression: (path: NodePath<t.TaggedTemplateExpression>, state: { key; filename; file }) => {
 				dynamicPaths.push(path);
-				// path.node.quasi.expressions -- > c
-				// path.scope.bindings.c.path.node.init --> binaryExpression (a, b)
-				//  dynamicPaths.push ... ath.scope.bindings.a.path,  ath.scope.bindings.b.path
 				path.node.quasi.expressions.forEach((expr) => {
 					findRelatedPaths(path, expr);
 				});

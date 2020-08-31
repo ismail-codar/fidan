@@ -10,6 +10,12 @@ const fidanValueInit = (init: t.Node) => {
 	);
 };
 
+const fidanComputedBinaryExpressionInit = (init: t.BinaryExpression) => {
+	return t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('computed')), [
+		t.arrowFunctionExpression([], t.blockStatement([ t.returnStatement(init) ]))
+	]);
+};
+
 const memberVal = (node: t.Node) => {
 	if (t.isUnaryExpression(node)) {
 		node.argument = t.memberExpression(node.argument, t.identifier('$val'));
@@ -50,5 +56,6 @@ export default {
 	fidanValueInit,
 	memberVal,
 	fidanValAccess,
-	insertFidanImport
+	insertFidanImport,
+	fidanComputedBinaryExpressionInit
 };
