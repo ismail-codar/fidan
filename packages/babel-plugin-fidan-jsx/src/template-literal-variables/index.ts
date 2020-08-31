@@ -24,14 +24,12 @@ const findRelatedPaths = (path: NodePath<t.Node>, expr: t.Node) => {
 			debugger;
 		}
 	} else if (t.isBinaryExpression(expr)) {
-		debugger;
 		findRelatedPaths(path, expr.left);
 		findRelatedPaths(path, expr.right);
 	} else if (t.isCallExpression(expr)) {
 		expr.arguments.forEach((arg) => {
 			findRelatedPaths(path, arg);
 		});
-		debugger;
 	} else if (!t.isLiteral(expr)) {
 		debugger;
 	}

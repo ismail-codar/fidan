@@ -4,5 +4,8 @@ const view = () => {
 	var c = fidan.computed(() => {
 		return someFunction(a(), b());
 	});
+	var d = 3;
+	console.log(d);
+
 	return html`<div>c: ${c}</div>`;
 };
