@@ -2,6 +2,37 @@ import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
 import { globalData } from '../common';
 
+const findRelatedPaths = (path: NodePath<t.Node>, expr: t.Expression) => {
+	const dynamicPaths = globalData.dynamicPaths;
+	if (t.isIdentifier(expr)) {
+		const bindingNodePath = path.scope.bindings[expr.name].path;
+		if (t.isVariableDeclarator(bindingNodePath.node)) {
+			dynamicPaths.push(bindingNodePath);
+			if (t.isIdentifier(bindingNodePath.node.init)) {
+				debugger;
+			} else if (t.isBinaryExpression(bindingNodePath.node.init)) {
+				findRelatedPaths(bindingNodePath, bindingNodePath.node.init.left);
+				findRelatedPaths(bindingNodePath, bindingNodePath.node.init.right);
+				debugger;
+			} else if (t.isCallExpression(bindingNodePath.node.init)) {
+				debugger;
+			} else if (!t.isLiteral(bindingNodePath.node.init)) {
+				debugger;
+			}
+		} else {
+			debugger;
+		}
+	} else if (t.isBinaryExpression(expr)) {
+		debugger;
+		findRelatedPaths(path, expr.left);
+		findRelatedPaths(path, expr.right);
+	} else if (t.isCallExpression(expr)) {
+		debugger;
+	} else if (!t.isLiteral(expr)) {
+		debugger;
+	}
+};
+
 export default (babel) => {
 	const dynamicPaths = globalData.dynamicPaths;
 	return {
@@ -12,28 +43,7 @@ export default (babel) => {
 				// path.scope.bindings.c.path.node.init --> binaryExpression (a, b)
 				//  dynamicPaths.push ... ath.scope.bindings.a.path,  ath.scope.bindings.b.path
 				path.node.quasi.expressions.forEach((expr) => {
-					if (t.isIdentifier(expr)) {
-						const bindingNode = path.scope.bindings[expr.name].path.node;
-						if (t.isVariableDeclarator(bindingNode)) {
-							if (t.isIdentifier(bindingNode.init)) {
-								debugger;
-							} else if (t.isBinaryExpression(bindingNode.init)) {
-								debugger;
-							} else if (t.isCallExpression(bindingNode.init)) {
-								debugger;
-							} else {
-								debugger;
-							}
-						} else {
-							debugger;
-						}
-					} else if (t.isBinaryExpression(expr)) {
-						debugger;
-					} else if (t.isCallExpression(expr)) {
-						debugger;
-					} else {
-						debugger;
-					}
+					findRelatedPaths(path, expr);
 				});
 			}
 		}

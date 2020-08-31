@@ -8,26 +8,15 @@ const isFidanCall = (node: t.CallExpression) => {
 	);
 };
 
-const isNodeDynamic = (name: string) => {
-	return globalData.dynamicPaths.find((tpath: NodePath<t.TaggedTemplateExpression>) => {
-		return tpath.node.quasi.expressions.find((expr) => {
-			if (t.isIdentifier(expr)) {
-				if (name === expr.name) {
-					return true;
-				} else {
-					console.log(tpath);
-					// c dinamiktir
-					// TODO c  nin deklaration ı callExpression ise argumanlarında da name var ise return true
-					debugger;
-				}
-			} else {
-				debugger;
-			}
-		});
-	});
+const isPathDynamic = (path: NodePath<t.Node>, bindingName?: string) => {
+	if (bindingName) {
+		return globalData.dynamicPaths.includes(path.scope.bindings[bindingName].path);
+	} else {
+		return globalData.dynamicPaths.includes(path);
+	}
 };
 
 export default {
 	isFidanCall,
-	isNodeDynamic
+	isPathDynamic
 };

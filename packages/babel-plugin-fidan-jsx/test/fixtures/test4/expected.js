@@ -1,7 +1,7 @@
 const view = () => {
-	var a = value(1);
-	var b = value(2);
-	var c = computed(
+	var a = fidan.value(1);
+	var b = fidan.value(2);
+	var c = fidan.computed(
 		() => {
 			return a() + b();
 		},

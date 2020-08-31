@@ -18,14 +18,14 @@ export default (babel) => {
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
 				if (t.isIdentifier(path.node.init) || t.isLiteral(path.node.init)) {
 					if (t.isIdentifier(path.node.id)) {
-						const isDynamic = check.isNodeDynamic(path.node.id.name);
+						const isDynamic = check.isPathDynamic(path);
 						if (isDynamic) {
 							path.node.init = modifiy.fidanValueInit(path.node.init);
 						}
 					} else {
 						debugger;
 					}
-				} else {
+				} else if (!t.isArrowFunctionExpression(path.node.init)) {
 					debugger;
 				}
 			},
@@ -33,7 +33,7 @@ export default (babel) => {
 				if (!check.isFidanCall(path.node)) {
 					path.node.arguments.forEach((arg, index) => {
 						if (t.isIdentifier(arg)) {
-							const isDynamic = check.isNodeDynamic(arg.name);
+							const isDynamic = check.isPathDynamic(path, arg.name);
 							if (isDynamic) {
 								path.node.arguments[index] = modifiy.fidanValAccess(arg);
 							}
