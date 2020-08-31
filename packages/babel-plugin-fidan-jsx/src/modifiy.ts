@@ -10,7 +10,7 @@ const fidanValueInit = (init: t.Node) => {
 	);
 };
 
-const fidanComputedBinaryExpressionInit = (init: t.BinaryExpression) => {
+const fidanComputedExpressionInit = (init: t.Expression) => {
 	return t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('computed')), [
 		t.arrowFunctionExpression([], t.blockStatement([ t.returnStatement(init) ]))
 	]);
@@ -57,5 +57,5 @@ export default {
 	memberVal,
 	fidanValAccess,
 	insertFidanImport,
-	fidanComputedBinaryExpressionInit
+	fidanComputedExpressionInit
 };

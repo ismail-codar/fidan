@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as babel from '@babel/core';
 import * as t from '@babel/types';
 import { NodePath, Scope, Binding } from 'babel-traverse';
-import { globalData } from '../common';
+import { globalData } from './common';
 
 const registryData: {
 	[key: string]: { fileName: string; paths: NodePath[] };

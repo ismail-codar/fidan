@@ -1,11 +1,8 @@
 const view = () => {
-	var a = value(1);
-	var b = value(2);
-	var c = computed(
-		() => {
-			return someFunction(a(), b());
-		},
-		[ a, b ]
-	);
+	var a = fidan.value(1);
+	var b = fidan.value(2);
+	var c = fidan.computed(() => {
+		return someFunction(a(), b());
+	});
 	return html`<div>c: ${c}</div>`;
 };

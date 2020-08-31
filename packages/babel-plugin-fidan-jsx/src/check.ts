@@ -1,7 +1,7 @@
 import * as t from 'babel-types';
 import { NodePath } from 'babel-traverse';
 import { globalData } from './common';
-import { declarationPathInScope } from './template-literal-variables/export-registry';
+import { declarationPathInScope } from './export-registry';
 
 const isFidanCall = (node: t.CallExpression) => {
 	return (
@@ -14,7 +14,6 @@ const isPathDynamic = (path: NodePath<t.Node>, bindingName?: string) => {
 	if (bindingName) {
 		const declPath = declarationPathInScope(path.scope, bindingName);
 		return dynamicPaths.includes(declPath);
-		// return dynamicPaths.includes(path.scope.bindings[bindingName].path);
 	} else {
 		return dynamicPaths.includes(path);
 	}

@@ -28,10 +28,8 @@ export default (babel) => {
 				} else if (!t.isArrowFunctionExpression(path.node.init)) {
 					const isDynamic = check.isPathDynamic(path);
 					if (isDynamic) {
-						if (t.isBinaryExpression(path.node.init)) {
-							path.node.init = modifiy.fidanComputedBinaryExpressionInit(path.node.init);
-						} else if (t.isCallExpression(path.node.init)) {
-							debugger;
+						if (t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+							path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
 						} else {
 							debugger;
 						}
@@ -58,6 +56,7 @@ export default (babel) => {
 						if (t.isIdentifier(arg)) {
 							const isDynamic = check.isPathDynamic(path, arg.name);
 							if (isDynamic) {
+								// TODO if function parameter is dynamic or not
 								path.node.arguments[index] = modifiy.fidanValAccess(arg);
 							}
 						} else {
