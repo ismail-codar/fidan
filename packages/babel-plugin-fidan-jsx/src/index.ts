@@ -6,6 +6,7 @@ import jsxToTemplateLiteral from './jsx-to-template-literal';
 import templateLiteralVariables from './template-literal-variables';
 import modifiy from './modifiy';
 import check from './check';
+import { declarationPathInScope } from './export-registry';
 
 export default (babel) => {
 	return {
@@ -20,7 +21,14 @@ export default (babel) => {
 					if (t.isIdentifier(path.node.id)) {
 						const isDynamic = check.isPathDynamic(path);
 						if (isDynamic) {
-							path.node.init = modifiy.fidanValueInit(path.node.init);
+							let rightIsDynamic = false;
+							if (t.isIdentifier(path.node.init)) {
+								const initDeclarationPath = declarationPathInScope(path.scope, path.node.init.name);
+								rightIsDynamic = check.isPathDynamic(initDeclarationPath);
+							}
+							if (!rightIsDynamic) {
+								path.node.init = modifiy.fidanValueInit(path.node.init);
+							}
 						}
 					} else {
 						debugger;
@@ -63,6 +71,18 @@ export default (babel) => {
 							debugger;
 						}
 					});
+				}
+			},
+			ExpressionStatement(path: NodePath<t.ExpressionStatement>) {
+				if (t.isAssignmentExpression(path.node.expression)) {
+					let rightIsDynamic = false;
+					if (t.isIdentifier(path.node.expression.right)) {
+						const initDeclarationPath = declarationPathInScope(path.scope, path.node.expression.right.name);
+						rightIsDynamic = check.isPathDynamic(initDeclarationPath);
+					}
+					if (!rightIsDynamic) {
+						path.node.expression = modifiy.fidanValueSet(path.node.expression);
+					}
 				}
 			}
 		}

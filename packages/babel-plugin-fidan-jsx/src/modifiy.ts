@@ -10,6 +10,12 @@ const fidanValueInit = (init: t.Node) => {
 	);
 };
 
+const fidanValueSet = (expr: t.AssignmentExpression) => {
+	if (t.isIdentifier(expr.left)) {
+		return t.callExpression(expr.left, [ expr.right ]);
+	}
+};
+
 const fidanComputedExpressionInit = (init: t.Expression) => {
 	return t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('computed')), [
 		t.arrowFunctionExpression([], t.blockStatement([ t.returnStatement(init) ]))
@@ -54,6 +60,7 @@ const insertFidanImport = (body: t.Node[], start: number) => {
 
 export default {
 	fidanValueInit,
+	fidanValueSet,
 	memberVal,
 	fidanValAccess,
 	insertFidanImport,
