@@ -1,4 +1,4 @@
-import { fidan } from '@fidanjs/runtime';
+import * as fidan from '@fidanjs/runtime';
 
 var a = 1;
 var b = 2;

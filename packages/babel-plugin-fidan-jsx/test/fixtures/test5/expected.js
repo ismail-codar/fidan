@@ -1,4 +1,4 @@
-import { fidan } from '@fidanjs/runtime';
+import * as fidan from '@fidanjs/runtime';
 
 const view = () => {
 	var a = fidan.value(1);

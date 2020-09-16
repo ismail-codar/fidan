@@ -50,10 +50,7 @@ const insertFidanImport = (body: t.Node[], start: number) => {
 	body.splice(
 		start,
 		0,
-		t.importDeclaration(
-			[ t.importSpecifier(t.identifier('fidan'), t.identifier('fidan')) ],
-			t.stringLiteral('@fidanjs/runtime')
-		)
+		t.importDeclaration([ t.importNamespaceSpecifier(t.identifier('fidan')) ], t.stringLiteral('@fidanjs/runtime'))
 	);
 };
 

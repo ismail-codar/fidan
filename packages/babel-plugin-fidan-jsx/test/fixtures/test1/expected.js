@@ -1,4 +1,4 @@
-import { fidan } from '@fidanjs/runtime';
+import * as fidan from '@fidanjs/runtime';
 
 var box = fidan.html`${Box(
 	{},

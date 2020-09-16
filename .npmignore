@@ -2,6 +2,7 @@
 .rts*
 bench
 src
+_demo
 spec
 packages
 node_modules

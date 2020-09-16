@@ -15,5 +15,5 @@
       "outDir": "build",
       "jsx": "preserve"
     },
-    "exclude": ["node_modules", "build", "dist", "scripts", "test"]
+    "exclude": ["node_modules", "build", "dist", "scripts", "test", "src/_demo"]
   }

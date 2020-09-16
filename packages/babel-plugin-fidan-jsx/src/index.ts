@@ -12,10 +12,12 @@ export default (babel) => {
 	return {
 		inherits: jsx,
 		visitor: {
-			Program(path: NodePath<t.Program>, state: { key; filename; file }) {
-				modifiy.insertFidanImport(path.node.body, 0);
-				path.traverse(jsxToTemplateLiteral(babel).visitor, state);
-				path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
+			Program: {
+				enter(path: NodePath<t.Program>, state: { key; filename; file }) {
+					modifiy.insertFidanImport(path.node.body, 0);
+					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
+					path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
+				}
 			},
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
 				if (t.isIdentifier(path.node.init) || t.isLiteral(path.node.init)) {

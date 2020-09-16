@@ -14,5 +14,5 @@
     "strictFunctionTypes": false,
     "jsx": "preserve"
   },
-  "exclude": ["node_modules", "build", "spec", "packages", "bench"]
+  "exclude": ["node_modules", "build", "spec", "packages", "bench", "src/_demo"]
 }

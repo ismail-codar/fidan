@@ -1,3 +1,5 @@
 export const App = () => {
-	return <div>App</div>;
+	debugger;
+	const a = 1;
+	return <div>App: {a}</div>;
 };
