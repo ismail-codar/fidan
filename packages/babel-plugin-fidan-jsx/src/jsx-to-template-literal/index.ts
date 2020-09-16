@@ -146,24 +146,21 @@ const transforms = {
 };
 
 function transformNode(node, opts) {
-	const strings = [];
-	const keys = [];
-	transforms[node.type]({ node, strings, keys }, opts);
+	const quasis = [];
+	const expressions = [];
+	transforms[node.type]({ node, strings: quasis, keys: expressions }, opts);
 
 	// strings must be one longer than keys
-	while (strings.length <= keys.length) {
-		addString(strings, keys, '');
+	while (quasis.length <= expressions.length) {
+		addString(quasis, expressions, '');
 	}
 
-	return [ strings, keys ];
+	return { quasis, expressions };
 }
 
 function replaceNode(path, state) {
 	const transformed = transformNode(path.node, state.opts);
-	debugger;
-	const literal = t.templateLiteral(transformed[0], transformed[1]);
-	// const literal = t.templateLiteral(transformNode(path.node, state.opts), []);
-
+	const literal = t.templateLiteral(transformed.quasis, transformed.expressions);
 	path.replaceWith(
 		t.taggedTemplateExpression(t.memberExpression(t.identifier('fidan'), t.identifier('html')), literal)
 	);
