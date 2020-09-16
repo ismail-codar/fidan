@@ -1,4 +1,6 @@
 .vscode
 test
 src
+dist
+.babelrc.js
 tsconfig.json

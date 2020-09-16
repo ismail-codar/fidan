@@ -1,8 +1,7 @@
 // https://github.com/johanholmerin/babel-plugin-jsx-to-template-literal
-
-const { declare } = require('@babel/helper-plugin-utils');
-const generator = require('@babel/generator').default;
-const { types: t } = require('@babel/core');
+import * as t from '@babel/types';
+import generator from '@babel/generator';
+import { declare } from '@babel/helper-plugin-utils';
 
 function trimString(string) {
 	return string.replace(/\s+/g, (match, offset, string) => {
@@ -54,16 +53,16 @@ function createComponent(name, node) {
 	const attributes = t.objectExpression(
 		node.openingElement.attributes.map((attr) => {
 			if (attr.type === 'JSXSpreadAttribute') {
-				return t.SpreadElement(attr.argument);
+				return t.spreadElement(attr.argument);
 			}
 
 			const value = attr.value ? attr.value.expression || attr.value : t.booleanLiteral(true);
 
-			return t.ObjectProperty(t.stringLiteral(attr.name.name), value);
+			return t.objectProperty(t.stringLiteral(attr.name.name), value);
 		})
 	);
 
-	const children = t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), node.children);
+	const children = null; // TODO t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), node.children);
 
 	return t.callExpression(t.identifier(name), [ attributes, children ]);
 }
@@ -160,10 +159,14 @@ function transformNode(node, opts) {
 }
 
 function replaceNode(path, state) {
-	const literal = t.templateLiteral(...transformNode(path.node, state.opts));
-	const { tag } = state.opts;
+	const transformed = transformNode(path.node, state.opts);
+	debugger;
+	const literal = t.templateLiteral(transformed[0], transformed[1]);
+	// const literal = t.templateLiteral(transformNode(path.node, state.opts), []);
 
-	path.replaceWith(tag ? t.taggedTemplateExpression(t.identifier(tag), literal) : literal);
+	path.replaceWith(
+		t.taggedTemplateExpression(t.memberExpression(t.identifier('fidan'), t.identifier('html')), literal)
+	);
 }
 
 export default declare((api, options) => {

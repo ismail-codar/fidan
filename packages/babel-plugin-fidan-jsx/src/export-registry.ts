@@ -1,8 +1,8 @@
+import * as t from '@babel/types';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as babel from '@babel/core';
-import * as t from '@babel/types';
-import { NodePath, Scope, Binding } from 'babel-traverse';
+import { NodePath, Scope, Binding } from '@babel/traverse';
 import { globalData } from './common';
 
 const registryData: {

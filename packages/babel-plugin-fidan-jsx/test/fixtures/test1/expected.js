@@ -1,11 +1,13 @@
-var box = html`${Box(
+import { fidan } from '@fidanjs/runtime';
+
+var box = fidan.html`${Box(
 	{},
 	html`${shouldShowAnswer(user)
-		? html`${Answer(
+		? fidan.html`${Answer(
 				{
 					value: false
 				},
-				html`no`
+				fidan.html`no`
 			)}`
-		: html`${Box.Comment({}, html`Text Content`)}`}`
+		: fidan.html`${Box.Comment({}, fidan.html`Text Content`)}`}`
 )}`;

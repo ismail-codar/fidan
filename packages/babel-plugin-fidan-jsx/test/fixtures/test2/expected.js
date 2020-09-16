@@ -1,3 +1,5 @@
+import { fidan } from '@fidanjs/runtime';
+
 var a = 1;
 var b = 2;
 var tmpNumA = 0;

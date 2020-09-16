@@ -1,5 +1,4 @@
-import * as t from 'babel-types';
-import { NodePath } from 'babel-traverse';
+import * as t from '@babel/types';
 
 // https://github.com/ismail-codar/fidan/blob/master/packages/deprecated-babel-plugin-transform-jsx/src/modify.ts
 

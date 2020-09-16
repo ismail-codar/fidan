@@ -12,7 +12,8 @@
       "allowSyntheticDefaultImports": true,
       "strictFunctionTypes": false,
       "allowJs": true,
-      "outDir": "build"
+      "outDir": "build",
+      "jsx": "preserve"
     },
-    "exclude": ["node_modules", "build", "scripts", "test"]
+    "exclude": ["node_modules", "build", "dist", "scripts", "test"]
   }

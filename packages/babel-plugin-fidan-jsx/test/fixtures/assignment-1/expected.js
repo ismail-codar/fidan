@@ -1,3 +1,5 @@
+import { fidan } from '@fidanjs/runtime';
+
 const view = () => {
 	var a = fidan.value(1);
 	var b = fidan.value(2);
@@ -11,5 +13,5 @@ const view = () => {
 	console.log(e());
 	e = c;
 
-	return html`<div>c: ${c}</div>`;
+	return fidan.html`<div>c: ${c}</div>`;
 };

@@ -1,5 +1,5 @@
-import * as t from 'babel-types';
-import { NodePath } from 'babel-traverse';
+import * as t from '@babel/types';
+import { NodePath } from '@babel/traverse';
 import jsx from '@babel/plugin-syntax-jsx';
 import { globalData } from './common';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
@@ -13,6 +13,7 @@ export default (babel) => {
 		inherits: jsx,
 		visitor: {
 			Program(path: NodePath<t.Program>, state: { key; filename; file }) {
+				modifiy.insertFidanImport(path.node.body, 0);
 				path.traverse(jsxToTemplateLiteral(babel).visitor, state);
 				path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
 			},
