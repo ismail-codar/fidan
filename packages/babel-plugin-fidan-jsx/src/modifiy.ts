@@ -1,6 +1,5 @@
 import * as t from '@babel/types';
-
-// https://github.com/ismail-codar/fidan/blob/master/packages/deprecated-babel-plugin-transform-jsx/src/modify.ts
+import generate from '@babel/generator';
 
 const fidanValueInit = (init: t.Node) => {
 	return t.callExpression(
@@ -46,12 +45,26 @@ const fidanValAccess = (node: t.Node) => {
 // 	}
 // };
 
-const insertFidanImport = (body: t.Node[], start: number) => {
-	body.splice(
-		start,
-		0,
-		t.importDeclaration([ t.importNamespaceSpecifier(t.identifier('fidan')) ], t.stringLiteral('@fidanjs/runtime'))
-	);
+const insertFidanImport = (body: t.Node[]) => {
+	const imports = body.filter((item) => t.isImportDeclaration(item)) as t.ImportDeclaration[];
+	let exists = imports.length && imports[0].specifiers.length && imports[0].specifiers[0].local.name === 'fidan';
+	if (!exists) {
+		exists =
+			body
+				.filter((item) => item && typeof item === 'object' && t.isVariableDeclaration(item))
+				.map((item: t.VariableDeclaration) => item.declarations[0].id['name'])
+				.find((item) => item === 'fidan') !== undefined;
+		if (!exists) {
+			body.splice(
+				0,
+				0,
+				t.importDeclaration(
+					[ t.importNamespaceSpecifier(t.identifier('fidan')) ],
+					t.stringLiteral('@fidanjs/runtime')
+				)
+			);
+		}
+	}
 };
 
 export default {

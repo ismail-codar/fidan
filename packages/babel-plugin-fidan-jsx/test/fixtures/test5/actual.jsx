@@ -1,3 +1,5 @@
+import * as fidan from '@fidanjs/runtime';
+
 const view = () => {
 	var a = 1;
 	var b = 2;

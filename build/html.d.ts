@@ -14,4 +14,4 @@ export declare const htmlProps: {
     contentEditable: boolean;
 };
 export declare const html: (literals: any, ...vars: any[]) => DocumentFragment;
-export declare const arrayMap: <T>(arr: FidanValue<T[]>, parentDom: Node & ParentNode, nextElement: Element, renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node, renderMode?: "reuse" | "reconcile") => void;
+export declare const arrayMap: <T>(arr: FidanValue<T[]>, parentDom: Node & ParentNode, nextElement: Element, renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node, renderMode?: 'reuse' | 'reconcile') => void;

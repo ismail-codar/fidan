@@ -14,7 +14,7 @@ export default (babel) => {
 		visitor: {
 			Program: {
 				enter(path: NodePath<t.Program>, state: { key; filename; file }) {
-					modifiy.insertFidanImport(path.node.body, 0);
+					modifiy.insertFidanImport(path.node.body);
 					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
 					path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
 				}

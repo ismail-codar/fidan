@@ -2,8 +2,6 @@
 import * as t from '@babel/types';
 import generator from '@babel/generator';
 import { declare } from '@babel/helper-plugin-utils';
-import { NodePath } from '@babel/traverse';
-import modifiy from '../modifiy';
 
 function trimString(string) {
 	return string.replace(/\s+/g, (match, offset, string) => {
