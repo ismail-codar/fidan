@@ -1,3 +1,5 @@
-import * as fidan from '@fidanjs/runtime';
+import { App } from './App';
 
-console.log(fidan);
+const app = App();
+
+document.getElementById('main').appendChild(app);

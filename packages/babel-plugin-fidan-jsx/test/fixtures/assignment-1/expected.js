@@ -12,6 +12,11 @@ const view = () => {
 	var e = d;
 	console.log(e());
 	e = c;
+	var g = 1;
+	var h = 2;
+	g = 3;
+	h = 4;
+	g = h;
 
 	return fidan.html`<div>c: ${c}</div>`;
 };

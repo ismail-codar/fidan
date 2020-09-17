@@ -71,20 +71,27 @@ export default (babel) => {
 								path.node.arguments[index] = modifiy.fidanValAccess(arg);
 							}
 						} else {
-							debugger;
+							// TODO ObjectExpression vs...
+							// debugger;
 						}
 					});
 				}
 			},
 			ExpressionStatement(path: NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
-					let rightIsDynamic = false;
-					if (t.isIdentifier(path.node.expression.right)) {
-						const initDeclarationPath = declarationPathInScope(path.scope, path.node.expression.right.name);
-						rightIsDynamic = check.isPathDynamic(initDeclarationPath);
-					}
-					if (!rightIsDynamic) {
-						path.node.expression = modifiy.fidanValueSet(path.node.expression);
+					const leftIsDynamic = check.isPathDynamic(path, path.node.expression.left.name);
+					if (leftIsDynamic) {
+						let rightIsDynamic = false;
+						if (t.isIdentifier(path.node.expression.right)) {
+							const initDeclarationPath = declarationPathInScope(
+								path.scope,
+								path.node.expression.right.name
+							);
+							rightIsDynamic = check.isPathDynamic(initDeclarationPath);
+						}
+						if (!rightIsDynamic) {
+							path.node.expression = modifiy.fidanValueSet(path.node.expression);
+						}
 					}
 				}
 			}

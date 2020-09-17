@@ -58,6 +58,12 @@ const insertFidanImport = (body: t.Node[]) => {
 			body.splice(
 				0,
 				0,
+				// t.variableDeclaration('var', [
+				// 	t.variableDeclarator(
+				// 		t.identifier('fidan'),
+				// 		t.callExpression(t.identifier('require'), [ t.stringLiteral('@fidanjs/runtime') ])
+				// 	)
+				// ])
 				t.importDeclaration(
 					[ t.importNamespaceSpecifier(t.identifier('fidan')) ],
 					t.stringLiteral('@fidanjs/runtime')
