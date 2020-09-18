@@ -25,10 +25,11 @@ function addString(strings, keys, string) {
 	const trimmedString = trimString(string);
 
 	if (strings.length <= keys.length) {
-		strings.push(t.templateElement({ raw: trimmedString }));
+		strings.push(t.templateElement({ raw: trimmedString, cooked: trimmedString }));
 	} else {
 		const last = strings[strings.length - 1];
 		last.value.raw = last.value.raw + trimmedString;
+		last.value.cooked = last.value.raw;
 	}
 }
 

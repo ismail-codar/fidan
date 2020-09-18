@@ -1,7 +1,7 @@
 import * as t from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import jsx from '@babel/plugin-syntax-jsx';
-import { globalData } from './common';
+import generate from '@babel/generator';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
 import templateLiteralVariables from './template-literal-variables';
 import modifiy from './modifiy';
@@ -16,8 +16,14 @@ export default (babel) => {
 				enter(path: NodePath<t.Program>, state: { key; filename; file }) {
 					modifiy.insertFidanImport(path.node.body);
 					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
+					// console.log(generate(path.node).code);
 					path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
+					// console.log(generate(path.node).code);
 				}
+				// exit(path: NodePath<t.Program>, state: { key; filename; file }) {
+				// 	debugger;
+				// 	console.log(generate(path.node).code);
+				// }
 			},
 			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
 				if (t.isIdentifier(path.node.init) || t.isLiteral(path.node.init)) {

@@ -6,6 +6,6 @@ const bundler = new Bundler(__dirname + '/index.html', { open: true, cache: fals
 const app = express();
 app.use(bundler.middleware());
 
-const port = process.env.PORT || 1234;
+const port = process.env.PORT || 1235;
 console.warn(' http://localhost:' + port);
 app.listen(Number(port));
