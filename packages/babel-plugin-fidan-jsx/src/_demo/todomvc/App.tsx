@@ -1,5 +1,4 @@
 const sqrt = (num: number) => {
-	console.log(num);
 	return num * num;
 };
 
@@ -10,12 +9,10 @@ export const App = () => {
 		a = a + 1;
 	}, 1000);
 
-	const b = sqrt(a);
-
 	return (
 		<div>
 			Num: {a} <br />
-			Sqrt: {b}
+			Sqrt: {sqrt(a)}
 		</div>
 	);
 };
