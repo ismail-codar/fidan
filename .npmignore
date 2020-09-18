@@ -4,6 +4,7 @@ bench
 src
 _demo
 spec
+dist
 packages
 node_modules
 tsconfig.json
