@@ -9,7 +9,7 @@ const isFidanCall = (node: t.CallExpression) => {
 	);
 };
 
-const isPathDynamic = (path: NodePath<t.Node>, bindingName?: string) => {
+const isPathDynamic = (path: t.NodePath<t.Node>, bindingName?: string) => {
 	const dynamicPaths = globalData.dynamicPaths;
 	if (bindingName) {
 		const declPath = declarationPathInScope(path.scope, bindingName);

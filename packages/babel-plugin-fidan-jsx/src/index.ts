@@ -1,5 +1,5 @@
+/// <reference path="../typings/babel.d.ts" />
 import * as t from '@babel/types';
-import { NodePath } from '@babel/traverse';
 import jsx from '@babel/plugin-syntax-jsx';
 import generate from '@babel/generator';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
@@ -13,19 +13,19 @@ export default (babel) => {
 		inherits: jsx,
 		visitor: {
 			Program: {
-				enter(path: NodePath<t.Program>, state: { key; filename; file }) {
+				enter(path: t.NodePath<t.Program>, state: { key; filename; file }) {
 					modifiy.insertFidanImport(path.node.body);
 					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
 					// console.log(generate(path.node).code);
 					path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
 					// console.log(generate(path.node).code);
 				}
-				// exit(path: NodePath<t.Program>, state: { key; filename; file }) {
+				// exit(path: t.NodePath<t.Program>, state: { key; filename; file }) {
 				// 	debugger;
 				// 	console.log(generate(path.node).code);
 				// }
 			},
-			VariableDeclarator(path: NodePath<t.VariableDeclarator>) {
+			VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
 				if (t.isIdentifier(path.node.init) || t.isLiteral(path.node.init)) {
 					if (t.isIdentifier(path.node.id)) {
 						const isDynamic = check.isPathDynamic(path);
@@ -53,7 +53,7 @@ export default (babel) => {
 					}
 				}
 			},
-			BinaryExpression(path: NodePath<t.BinaryExpression>) {
+			BinaryExpression(path: t.NodePath<t.BinaryExpression>) {
 				if (t.isIdentifier(path.node.left)) {
 					const isDynamic = check.isPathDynamic(path, path.node.left.name);
 					if (isDynamic) {
@@ -67,7 +67,7 @@ export default (babel) => {
 					}
 				}
 			},
-			CallExpression(path: NodePath<t.CallExpression>) {
+			CallExpression(path: t.NodePath<t.CallExpression>) {
 				if (!check.isFidanCall(path.node)) {
 					path.node.arguments.forEach((arg, index) => {
 						if (t.isIdentifier(arg)) {
@@ -83,9 +83,9 @@ export default (babel) => {
 					});
 				}
 			},
-			ExpressionStatement(path: NodePath<t.ExpressionStatement>) {
+			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
-					const leftIsDynamic = check.isPathDynamic(path, path.node.expression.left.name);
+					const leftIsDynamic = check.isPathDynamic(path, path.node.expression.left['name']);
 					if (leftIsDynamic) {
 						let rightIsDynamic = false;
 						if (t.isIdentifier(path.node.expression.right)) {
@@ -100,6 +100,15 @@ export default (babel) => {
 						}
 					}
 				}
+			},
+			TaggedTemplateExpression(path: t.NodePath<t.TaggedTemplateExpression>) {
+				path.node.quasi.expressions.forEach((expr, index) => {
+					if (t.isCallExpression(expr)) {
+						path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(
+							path.node.quasi.expressions[index]
+						);
+					}
+				});
 			}
 		}
 	};

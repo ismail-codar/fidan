@@ -15,7 +15,7 @@ function buildBabelConfig(plugin) {
 	};
 }
 
-const getDeclationsFromExports = (path: NodePath<t.Identifier>): NodePath[] => {
+const getDeclationsFromExports = (path: t.NodePath<t.Identifier>): NodePath[] => {
 	let parentPath: NodePath<any> = path.parentPath;
 	while (!t.isAssignmentExpression(parentPath.node)) {
 		parentPath = parentPath.parentPath;
@@ -43,7 +43,7 @@ const getExportPaths = (fileName: string): NodePath[] => {
 							debugger;
 							// localExports.push.apply(localExports, getDeclationsFromNamedExport(p.node));
 						},
-						Identifier(path: NodePath<t.Identifier>, file) {
+						Identifier(path: t.NodePath<t.Identifier>, file) {
 							const parentNode = path.parent;
 							if (path.node.name === 'exports') {
 								if (t.isMemberExpression(path.parent)) {

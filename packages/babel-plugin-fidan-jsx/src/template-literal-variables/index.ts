@@ -3,7 +3,7 @@ import { NodePath } from '@babel/traverse';
 import { globalData } from '../common';
 import { declarationPathInScope } from '../export-registry';
 
-const pushDynamicPaths = (path: NodePath<t.Node>) => {
+const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 	const dynamicPaths = globalData.dynamicPaths;
 	let declarationPath: NodePath<t.Node> = null;
 	if (!dynamicPaths.includes(path)) {
@@ -38,7 +38,7 @@ const pushDynamicPaths = (path: NodePath<t.Node>) => {
 	}
 };
 
-const findVariableReferencedPaths = (path: NodePath<t.Node>) => {
+const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 	if (t.isVariableDeclarator(path.node)) {
 		let bindingName = '';
 		if (!bindingName) {
@@ -82,7 +82,10 @@ export default (babel) => {
 	const dynamicPaths = globalData.dynamicPaths;
 	return {
 		visitor: {
-			TaggedTemplateExpression: (path: NodePath<t.TaggedTemplateExpression>, state: { key; filename; file }) => {
+			TaggedTemplateExpression: (
+				path: t.NodePath<t.TaggedTemplateExpression>,
+				state: { key; filename; file }
+			) => {
 				dynamicPaths.push(path);
 				path.node.quasi.expressions.forEach((expr) => {
 					if (t.isIdentifier(expr)) {
