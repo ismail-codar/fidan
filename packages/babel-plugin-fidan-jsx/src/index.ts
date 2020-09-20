@@ -16,7 +16,7 @@ export default (babel) => {
 				enter(path: t.NodePath<t.Program>, state: { key; filename; file }) {
 					modifiy.insertFidanImport(path.node.body);
 					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
-					// console.log(generate(path.node).code);
+					console.log(generate(path.node).code);
 					path.traverse(templateLiteralVariables(babel).visitor, state); // TODO move to jsxToTemplateLiteral
 					// console.log(generate(path.node).code);
 				}
@@ -104,9 +104,11 @@ export default (babel) => {
 			TaggedTemplateExpression(path: t.NodePath<t.TaggedTemplateExpression>) {
 				path.node.quasi.expressions.forEach((expr, index) => {
 					if (t.isCallExpression(expr)) {
-						path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(
-							path.node.quasi.expressions[index]
-						);
+						if (!check.isComponentCall(path, expr)) {
+							path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(
+								path.node.quasi.expressions[index]
+							);
+						}
 					}
 				});
 			}
