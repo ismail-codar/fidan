@@ -63,7 +63,7 @@ function createComponent(name, node) {
 		})
 	);
 
-	const children = null; // TODO t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), node.children);
+	const children = t.jsxFragment(t.jsxOpeningFragment(), t.jsxClosingFragment(), node.children);
 
 	return t.callExpression(t.identifier(name), [ attributes, children ]);
 }
@@ -98,6 +98,7 @@ const transforms = {
 		// Attributes
 		node.openingElement.attributes.forEach((attr) => {
 			if (attr.type === 'JSXSpreadAttribute') {
+				debugger;
 				throw new Error('JSXSpreadAttribute is not supported');
 			}
 
@@ -130,6 +131,7 @@ const transforms = {
 		addString(strings, keys, `</${node.closingElement.name.name}>`);
 	},
 	JSXSpreadChild() {
+		debugger;
 		throw new Error('JSXSpreadChild is not supported');
 	},
 	JSXText({ node, strings, keys }) {

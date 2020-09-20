@@ -1,10 +1,10 @@
-const CountItem = (props: { value: number }) => {
+const CountItem = (props) => {
 	const value = { props };
 	return <span>{value}</span>;
 };
 
-const CounterButton = (props: { text: string; onClick: () => void }) => {
-	return <button onClick={props.onClick}>{props.text}</button>;
+const CounterButton = ({ text, onClick }) => {
+	return <button onClick={onClick}>{text}</button>;
 };
 
 export const App = () => {
