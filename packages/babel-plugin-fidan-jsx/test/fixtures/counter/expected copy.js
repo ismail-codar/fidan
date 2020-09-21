@@ -5,7 +5,7 @@ const CountItem = (props) => {
 	return fidan.html`<span>${value}</span>`;
 };
 const CounterButton = ({ text, onClick }) => {
-	return fidan.html`<button on-click="${onClick}">${text}</button>`;
+	return fidan.html`<button onclick="${onClick}">${text}</button>`;
 };
 export const App = () => {
 	let count = fidan.value(0);

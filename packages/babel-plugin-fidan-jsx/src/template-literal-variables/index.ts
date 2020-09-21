@@ -45,7 +45,6 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 			bindingNames.push(path.node.id.name);
 		} else if (t.isObjectPattern(path.node.id)) {
 			path.node.id.properties.forEach((item) => {
-				// TODO is component props item ???
 				if (t.isObjectProperty(item) && t.isIdentifier(item.key)) {
 					bindingNames.push(item.key.name);
 				} else {

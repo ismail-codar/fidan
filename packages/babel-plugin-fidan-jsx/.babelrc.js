@@ -5,7 +5,7 @@ module.exports = {
 			process.env.IS_TEST ? './src/index.ts' : './build/index.js',
 			{
 				lowercaseEventNames: true,
-				eventNamesPrefix: 'on-'
+				eventNamesPrefix: 'on'
 			}
 		]
 	]

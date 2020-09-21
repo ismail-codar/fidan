@@ -23,8 +23,13 @@ const isPathDynamic = (path: t.NodePath<t.Node>, bindingName?: string) => {
 	}
 };
 
+const isEmptyLiteral = (literal: t.TemplateLiteral) => {
+	return literal.quasis.length == 1 && literal.quasis[0].value.raw === '';
+};
+
 export default {
 	isFidanCall,
 	isComponentCall,
-	isPathDynamic
+	isPathDynamic,
+	isEmptyLiteral
 };

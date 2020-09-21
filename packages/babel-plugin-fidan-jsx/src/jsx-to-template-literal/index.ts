@@ -2,6 +2,7 @@
 import * as t from '@babel/types';
 import generator from '@babel/generator';
 import { declare } from '@babel/helper-plugin-utils';
+import check from '../check';
 
 function trimString(string) {
 	return string.replace(/\s+/g, (match, offset, string) => {
@@ -164,9 +165,13 @@ function transformNode(node, opts) {
 function replaceNode(path, state) {
 	const transformed = transformNode(path.node, state.opts);
 	const literal = t.templateLiteral(transformed.quasis, transformed.expressions);
-	path.replaceWith(
-		t.taggedTemplateExpression(t.memberExpression(t.identifier('fidan'), t.identifier('html')), literal)
-	);
+	if (check.isEmptyLiteral(literal)) {
+		path.remove();
+	} else {
+		path.replaceWith(
+			t.taggedTemplateExpression(t.memberExpression(t.identifier('fidan'), t.identifier('html')), literal)
+		);
+	}
 }
 
 export default declare((api, options) => {
