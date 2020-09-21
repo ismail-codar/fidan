@@ -1,5 +1,6 @@
 const CountItem = (props) => {
-	const value = { props };
+	const { value } = props;
+	console.log(value);
 	return <span>{value}</span>;
 };
 

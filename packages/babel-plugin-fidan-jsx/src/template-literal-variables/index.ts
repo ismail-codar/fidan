@@ -40,38 +40,47 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 
 const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 	if (t.isVariableDeclarator(path.node)) {
-		let bindingName = '';
-		if (!bindingName) {
-			if (t.isIdentifier(path.node.id)) {
-				bindingName = path.node.id.name;
-			} else {
-				debugger;
-			}
+		const bindingNames = [];
+		if (t.isIdentifier(path.node.id)) {
+			bindingNames.push(path.node.id.name);
+		} else if (t.isObjectPattern(path.node.id)) {
+			path.node.id.properties.forEach((item) => {
+				// TODO is component props item ???
+				if (t.isObjectProperty(item) && t.isIdentifier(item.key)) {
+					bindingNames.push(item.key.name);
+				} else {
+					debugger;
+				}
+			});
+		} else {
+			debugger;
 		}
 		pushDynamicPaths(path);
-		const referencePaths = path.scope.bindings[bindingName].referencePaths.slice(0);
-		referencePaths.forEach((refPath) => {
-			if (t.isIdentifier(refPath.node)) {
-				const parentNode = refPath.parentPath.node;
-				if (t.isVariableDeclarator(parentNode)) {
-					pushDynamicPaths(refPath.parentPath);
-				} else if (t.isAssignmentExpression(parentNode)) {
-					if (t.isIdentifier(parentNode.left)) {
-						debugger;
-						const leftDeclarationPath = declarationPathInScope(
-							refPath.parentPath.scope,
-							parentNode.left.name
-						);
-						pushDynamicPaths(leftDeclarationPath);
+		bindingNames.forEach((bindingName) => {
+			const referencePaths = path.scope.bindings[bindingName].referencePaths.slice(0);
+			referencePaths.forEach((refPath) => {
+				if (t.isIdentifier(refPath.node)) {
+					const parentNode = refPath.parentPath.node;
+					if (t.isVariableDeclarator(parentNode)) {
+						pushDynamicPaths(refPath.parentPath);
+					} else if (t.isAssignmentExpression(parentNode)) {
+						if (t.isIdentifier(parentNode.left)) {
+							debugger;
+							const leftDeclarationPath = declarationPathInScope(
+								refPath.parentPath.scope,
+								parentNode.left.name
+							);
+							pushDynamicPaths(leftDeclarationPath);
+						} else {
+							debugger;
+						}
 					} else {
 						debugger;
 					}
 				} else {
 					debugger;
 				}
-			} else {
-				debugger;
-			}
+			});
 		});
 	} else {
 		debugger;
@@ -91,6 +100,22 @@ export default (babel) => {
 					if (t.isIdentifier(expr)) {
 						const bindingNodePath = path.scope.bindings[expr.name].path;
 						findVariableReferencedPaths(bindingNodePath);
+					} else if (t.isCallExpression(expr)) {
+						expr.arguments.forEach((arg) => {
+							if (t.isIdentifier(arg)) {
+								const bindingNodePath = path.scope.bindings[arg.name].path;
+								findVariableReferencedPaths(bindingNodePath);
+							} else if (t.isObjectExpression(arg)) {
+								arg.properties.forEach((prop) => {
+									if (t.isObjectProperty(prop) && t.isIdentifier(prop.value)) {
+										const bindingNodePath = path.scope.bindings[prop.value.name].path;
+										findVariableReferencedPaths(bindingNodePath);
+									} else if (t.isObjectMethod(prop) || t.isSpreadElement(prop)) {
+										debugger;
+									}
+								});
+							}
+						});
 					} else {
 						debugger;
 					}

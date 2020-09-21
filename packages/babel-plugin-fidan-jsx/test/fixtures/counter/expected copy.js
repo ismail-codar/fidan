@@ -1,9 +1,7 @@
 import * as fidan from '@fidanjs/runtime';
 
 const CountItem = (props) => {
-	const value = {
-		props
-	};
+	const value = props.value;
 	return fidan.html`<span>${value}</span>`;
 };
 const CounterButton = ({ text, onClick }) => {
