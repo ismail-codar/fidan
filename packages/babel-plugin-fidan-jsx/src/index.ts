@@ -100,7 +100,10 @@ export default (babel) => {
 						}
 					}
 				} else if (t.isUpdateExpression(path.node.expression)) {
-					if (t.isIdentifier(path.node.expression.argument)) {
+					if (
+						t.isIdentifier(path.node.expression.argument) &&
+						check.isPathDynamic(path, path.node.expression.argument.name)
+					) {
 						path.node.expression = modifiy.fidanValueSet(
 							t.assignmentExpression(
 								'=',
@@ -135,7 +138,7 @@ export default (babel) => {
 									// throw 'component call parameter must be objectExpression: ' + generate(arg).code;
 								}
 							});
-						} else {
+						} else if (t.isIdentifier(path.node.quasi.expressions[index])) {
 							path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(
 								path.node.quasi.expressions[index]
 							);

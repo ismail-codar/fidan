@@ -15,7 +15,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
 if (!RUN_SINGLE_TEST) {
-	RUN_SINGLE_TEST = 'counter';
+	RUN_SINGLE_TEST = 'array-1';
 }
 
 var exitCode = 0;
@@ -62,6 +62,7 @@ function runTest(dir) {
 	process.stdout.write('\n');
 
 	function normalizeLines(str: string) {
+		str = str.replace(/\t/g, ' ');
 		try {
 			str = format(str, {
 				parser: testFile.endsWith('.tsx') ? 'typescript' : 'babel'
