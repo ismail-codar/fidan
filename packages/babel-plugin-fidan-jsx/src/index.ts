@@ -26,7 +26,13 @@ export default (babel) => {
 				// }
 			},
 			VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-				if (t.isIdentifier(path.node.init) || t.isLiteral(path.node.init)) {
+				if (
+					t.isIdentifier(path.node.init) ||
+					t.isLiteral(path.node.init) ||
+					t.isArrayExpression(path.node.init) ||
+					t.isNewExpression(path.node.init) ||
+					t.isCallExpression(path.node.init)
+				) {
 					if (t.isIdentifier(path.node.id)) {
 						const isDynamic = check.isPathDynamic(path);
 						if (isDynamic) {

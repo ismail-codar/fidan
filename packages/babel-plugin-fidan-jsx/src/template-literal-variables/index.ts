@@ -115,6 +115,16 @@ export default (babel) => {
 								});
 							}
 						});
+						if (
+							t.isMemberExpression(expr.callee) &&
+							t.isIdentifier(expr.callee.object) &&
+							t.isIdentifier(expr.callee.property) &&
+							expr.callee.property.name === 'map'
+						) {
+							debugger;
+							const bindingNodePath = path.scope.bindings[expr.callee.object.name].path;
+							findVariableReferencedPaths(bindingNodePath);
+						}
 					} else {
 						debugger;
 					}

@@ -2,10 +2,9 @@ import * as t from '@babel/types';
 import generate from '@babel/generator';
 
 const fidanValueInit = (init: t.Node) => {
-	return t.callExpression(
-		t.memberExpression(t.identifier('fidan'), t.identifier(t.isArrayExpression(init) ? 'array' : 'value')),
-		[ init == null ? t.nullLiteral() : init as any ]
-	);
+	return t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('value')), [
+		init == null ? t.nullLiteral() : init as any
+	]);
 };
 
 const fidanValueSet = (expr: t.AssignmentExpression) => {
