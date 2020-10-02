@@ -75,7 +75,7 @@ const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
 	if (dataArray.$val['$overrided']) return;
 	dataArray.$val['$overrided'] = true;
 	[ 'copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift' ].forEach((method) => {
-		dataArray.$val[method] = function() {
+		dataArray[method] = function() {
 			const arr = dataArray.$val.slice(0);
 			const size1 = arr.length;
 			const ret = Array.prototype[method].apply(arr, arguments);

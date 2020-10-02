@@ -8,7 +8,11 @@ var value = function value(val) {
       return innerFn['$val'];
     } else {
       var updateAfter = Array.isArray(val);
-      if (!updateAfter) innerFn['$val'] = val;
+
+      if (!updateAfter) {
+        innerFn['$val'] = val;
+      }
+
       var depends = innerFn['c_depends'];
       if (depends.length) for (var i = 0; i < depends.length; i++) {
         if (depends[i].compute) {
@@ -21,7 +25,11 @@ var value = function value(val) {
           depends[i](innerFn.$val, innerFn);
         }
       }
-      if (updateAfter) innerFn['$val'] = val;
+
+      if (updateAfter) {
+        innerFn['$val'] = val;
+        overrideArrayMutators(innerFn);
+      }
     }
   };
 
@@ -70,6 +78,11 @@ var computed = function computed(fn, dependencies) {
     caller: cmp
   });
   cmp.$val = val;
+
+  if (Array.isArray(val)) {
+    overrideArrayMutators(cmp);
+  }
+
   var deps = autoTracks ? autoTracks : dependencies;
   autoTracks = null;
   cmp['compute'] = fn;
@@ -79,6 +92,28 @@ var computed = function computed(fn, dependencies) {
   }
 
   return cmp;
+};
+
+var overrideArrayMutators = function overrideArrayMutators(dataArray) {
+  if (!dataArray.size) dataArray.size = value(dataArray.$val.length);else dataArray.size(dataArray.$val.length);
+  if (dataArray.$val['$overrided']) return;
+  dataArray.$val['$overrided'] = true;
+  ['copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'].forEach(function (method) {
+    dataArray[method] = function () {
+      var arr = dataArray.$val.slice(0);
+      var size1 = arr.length;
+      var ret = Array.prototype[method].apply(arr, arguments);
+      var size2 = arr.length;
+      if (size1 !== size2) dataArray.size(size2); // TODO event based strategy for -> 'pop, push, shift, splice, unshift'
+
+      dataArray(arr, {
+        method: method,
+        caller: dataArray,
+        args: Array.prototype.slice.call(arguments)
+      });
+      return ret;
+    };
+  });
 };
 
 var injectToProperty = function injectToProperty(obj, propertyKey, val) {

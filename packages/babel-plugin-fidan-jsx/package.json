@@ -7,7 +7,8 @@
 		"build": "tsc",
 		"local": "yarn build && yalc publish && yalc push",
 		"test": "ts-node ./test",
-		"demo": "parcel src/_demo/index.html --no-cache"
+		"demo": "parcel src/_demo/index.html --no-cache",
+		"yalc-link": "yalc link @fidanjs/runtime"
 	},
 	"keywords": [],
 	"author": "",
