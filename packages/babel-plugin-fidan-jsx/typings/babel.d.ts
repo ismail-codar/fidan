@@ -7,7 +7,7 @@ declare module '@babel/types' {
 		node: T;
 		traverse: any;
 		scope: any;
-		parentPath: any;
-		parent: any;
+		parentPath: NodePath<t.Node>;
+		parent: t.Node;
 	}
 }

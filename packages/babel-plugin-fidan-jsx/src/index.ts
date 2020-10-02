@@ -31,7 +31,7 @@ export default (babel) => {
 					t.isLiteral(path.node.init) ||
 					t.isArrayExpression(path.node.init) ||
 					t.isNewExpression(path.node.init) ||
-					t.isCallExpression(path.node.init)
+					t.isCallExpression(path.node.init) // TODO or compute
 				) {
 					if (t.isIdentifier(path.node.id)) {
 						const isDynamic = check.isPathDynamic(path);
@@ -42,7 +42,18 @@ export default (babel) => {
 								rightIsDynamic = check.isPathDynamic(initDeclarationPath);
 							}
 							if (!rightIsDynamic) {
-								path.node.init = modifiy.fidanValueInit(path.node.init);
+								// if (check.isArrayVariableDeclarator(path.node)) {
+								// 	modifiy.insertArrayInit(path);
+								// }
+								let dynamics = [];
+								if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+									dynamics = check.dynamicArguments(path, path.node.init.arguments);
+								}
+								if (dynamics.length) {
+									path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
+								} else {
+									path.node.init = modifiy.fidanValueInit(path.node.init);
+								}
 							}
 						}
 					} else {
@@ -75,17 +86,10 @@ export default (babel) => {
 			},
 			CallExpression(path: t.NodePath<t.CallExpression>) {
 				if (!check.isFidanCall(path.node)) {
-					path.node.arguments.forEach((arg, index) => {
-						if (t.isIdentifier(arg)) {
-							const isDynamic = check.isPathDynamic(path, arg.name);
-							if (isDynamic) {
-								// TODO if function parameter is dynamic or not
-								path.node.arguments[index] = modifiy.fidanValAccess(arg);
-							}
-						} else {
-							// TODO ObjectExpression vs...
-							// debugger;
-						}
+					const dynamics = check.dynamicArguments(path, path.node.arguments);
+					dynamics.forEach((arg, index) => {
+						// TODO if function parameter is dynamic or not
+						path.node.arguments[index] = modifiy.fidanValAccess(arg);
 					});
 				}
 			},

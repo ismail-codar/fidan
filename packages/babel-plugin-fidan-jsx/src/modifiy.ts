@@ -1,5 +1,6 @@
 import * as t from '@babel/types';
 import generate from '@babel/generator';
+import check from './check';
 
 const fidanValueInit = (init: t.Node) => {
 	return t.callExpression(t.memberExpression(t.identifier('fidan'), t.identifier('value')), [
@@ -72,6 +73,25 @@ const insertFidanImport = (body: t.Node[]) => {
 	}
 };
 
+// export const insertArrayInit = (path: t.NodePath<t.VariableDeclarator>) => {
+// 	// TODO insert var _$arr1 = arr1().slice(0);
+// 	if (t.isIdentifier(path.node.id)) {
+// 		const arrName = path.node.id.name;
+// 		const arrSliceVariable = t.variableDeclaration('var', [
+// 			t.variableDeclarator(
+// 				t.identifier('_$' + arrName),
+// 				t.callExpression(
+// 					t.memberExpression(t.callExpression(t.identifier(arrName), []), t.identifier('slice')),
+// 					[]
+// 				)
+// 			)
+// 		]);
+// 		const parentBlock = check.parentBlockStatement(path);
+// 		const idx = parentBlock.parentStatement.body.indexOf(parentBlock.bodyItemPath.node as t.Statement);
+// 		parentBlock.parentStatement.body.splice(idx + 1, 0, arrSliceVariable);
+// 	}
+// };
+
 export default {
 	fidanValueInit,
 	fidanValueSet,
@@ -79,4 +99,5 @@ export default {
 	fidanValAccess,
 	insertFidanImport,
 	fidanComputedExpressionInit
+	// insertArrayInit
 };
