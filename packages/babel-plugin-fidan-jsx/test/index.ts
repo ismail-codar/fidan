@@ -14,9 +14,9 @@ process.env['IS_TEST'] = 'true';
 
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
-if (!RUN_SINGLE_TEST) {
-	RUN_SINGLE_TEST = 'array-1';
-}
+// if (!RUN_SINGLE_TEST) {
+// 	RUN_SINGLE_TEST = 'call-1';
+// }
 
 var exitCode = 0;
 

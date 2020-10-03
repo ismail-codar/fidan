@@ -9,5 +9,8 @@ declare module '@babel/types' {
 		scope: any;
 		parentPath: NodePath<t.Node>;
 		parent: t.Node;
+		additionalInfo: {
+			memberExpressions?: t.MemberExpression[];
+		};
 	}
 }

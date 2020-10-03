@@ -31,6 +31,8 @@ export default (babel) => {
 					t.isLiteral(path.node.init) ||
 					t.isArrayExpression(path.node.init) ||
 					t.isNewExpression(path.node.init) ||
+					t.isBinaryExpression(path.node.init) ||
+					t.isObjectExpression(path.node.init) ||
 					t.isCallExpression(path.node.init) // TODO or compute
 				) {
 					if (t.isIdentifier(path.node.id)) {
@@ -48,11 +50,35 @@ export default (babel) => {
 								let dynamics = [];
 								if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
 									dynamics = check.dynamicArguments(path, path.node.init.arguments);
+								} else if (t.isObjectExpression(path.node.init)) {
+									path.additionalInfo.memberExpressions.forEach((memberExpression) => {
+										const objectProperty = check.objectPropertyFromMemberExpression(
+											path.node.init as t.ObjectExpression,
+											memberExpression
+										);
+										if (t.isObjectProperty(objectProperty)) {
+											if (t.isLiteral(objectProperty.value)) {
+												objectProperty.value = modifiy.fidanValueInit(objectProperty.value);
+											} else {
+												// TODO objectProperty.value can be binaryExpression vs... fidanComputedExpressionInit
+												debugger;
+											}
+										} else {
+											debugger;
+										}
+									});
 								}
-								if (dynamics.length) {
+								if (
+									dynamics.length ||
+									t.isBinaryExpression(path.node.init) ||
+									t.isCallExpression(path.node.init)
+								) {
 									path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
 								} else {
-									path.node.init = modifiy.fidanValueInit(path.node.init);
+									if (!path.additionalInfo) {
+										//additionalInfo passed when template binding like obj.prop
+										path.node.init = modifiy.fidanValueInit(path.node.init);
+									}
 								}
 							}
 						}
@@ -64,6 +90,8 @@ export default (babel) => {
 					if (isDynamic) {
 						if (t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
 							path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
+						} else if (t.isObjectExpression(path.node.init)) {
+							debugger;
 						} else {
 							debugger;
 						}
@@ -89,7 +117,14 @@ export default (babel) => {
 					const dynamics = check.dynamicArguments(path, path.node.arguments);
 					dynamics.forEach((arg, index) => {
 						// TODO if function parameter is dynamic or not
-						path.node.arguments[index] = modifiy.fidanValAccess(arg);
+						if (t.isIdentifier(arg)) {
+							const isDynamic = check.isPathDynamic(path, arg.name);
+							if (isDynamic) {
+								path.node.arguments[index] = modifiy.fidanValAccess(arg);
+							}
+						} else if (!t.isLiteral(arg)) {
+							debugger;
+						}
 					});
 				}
 			},
@@ -148,10 +183,10 @@ export default (babel) => {
 									// throw 'component call parameter must be objectExpression: ' + generate(arg).code;
 								}
 							});
-						} else if (t.isIdentifier(path.node.quasi.expressions[index])) {
-							path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(
-								path.node.quasi.expressions[index]
-							);
+						} else {
+							if (!check.nonComputedCallExpression(expr)) {
+								path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
+							}
 						}
 					}
 				});

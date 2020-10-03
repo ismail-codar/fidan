@@ -73,24 +73,17 @@ const insertFidanImport = (body: t.Node[]) => {
 	}
 };
 
-// export const insertArrayInit = (path: t.NodePath<t.VariableDeclarator>) => {
-// 	// TODO insert var _$arr1 = arr1().slice(0);
-// 	if (t.isIdentifier(path.node.id)) {
-// 		const arrName = path.node.id.name;
-// 		const arrSliceVariable = t.variableDeclaration('var', [
-// 			t.variableDeclarator(
-// 				t.identifier('_$' + arrName),
-// 				t.callExpression(
-// 					t.memberExpression(t.callExpression(t.identifier(arrName), []), t.identifier('slice')),
-// 					[]
-// 				)
-// 			)
-// 		]);
-// 		const parentBlock = check.parentBlockStatement(path);
-// 		const idx = parentBlock.parentStatement.body.indexOf(parentBlock.bodyItemPath.node as t.Statement);
-// 		parentBlock.parentStatement.body.splice(idx + 1, 0, arrSliceVariable);
-// 	}
-// };
+export const additionInfoToPath = (path: t.NodePath<t.Node>, info: t.Node) => {
+	if (!path.additionalInfo) {
+		path.additionalInfo = {};
+		if (t.isMemberExpression(info)) {
+			if (!path.additionalInfo.memberExpressions) {
+				path.additionalInfo.memberExpressions = [];
+			}
+			path.additionalInfo.memberExpressions.push(info);
+		}
+	}
+};
 
 export default {
 	fidanValueInit,
@@ -98,6 +91,6 @@ export default {
 	memberVal,
 	fidanValAccess,
 	insertFidanImport,
-	fidanComputedExpressionInit
-	// insertArrayInit
+	fidanComputedExpressionInit,
+	additionInfoToPath
 };

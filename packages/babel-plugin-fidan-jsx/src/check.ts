@@ -63,6 +63,43 @@ const parentBlockStatement = (
 	}
 };
 
+const objectPropertyFromMemberExpression = (
+	objectExpression: t.ObjectExpression,
+	memberExpression: t.MemberExpression
+): t.ObjectMethod | t.ObjectProperty | t.SpreadElement => {
+	let objectProperty: t.ObjectMethod | t.ObjectProperty | t.SpreadElement = null;
+	while (memberExpression) {
+		if (t.isIdentifier(memberExpression.property)) {
+			const memberPropertyName = memberExpression.property.name;
+			objectProperty = objectExpression.properties.find((prop) => {
+				if (t.isSpreadElement(prop)) {
+					debugger;
+				} else {
+					if (t.isIdentifier(prop.key)) {
+						return prop.key.name === memberPropertyName;
+					} else {
+						debugger;
+					}
+				}
+				return null;
+			});
+		}
+		if (t.isMemberExpression(memberExpression.object)) {
+			memberExpression = memberExpression.object;
+		} else {
+			break;
+		}
+	}
+	return objectProperty;
+};
+
+export const nonComputedCallExpression = (expr: t.CallExpression) => {
+	// TODO improve this
+	return (
+		t.isMemberExpression(expr.callee) && t.isIdentifier(expr.callee.property) && expr.callee.property.name === 'map'
+	);
+};
+
 export default {
 	isFidanCall,
 	isComponentCall,
@@ -70,5 +107,7 @@ export default {
 	isEmptyLiteral,
 	dynamicArguments,
 	isArrayVariableDeclarator,
-	parentBlockStatement
+	parentBlockStatement,
+	objectPropertyFromMemberExpression,
+	nonComputedCallExpression
 };

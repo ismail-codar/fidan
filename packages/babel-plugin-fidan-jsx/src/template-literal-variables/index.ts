@@ -2,6 +2,7 @@ import * as t from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { globalData } from '../common';
 import { declarationPathInScope } from '../export-registry';
+import modifiy from '../modifiy';
 
 const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 	const dynamicPaths = globalData.dynamicPaths;
@@ -101,10 +102,7 @@ export default (babel) => {
 						findVariableReferencedPaths(bindingNodePath);
 					} else if (t.isCallExpression(expr)) {
 						expr.arguments.forEach((arg) => {
-							if (t.isIdentifier(arg)) {
-								const bindingNodePath = path.scope.bindings[arg.name].path;
-								findVariableReferencedPaths(bindingNodePath);
-							} else if (t.isObjectExpression(arg)) {
+							if (t.isObjectExpression(arg)) {
 								arg.properties.forEach((prop) => {
 									if (t.isObjectProperty(prop) && t.isIdentifier(prop.value)) {
 										const bindingNodePath = path.scope.bindings[prop.value.name].path;
@@ -121,9 +119,16 @@ export default (babel) => {
 							t.isIdentifier(expr.callee.property) &&
 							expr.callee.property.name === 'map'
 						) {
-							debugger;
 							const bindingNodePath = path.scope.bindings[expr.callee.object.name].path;
 							findVariableReferencedPaths(bindingNodePath);
+						}
+					} else if (t.isMemberExpression(expr)) {
+						if (t.isIdentifier(expr.object)) {
+							const bindingNodePath = path.scope.bindings[expr.object.name].path;
+							modifiy.additionInfoToPath(bindingNodePath, expr);
+							findVariableReferencedPaths(bindingNodePath);
+						} else {
+							debugger;
 						}
 					} else {
 						debugger;

@@ -2,10 +2,10 @@ import * as fidan from '@fidanjs/runtime';
 
 var box = fidan.html`${Box(
 	{},
-	html`${shouldShowAnswer(user)
+	fidan.html`${shouldShowAnswer(user)
 		? fidan.html`${Answer(
 				{
-					value: false
+					value: fidan.value(false)
 				},
 				fidan.html`no`
 			)}`
