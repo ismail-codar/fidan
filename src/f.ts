@@ -2,6 +2,29 @@ import { FidanValue, ComputionMethodArguments, FidanValueFn, FidanArray } from '
 const simpleMutationMethods = [ 'pop', 'push', 'shift', 'splice', 'unshift' ];
 const complexMutationMethods = [ 'copyWithin', 'fill', 'reverse', 'sort' ];
 const mutationMethods = simpleMutationMethods.concat(complexMutationMethods);
+const nonMutationmethods = [
+	'concat',
+	'entries',
+	'every',
+	'filter',
+	'find',
+	'findIndex',
+	'forEach',
+	'from',
+	'includes',
+	'indexOf',
+	'isArray',
+	'join',
+	'keys',
+	'lastIndexOf',
+	'map',
+	'reduce',
+	'reduceRight',
+	'slice',
+	'some',
+	'toString',
+	'valueOf'
+];
 
 let autoTracks: any[] = null;
 
@@ -27,7 +50,6 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 				}
 			if (updateAfter) {
 				innerFn['$val'] = val;
-				createFidanArray(innerFn);
 			}
 		}
 	};
@@ -47,11 +69,7 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 	};
 
 	if (Array.isArray(val)) {
-		innerFn['map'] = (renderFn, renderMode) => ({
-			arr: innerFn,
-			renderFn,
-			renderMode
-		});
+		createFidanArray(innerFn);
 	}
 
 	return innerFn;
@@ -78,9 +96,16 @@ export const createFidanArray = (dataArray: FidanArray<any[]>) => {
 	if (!dataArray.size) dataArray.size = value(dataArray.$val.length);
 	else dataArray.size(dataArray.$val.length);
 
-	Object.assign(dataArray, dataArray.$val);
+	nonMutationmethods.forEach((method) => {
+		dataArray[method] = (...args) => dataArray.$val[method].apply(dataArray.$val, args);
+	});
+	dataArray['map'] = (renderFn, renderMode) => ({
+		arr: dataArray,
+		renderFn,
+		renderMode
+	});
 	Object.defineProperty(dataArray, 'length', {
-		configurable: false,
+		configurable: true,
 		enumerable: true,
 		get: () => {
 			return dataArray.$val.length;

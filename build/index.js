@@ -1,6 +1,7 @@
 var simpleMutationMethods = ['pop', 'push', 'shift', 'splice', 'unshift'];
 var complexMutationMethods = ['copyWithin', 'fill', 'reverse', 'sort'];
 var mutationMethods = simpleMutationMethods.concat(complexMutationMethods);
+var nonMutationmethods = ['concat', 'entries', 'every', 'filter', 'find', 'findIndex', 'forEach', 'from', 'includes', 'indexOf', 'isArray', 'join', 'keys', 'lastIndexOf', 'map', 'reduce', 'reduceRight', 'slice', 'some', 'toString', 'valueOf'];
 var autoTracks = null;
 var value = function value(val) {
   if (val && val.hasOwnProperty('$val')) return val;
@@ -31,7 +32,6 @@ var value = function value(val) {
 
       if (updateAfter) {
         innerFn['$val'] = val;
-        createFidanArray(innerFn);
       }
     }
   };
@@ -63,13 +63,7 @@ var value = function value(val) {
   };
 
   if (Array.isArray(val)) {
-    innerFn['map'] = function (renderFn, renderMode) {
-      return {
-        arr: innerFn,
-        renderFn: renderFn,
-        renderMode: renderMode
-      };
-    };
+    createFidanArray(innerFn);
   }
 
   return innerFn;
@@ -100,9 +94,22 @@ var createFidanArray = function createFidanArray(dataArray) {
   if (dataArray.$val['$overrided']) return;
   dataArray.$val['$overrided'] = true;
   if (!dataArray.size) dataArray.size = value(dataArray.$val.length);else dataArray.size(dataArray.$val.length);
-  Object.assign(dataArray, dataArray.$val);
+  nonMutationmethods.forEach(function (method) {
+    dataArray[method] = function () {
+      return dataArray.$val[method].apply(dataArray.$val, [].slice.call(arguments));
+    };
+  });
+
+  dataArray['map'] = function (renderFn, renderMode) {
+    return {
+      arr: dataArray,
+      renderFn: renderFn,
+      renderMode: renderMode
+    };
+  };
+
   Object.defineProperty(dataArray, 'length', {
-    configurable: false,
+    configurable: true,
     enumerable: true,
     get: function get() {
       return dataArray.$val.length;
