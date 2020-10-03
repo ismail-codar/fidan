@@ -1,3 +1,6 @@
+var simpleMutationMethods = ['pop', 'push', 'shift', 'splice', 'unshift'];
+var complexMutationMethods = ['copyWithin', 'fill', 'reverse', 'sort'];
+var mutationMethods = simpleMutationMethods.concat(complexMutationMethods);
 var autoTracks = null;
 var value = function value(val) {
   if (val && val.hasOwnProperty('$val')) return val;
@@ -28,7 +31,7 @@ var value = function value(val) {
 
       if (updateAfter) {
         innerFn['$val'] = val;
-        overrideArrayMutators(innerFn);
+        createFidanArray(innerFn);
       }
     }
   };
@@ -80,7 +83,7 @@ var computed = function computed(fn, dependencies) {
   cmp.$val = val;
 
   if (Array.isArray(val)) {
-    overrideArrayMutators(cmp);
+    createFidanArray(cmp);
   }
 
   var deps = autoTracks ? autoTracks : dependencies;
@@ -93,18 +96,28 @@ var computed = function computed(fn, dependencies) {
 
   return cmp;
 };
-
-var overrideArrayMutators = function overrideArrayMutators(dataArray) {
-  if (!dataArray.size) dataArray.size = value(dataArray.$val.length);else dataArray.size(dataArray.$val.length);
+var createFidanArray = function createFidanArray(dataArray) {
   if (dataArray.$val['$overrided']) return;
   dataArray.$val['$overrided'] = true;
-  ['copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift'].forEach(function (method) {
+  if (!dataArray.size) dataArray.size = value(dataArray.$val.length);else dataArray.size(dataArray.$val.length);
+  Object.assign(dataArray, dataArray.$val);
+  Object.defineProperty(dataArray, 'length', {
+    configurable: false,
+    enumerable: true,
+    get: function get() {
+      return dataArray.$val.length;
+    },
+    set: function set(v) {
+      return dataArray.$val.length = v;
+    }
+  });
+  mutationMethods.forEach(function (method) {
     dataArray[method] = function () {
       var arr = dataArray.$val.slice(0);
       var size1 = arr.length;
       var ret = Array.prototype[method].apply(arr, arguments);
       var size2 = arr.length;
-      if (size1 !== size2) dataArray.size(size2); // TODO event based strategy for -> 'pop, push, shift, splice, unshift'
+      if (size1 !== size2) dataArray.size(size2); // TODO event based strategy for -> simpleMutationMethods
 
       dataArray(arr, {
         method: method,
@@ -506,7 +519,7 @@ var reuseNodes = function reuseNodes(parent, renderedValues, data, createFn, noO
   }
 };
 
-// https://github.com/ismail-codar/fidan/blob/master/packages/babel-plugin-fidan-jsx/test/fixtures/call-instance-1/expected.js
+// https://github.com/ismail-codar/fidan/blob/master/src/html.ts
 var TEXT = 1;
 var DOM = 2;
 var FN = 4; // "function" && !isDynamic
@@ -705,6 +718,7 @@ var arrayMap = function arrayMap(arr, parentDom, nextElement, renderCallback, re
 
 exports.arrayMap = arrayMap;
 exports.computed = computed;
+exports.createFidanArray = createFidanArray;
 exports.debounce = debounce;
 exports.html = html;
 exports.htmlProps = htmlProps;

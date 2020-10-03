@@ -1,8 +1,7 @@
-// https://github.com/ismail-codar/fidan/blob/master/packages/babel-plugin-fidan-jsx/test/fixtures/call-instance-1/expected.js
 // https://github.com/ismail-codar/fidan/blob/master/src/html.ts
 
 import { computed } from './f';
-import { FidanValue } from '.';
+import { FidanValue } from './types';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 

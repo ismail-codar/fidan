@@ -1,4 +1,7 @@
-import { FidanValue, ComputionMethodArguments, FidanValueFn, FidanArray } from '.';
+import { FidanValue, ComputionMethodArguments, FidanValueFn, FidanArray } from './types';
+const simpleMutationMethods = [ 'pop', 'push', 'shift', 'splice', 'unshift' ];
+const complexMutationMethods = [ 'copyWithin', 'fill', 'reverse', 'sort' ];
+const mutationMethods = simpleMutationMethods.concat(complexMutationMethods);
 
 let autoTracks: any[] = null;
 
@@ -24,7 +27,7 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
 				}
 			if (updateAfter) {
 				innerFn['$val'] = val;
-				overrideArrayMutators(innerFn);
+				createFidanArray(innerFn);
 			}
 		}
 	};
@@ -60,7 +63,7 @@ export const computed = <T>(fn: (val: T, opt?: ComputionMethodArguments<T>) => a
 	const val = fn(undefined, { caller: cmp } as any);
 	cmp.$val = val;
 	if (Array.isArray(val)) {
-		overrideArrayMutators(cmp as any);
+		createFidanArray(cmp as any);
 	}
 	const deps = autoTracks ? autoTracks : dependencies;
 	autoTracks = null;
@@ -69,19 +72,29 @@ export const computed = <T>(fn: (val: T, opt?: ComputionMethodArguments<T>) => a
 	return cmp;
 };
 
-const overrideArrayMutators = (dataArray: FidanArray<any[]>) => {
-	if (!dataArray.size) dataArray.size = value(dataArray.$val.length);
-	else dataArray.size(dataArray.$val.length);
+export const createFidanArray = (dataArray: FidanArray<any[]>) => {
 	if (dataArray.$val['$overrided']) return;
 	dataArray.$val['$overrided'] = true;
-	[ 'copyWithin', 'fill', 'pop', 'push', 'reverse', 'shift', 'sort', 'splice', 'unshift' ].forEach((method) => {
+	if (!dataArray.size) dataArray.size = value(dataArray.$val.length);
+	else dataArray.size(dataArray.$val.length);
+
+	Object.assign(dataArray, dataArray.$val);
+	Object.defineProperty(dataArray, 'length', {
+		configurable: false,
+		enumerable: true,
+		get: () => {
+			return dataArray.$val.length;
+		},
+		set: (v) => (dataArray.$val.length = v)
+	});
+	mutationMethods.forEach((method) => {
 		dataArray[method] = function() {
 			const arr = dataArray.$val.slice(0);
 			const size1 = arr.length;
 			const ret = Array.prototype[method].apply(arr, arguments);
 			const size2 = arr.length;
 			if (size1 !== size2) dataArray.size(size2);
-			// TODO event based strategy for -> 'pop, push, shift, splice, unshift'
+			// TODO event based strategy for -> simpleMutationMethods
 			dataArray(arr, {
 				method,
 				caller: dataArray,

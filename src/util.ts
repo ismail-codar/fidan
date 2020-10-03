@@ -1,5 +1,5 @@
 import { value } from './f';
-import { FidanValue, FidanArray, DataArrayEvents, ComputionMethodArguments } from '.';
+import { FidanValue, FidanArray, DataArrayEvents, ComputionMethodArguments } from './types';
 
 export const injectToProperty = (obj: Object, propertyKey: string, val: FidanValue<any>) => {
 	// const descr = Object.getOwnPropertyDescriptor(obj, propertyKey);
