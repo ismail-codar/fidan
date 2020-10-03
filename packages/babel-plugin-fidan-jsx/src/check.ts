@@ -93,8 +93,12 @@ const objectPropertyFromMemberExpression = (
 	return objectProperty;
 };
 
-export const nonComputedCallExpression = (expr: t.CallExpression) => {
+export const nonComputedCallExpression = (path: t.NodePath, expr: t.CallExpression) => {
 	// TODO improve this
+	const dynamics = dynamicArguments(path, expr.arguments);
+	if (dynamics.length === 0) {
+		return true;
+	}
 	return (
 		t.isMemberExpression(expr.callee) && t.isIdentifier(expr.callee.property) && expr.callee.property.name === 'map'
 	);

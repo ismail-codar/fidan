@@ -10,9 +10,7 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 	if (!dynamicPaths.includes(path)) {
 		dynamicPaths.push(path);
 		if (t.isVariableDeclarator(path.node)) {
-			if (t.isIdentifier(path.node.init)) {
-				debugger;
-			} else if (t.isBinaryExpression(path.node.init)) {
+			if (t.isBinaryExpression(path.node.init)) {
 				if (t.isIdentifier(path.node.init.left)) {
 					declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.left.name);
 					pushDynamicPaths(declarationPath);
@@ -21,7 +19,7 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 					declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.right.name);
 					pushDynamicPaths(declarationPath);
 				}
-			} else if (t.isCallExpression(path.node.init)) {
+			} else if (t.isCallExpression(path.node.init) || t.isNewExpression(path.node.init)) {
 				path.node.init.arguments.forEach((arg) => {
 					if (t.isIdentifier(arg)) {
 						declarationPath = declarationPathInScope(path.parentPath.scope, arg.name);
@@ -30,7 +28,11 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 						debugger;
 					}
 				});
-			} else if (!t.isLiteral(path.node.init)) {
+			} else if (
+				!t.isLiteral(path.node.init) &&
+				!t.isArrayExpression(path.node.init) &&
+				!t.isObjectExpression(path.node.init)
+			) {
 				debugger;
 			}
 		} else {
@@ -65,7 +67,6 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 						pushDynamicPaths(refPath.parentPath);
 					} else if (t.isAssignmentExpression(parentNode)) {
 						if (t.isIdentifier(parentNode.left)) {
-							debugger;
 							const leftDeclarationPath = declarationPathInScope(
 								refPath.parentPath.scope,
 								parentNode.left.name
@@ -74,7 +75,7 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 						} else {
 							debugger;
 						}
-					} else {
+					} else if (!t.isMemberExpression(parentNode)) {
 						debugger;
 					}
 				} else {
@@ -82,9 +83,10 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 				}
 			});
 		});
-	} else {
-		debugger;
 	}
+	// else {
+	// debugger;
+	// }
 };
 
 export default (babel) => {

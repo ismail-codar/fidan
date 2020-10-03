@@ -184,7 +184,7 @@ export default (babel) => {
 								}
 							});
 						} else {
-							if (!check.nonComputedCallExpression(expr)) {
+							if (!check.nonComputedCallExpression(path, expr)) {
 								path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
 							}
 						}
