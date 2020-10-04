@@ -3,16 +3,10 @@ export const App = () => {
 	let todos = fidan.value([
 		{
 			title: fidan.value('Todo1')
-		},
-		{
-			title: fidan.value('Todo2')
-		},
-		{
-			title: fidan.value('Todo3')
 		}
 	]);
 	todos.push({
-		title: fidan.value('Todo4')
+		title: fidan.value('Todo2')
 	});
 	return fidan.html`<div><ul>${todos.map(
 		(todo) =>
