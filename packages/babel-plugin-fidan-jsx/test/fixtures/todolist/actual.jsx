@@ -1,16 +1,6 @@
 export const App = () => {
 	let todos = [ { title: 'Todo1' }, { title: 'Todo2' }, { title: 'Todo3' } ];
-
-	setTimeout(() => {
-		todos.push({ title: 'Todo4' });
-
-		setTimeout(() => {
-			const filtered = todos.filter((todo, index) => {
-				return index % 2 === 0;
-			});
-			todos = filtered;
-		}, 2000);
-	}, 2000);
+	todos.push({ title: 'Todo4' });
 
 	return (
 		<div>
