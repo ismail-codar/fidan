@@ -6,7 +6,7 @@ import jsxToTemplateLiteral from './jsx-to-template-literal';
 import templateLiteralVariables from './template-literal-variables';
 import modifiy from './modifiy';
 import check from './check';
-import { declarationPathInScope } from './export-registry';
+import { declarationPathInScope, variableBindingInScope } from './export-registry';
 
 export default (babel) => {
 	return {
@@ -61,10 +61,11 @@ export default (babel) => {
 												objectProperty.value = modifiy.fidanValueInit(objectProperty.value);
 											} else {
 												// TODO objectProperty.value can be binaryExpression vs... fidanComputedExpressionInit
-												debugger;
+
+												check.unknownState(path);
 											}
 										} else {
-											debugger;
+											check.unknownState(path);
 										}
 									});
 								}
@@ -83,7 +84,7 @@ export default (babel) => {
 							}
 						}
 					} else {
-						debugger;
+						check.unknownState(path);
 					}
 				} else if (!t.isArrowFunctionExpression(path.node.init)) {
 					const isDynamic = check.isPathDynamic(path);
@@ -91,9 +92,9 @@ export default (babel) => {
 						if (t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
 							path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
 						} else if (t.isObjectExpression(path.node.init)) {
-							debugger;
+							check.unknownState(path);
 						} else {
-							debugger;
+							check.unknownState(path);
 						}
 					}
 				}
@@ -123,9 +124,47 @@ export default (babel) => {
 								path.node.arguments[index] = modifiy.fidanValAccess(arg);
 							}
 						} else if (!t.isLiteral(arg)) {
-							debugger;
+							check.unknownState(path);
 						}
 					});
+				}
+			},
+			ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
+				const parentArrayVariableDeclaratorPath = check.parentPathLoop<
+					t.VariableDeclarator
+				>(path, (checkPath) => t.isVariableDeclarator(checkPath.node));
+				if (parentArrayVariableDeclaratorPath && check.isPathDynamic(parentArrayVariableDeclaratorPath)) {
+					debugger;
+					// TODO check is dynamic property......
+					// path.node.value = modifiy.fidanValueInit(path.node.value);
+				}
+			},
+			MemberExpression(path: t.NodePath<t.MemberExpression>) {
+				// TODO move to -> template-literal-variables
+				let taggedTemplateHtmlCallExpressionPath = check.parentPathLoop<
+					t.TaggedTemplateExpression
+				>(path, (checkPath) => check.isFidanTaggedTemplateHtmlCallExpression(checkPath));
+				if (taggedTemplateHtmlCallExpressionPath) {
+					if (taggedTemplateHtmlCallExpressionPath.node.quasi.expressions.length === 1) {
+						if (t.isCallExpression(taggedTemplateHtmlCallExpressionPath.node.quasi.expressions[0])) {
+							const callee = taggedTemplateHtmlCallExpressionPath.node.quasi.expressions[0].callee;
+							if (
+								t.isMemberExpression(callee) &&
+								t.isIdentifier(callee.object) &&
+								t.isIdentifier(callee.property) &&
+								callee.property.name === 'map'
+							) {
+								//todolist -> todo.title
+								const parentArrayVariableDeclaratorPath = taggedTemplateHtmlCallExpressionPath.scope
+									.bindings[callee.object.name].path as t.NodePath<t.VariableDeclarator>;
+								// parentArrayVariableDeclaratorPath.additionalInfo.memberExpressions.push(path.node);
+							} else {
+								check.unknownState(taggedTemplateHtmlCallExpressionPath);
+							}
+						}
+					} else {
+						check.unknownState(taggedTemplateHtmlCallExpressionPath);
+					}
 				}
 			},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
@@ -175,11 +214,11 @@ export default (babel) => {
 												prop.value = modifiy.fidanValueInit(prop.value);
 											}
 										} else {
-											debugger;
+											check.unknownState(path);
 										}
 									});
 								} else {
-									debugger;
+									check.unknownState(path);
 									// throw 'component call parameter must be objectExpression: ' + generate(arg).code;
 								}
 							});

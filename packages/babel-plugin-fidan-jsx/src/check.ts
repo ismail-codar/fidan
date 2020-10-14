@@ -2,9 +2,12 @@ import * as t from '@babel/types';
 import { globalData } from './common';
 import { declarationPathInScope } from './export-registry';
 
-const isFidanCall = (node: t.CallExpression) => {
+const isFidanCall = (node: t.Expression) => {
 	return (
-		t.isMemberExpression(node.callee) && t.isIdentifier(node.callee.object) && node.callee.object.name === 'fidan'
+		t.isCallExpression(node) &&
+		t.isMemberExpression(node.callee) &&
+		t.isIdentifier(node.callee.object) &&
+		node.callee.object.name === 'fidan'
 	);
 };
 
@@ -12,6 +15,14 @@ const isComponentCall = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.C
 	// TODO check if calling function returns html
 	return t.isIdentifier(expr.callee) && expr.callee.name[0] === expr.callee.name[0].toUpperCase();
 };
+
+const isFidanTaggedTemplateHtmlCallExpression = (path: t.NodePath<t.Node>) =>
+	t.isTaggedTemplateExpression(path.node) &&
+	t.isMemberExpression(path.node.tag) &&
+	t.isIdentifier(path.node.tag.object) &&
+	path.node.tag.object.name === 'fidan' &&
+	t.isIdentifier(path.node.tag.property) &&
+	path.node.tag.property.name === 'html';
 
 const isPathDynamic = (path: t.NodePath<t.Node>, bindingName?: string) => {
 	const dynamicPaths = globalData.dynamicPaths;
@@ -103,8 +114,26 @@ export const nonComputedCallExpression = (path: t.NodePath, expr: t.CallExpressi
 		t.isMemberExpression(expr.callee) && t.isIdentifier(expr.callee.property) && expr.callee.property.name === 'map'
 	);
 };
+const parentPathLoop = <T>(path: t.NodePath<t.Node>, check: (path: t.NodePath<t.Node>) => boolean): t.NodePath<T> => {
+	while (true) {
+		if (path == null || t.isProgram(path.node)) {
+			return null;
+		}
+		if (check(path)) {
+			return path as any;
+		}
+		path = path.parentPath;
+	}
+
+	return null;
+};
+
+const unknownState = (path: t.NodePath<t.Node>) => {
+	// debugger;
+};
 
 export default {
+	unknownState,
 	isFidanCall,
 	isComponentCall,
 	isPathDynamic,
@@ -113,5 +142,7 @@ export default {
 	isArrayVariableDeclarator,
 	parentBlockStatement,
 	objectPropertyFromMemberExpression,
-	nonComputedCallExpression
+	nonComputedCallExpression,
+	parentPathLoop,
+	isFidanTaggedTemplateHtmlCallExpression
 };

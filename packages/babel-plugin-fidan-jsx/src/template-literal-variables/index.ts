@@ -3,6 +3,7 @@ import { NodePath } from '@babel/traverse';
 import { globalData } from '../common';
 import { declarationPathInScope } from '../export-registry';
 import modifiy from '../modifiy';
+import check from '../check';
 
 const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 	const dynamicPaths = globalData.dynamicPaths;
@@ -25,7 +26,7 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 						declarationPath = declarationPathInScope(path.parentPath.scope, arg.name);
 						pushDynamicPaths(declarationPath);
 					} else {
-						debugger;
+						check.unknownState(path);
 					}
 				});
 			} else if (
@@ -33,10 +34,10 @@ const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 				!t.isArrayExpression(path.node.init) &&
 				!t.isObjectExpression(path.node.init)
 			) {
-				debugger;
+				check.unknownState(path);
 			}
 		} else {
-			debugger;
+			check.unknownState(path);
 		}
 	}
 };
@@ -51,11 +52,11 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 				if (t.isObjectProperty(item) && t.isIdentifier(item.key)) {
 					bindingNames.push(item.key.name);
 				} else {
-					debugger;
+					check.unknownState(path);
 				}
 			});
 		} else {
-			debugger;
+			check.unknownState(path);
 		}
 		pushDynamicPaths(path);
 		bindingNames.forEach((bindingName) => {
@@ -73,13 +74,13 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 							);
 							pushDynamicPaths(leftDeclarationPath);
 						} else {
-							debugger;
+							check.unknownState(path);
 						}
 					} else if (!t.isMemberExpression(parentNode)) {
-						debugger;
+						check.unknownState(path);
 					}
 				} else {
-					debugger;
+					check.unknownState(path);
 				}
 			});
 		});
@@ -110,7 +111,7 @@ export default (babel) => {
 										const bindingNodePath = path.scope.bindings[prop.value.name].path;
 										findVariableReferencedPaths(bindingNodePath);
 									} else if (t.isObjectMethod(prop) || t.isSpreadElement(prop)) {
-										debugger;
+										check.unknownState(path);
 									}
 								});
 							}
@@ -130,10 +131,10 @@ export default (babel) => {
 							modifiy.additionInfoToPath(bindingNodePath, expr);
 							findVariableReferencedPaths(bindingNodePath);
 						} else {
-							debugger;
+							check.unknownState(path);
 						}
 					} else {
-						debugger;
+						check.unknownState(path);
 					}
 				});
 			}

@@ -74,6 +74,8 @@ const insertFidanImport = (body: t.Node[]) => {
 };
 
 export const additionInfoToPath = (path: t.NodePath<t.Node>, info: t.Node) => {
+	// object-property-1
+	// which members are dynamic on dynamic object variable
 	if (!path.additionalInfo) {
 		path.additionalInfo = {};
 		if (t.isMemberExpression(info)) {
