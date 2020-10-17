@@ -3,4 +3,4 @@ import { App } from './todolist/App';
 
 const app = App();
 
-document.getElementById('main').appendChild(app);
+document.getElementById('main').appendChild(app as any);

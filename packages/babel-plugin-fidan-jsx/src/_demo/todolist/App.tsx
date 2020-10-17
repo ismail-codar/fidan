@@ -1,20 +1,18 @@
 export const App = () => {
-	let todos = [ { title: 'Todo1' }, { title: 'Todo2' }, { title: 'Todo3' } ];
+	let newTodo = '';
+	let todos: { title: string; completed: boolean }[] = [];
 
-	setTimeout(() => {
-		todos.push({ title: 'Todo4' });
-
-		setTimeout(() => {
-			const filtered = todos.filter((todo, index) => {
-				return index % 2 === 0;
-			});
-			todos = filtered;
-		}, 2000);
-	}, 2000);
+	const handleInput = (e) => {
+		if (e.keyCode === 13) {
+			todos.push({ title: e.target.value, completed: false });
+			newTodo = '';
+		}
+	};
 
 	return (
 		<div>
-			<ul>{todos.map((todo) => <li className={'cls_' + todo.title}>{todo.title}</li>)}</ul>
+			<input onKeyDown={handleInput} value={newTodo} />
+			<ul>{todos.map((todo) => <li className={todo.completed ? 'todo-completed' : ''}>{todo.title}</li>)}</ul>
 		</div>
 	);
 };

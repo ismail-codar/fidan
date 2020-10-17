@@ -149,10 +149,10 @@ export default (babel) => {
 					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.property) // TODO property.name mutation method check
 				) {
 					// todolist -> todos.push({...
-					parentArrayVariableDeclaratorPath =
-						parentObjectExpressionPath.parentPath.scope.bindings[
-							parentObjectExpressionPath.parentPath.node.callee.object.name
-						].path;
+					parentArrayVariableDeclaratorPath = declarationPathInScope(
+						parentObjectExpressionPath.parentPath.scope,
+						parentObjectExpressionPath.parentPath.node.callee.object.name
+					);
 				} else {
 					// todolist -> todos =  [{...}]
 					parentArrayVariableDeclaratorPath = check.parentPathLoop<
