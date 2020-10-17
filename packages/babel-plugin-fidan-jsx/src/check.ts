@@ -132,6 +132,25 @@ const parentPathLoop = <T>(path: t.NodePath<t.Node>, check: (path: t.NodePath<t.
 	return null;
 };
 
+const binaryExpressionItems = (expr: t.BinaryExpression, callback: (itemName: string) => void) => {
+	if (t.isIdentifier(expr.left)) {
+		callback(expr.left.name);
+	}
+	if (t.isIdentifier(expr.right)) {
+		callback(expr.right.name);
+	}
+	if (t.isMemberExpression(expr.left)) {
+		if (t.isIdentifier(expr.left.object)) {
+			callback(expr.left.object.name);
+		}
+	}
+	if (t.isMemberExpression(expr.right)) {
+		if (t.isIdentifier(expr.right.object)) {
+			callback(expr.right.object.name);
+		}
+	}
+};
+
 const unknownState = (path: t.NodePath<t.Node>) => {
 	// debugger;
 };
@@ -149,5 +168,6 @@ export default {
 	objectPropertyFromMemberExpression,
 	nonComputedCallExpression,
 	parentPathLoop,
-	isFidanTaggedTemplateHtmlCallExpression
+	isFidanTaggedTemplateHtmlCallExpression,
+	binaryExpressionItems
 };

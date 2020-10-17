@@ -84,21 +84,21 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 				}
 			});
 		});
+	} else if (t.isIdentifier(path.node)) {
+		// (todo) => ....
+		pushDynamicPaths(path);
+	} else {
+		check.unknownState(path);
 	}
-	// else {
-	// debugger;
-	// }
 };
 
 export default (babel) => {
-	const dynamicPaths = globalData.dynamicPaths;
 	return {
 		visitor: {
 			TaggedTemplateExpression: (
 				path: t.NodePath<t.TaggedTemplateExpression>,
 				state: { key; filename; file }
 			) => {
-				dynamicPaths.push(path);
 				path.node.quasi.expressions.forEach((expr) => {
 					if (t.isIdentifier(expr)) {
 						const bindingNodePath = path.scope.bindings[expr.name].path;
@@ -135,8 +135,11 @@ export default (babel) => {
 							check.unknownState(path);
 						}
 					} else if (t.isBinaryExpression(expr)) {
-						// check.binaryExpressionItems(path, expr, (expressionItem)=>  {})
-						debugger;
+						//todolist -> className={'cls_' + todo.title}
+						check.binaryExpressionItems(expr, (itemName) => {
+							const bindingNodePath = path.scope.bindings[itemName].path;
+							findVariableReferencedPaths(bindingNodePath);
+						});
 					} else {
 						check.unknownState(path);
 					}

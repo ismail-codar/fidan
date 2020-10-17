@@ -188,7 +188,8 @@ export default (babel) => {
 				) {
 					return;
 				}
-				if (check.isPathDynamic(path)) {
+				if (t.isIdentifier(path.node.object) && check.isPathDynamic(path, path.node.object.name)) {
+					//todolist -> return 'cls_' + todo.title
 					path.node.property = modifiy.fidanValAccess(path.node.property);
 				}
 			},

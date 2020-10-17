@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as babel from '@babel/core';
 import { NodePath, Scope, Binding } from '@babel/traverse';
 import { globalData } from './common';
+import { check } from 'prettier';
 
 const registryData: {
 	[key: string]: { fileName: string; paths: NodePath[] };
@@ -111,7 +112,7 @@ export const variableBindingInScope = (scope: Scope, searchName: string): Bindin
 export const declarationPathInScope = (scope: Scope, searchName: string): NodePath => {
 	const variableBinding = variableBindingInScope(scope, searchName);
 	if (!variableBinding) return null;
-	if (t.isVariableDeclarator(variableBinding.path.node)) {
+	if (t.isVariableDeclarator(variableBinding.path.node) || t.isIdentifier(variableBinding.path.node)) {
 		return variableBinding.path;
 	} else if (
 		t.isImportSpecifier(variableBinding.path.node) ||
@@ -129,5 +130,7 @@ export const declarationPathInScope = (scope: Scope, searchName: string): NodePa
 			}
 			return null;
 		});
+	} else {
+		debugger;
 	}
 };
