@@ -51,6 +51,7 @@ export default (babel) => {
 								if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
 									dynamics = check.dynamicArguments(path, path.node.init.arguments);
 								} else if (t.isObjectExpression(path.node.init)) {
+									// TODO this logic can be move to ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
 									path.additionalInfo.memberExpressions.forEach((memberExpression) => {
 										const objectProperty = check.objectPropertyFromMemberExpression(
 											path.node.init as t.ObjectExpression,
@@ -61,7 +62,6 @@ export default (babel) => {
 												objectProperty.value = modifiy.fidanValueInit(objectProperty.value);
 											} else {
 												// TODO objectProperty.value can be binaryExpression vs... fidanComputedExpressionInit
-
 												check.unknownState(path);
 											}
 										} else {
@@ -141,9 +141,25 @@ export default (babel) => {
 					return true;
 				});
 				pathStr = pathStr.substr(0, pathStr.length - 1);
-				const parentArrayVariableDeclaratorPath = check.parentPathLoop<
-					t.VariableDeclarator
-				>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
+				let parentArrayVariableDeclaratorPath: t.NodePath<t.VariableDeclarator> = null;
+				if (
+					t.isCallExpression(parentObjectExpressionPath.parentPath.node) &&
+					t.isMemberExpression(parentObjectExpressionPath.parentPath.node.callee) &&
+					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.object) &&
+					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.property) // TODO property.name mutation method check
+				) {
+					debugger;
+					// todolist -> todos.push({...
+					parentArrayVariableDeclaratorPath =
+						parentObjectExpressionPath.parentPath.scope.bindings[
+							parentObjectExpressionPath.parentPath.node.callee.object.name
+						].path;
+				} else {
+					// todolist -> todos =  [{...}]
+					parentArrayVariableDeclaratorPath = check.parentPathLoop<
+						t.VariableDeclarator
+					>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
+				}
 				if (
 					parentArrayVariableDeclaratorPath &&
 					parentArrayVariableDeclaratorPath.additionalInfo &&
