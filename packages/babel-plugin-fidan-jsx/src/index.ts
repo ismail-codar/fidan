@@ -180,6 +180,18 @@ export default (babel) => {
 					}
 				}
 			},
+			MemberExpression(path: t.NodePath<t.MemberExpression>) {
+				if (
+					check.isFidanMember(path.node) || // fidan.value, fidan.html
+					t.isCallExpression(path.parentPath.node) || // arr.map
+					t.isTemplateLiteral(path.parentPath.node) //${todo.title}
+				) {
+					return;
+				}
+				if (check.isPathDynamic(path)) {
+					path.node.property = modifiy.fidanValAccess(path.node.property);
+				}
+			},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
 					const leftIsDynamic = check.isPathDynamic(path, path.node.expression.left['name']);

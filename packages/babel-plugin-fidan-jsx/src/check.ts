@@ -11,6 +11,10 @@ const isFidanCall = (node: t.Expression) => {
 	);
 };
 
+const isFidanMember = (node: t.Expression) => {
+	return t.isMemberExpression(node) && t.isIdentifier(node.object) && node.object.name === 'fidan';
+};
+
 const isComponentCall = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.CallExpression) => {
 	// TODO check if calling function returns html
 	return t.isIdentifier(expr.callee) && expr.callee.name[0] === expr.callee.name[0].toUpperCase();
@@ -135,6 +139,7 @@ const unknownState = (path: t.NodePath<t.Node>) => {
 export default {
 	unknownState,
 	isFidanCall,
+	isFidanMember,
 	isComponentCall,
 	isPathDynamic,
 	isEmptyLiteral,

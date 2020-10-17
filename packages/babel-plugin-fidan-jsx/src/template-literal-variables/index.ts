@@ -134,7 +134,8 @@ export default (babel) => {
 						} else {
 							check.unknownState(path);
 						}
-					} else if (t.isBinaryExpression(path.node)) {
+					} else if (t.isBinaryExpression(expr)) {
+						// check.binaryExpressionItems(path, expr, (expressionItem)=>  {})
 						debugger;
 					} else {
 						check.unknownState(path);
