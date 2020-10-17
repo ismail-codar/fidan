@@ -76,8 +76,9 @@ export default (babel) => {
 								) {
 									path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
 								} else {
-									if (!path.additionalInfo) {
-										//additionalInfo passed when template binding like obj.prop
+									//additionalInfo passed when template binding like obj.prop
+									if (!path.additionalInfo || t.isArrayExpression(path.node.init)) {
+										// object-property-1 vs todolist
 										path.node.init = modifiy.fidanValueInit(path.node.init);
 									}
 								}
@@ -130,40 +131,37 @@ export default (babel) => {
 				}
 			},
 			ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
+				let pathStr = '';
+				const parentObjectExpressionPath = check.parentPathLoop<t.ObjectExpression>(path, (checkPath) => {
+					if (t.isObjectProperty(checkPath.node) && t.isIdentifier(checkPath.node.key)) {
+						pathStr += checkPath.node.key.name;
+						pathStr += '.';
+						return false;
+					}
+					return true;
+				});
+				pathStr = pathStr.substr(0, pathStr.length - 1);
 				const parentArrayVariableDeclaratorPath = check.parentPathLoop<
 					t.VariableDeclarator
-				>(path, (checkPath) => t.isVariableDeclarator(checkPath.node));
-				if (parentArrayVariableDeclaratorPath && check.isPathDynamic(parentArrayVariableDeclaratorPath)) {
-					debugger;
-					// TODO check is dynamic property......
-					// path.node.value = modifiy.fidanValueInit(path.node.value);
-				}
-			},
-			MemberExpression(path: t.NodePath<t.MemberExpression>) {
-				// TODO move to -> template-literal-variables
-				let taggedTemplateHtmlCallExpressionPath = check.parentPathLoop<
-					t.TaggedTemplateExpression
-				>(path, (checkPath) => check.isFidanTaggedTemplateHtmlCallExpression(checkPath));
-				if (taggedTemplateHtmlCallExpressionPath) {
-					if (taggedTemplateHtmlCallExpressionPath.node.quasi.expressions.length === 1) {
-						if (t.isCallExpression(taggedTemplateHtmlCallExpressionPath.node.quasi.expressions[0])) {
-							const callee = taggedTemplateHtmlCallExpressionPath.node.quasi.expressions[0].callee;
-							if (
-								t.isMemberExpression(callee) &&
-								t.isIdentifier(callee.object) &&
-								t.isIdentifier(callee.property) &&
-								callee.property.name === 'map'
-							) {
-								//todolist -> todo.title
-								const parentArrayVariableDeclaratorPath = taggedTemplateHtmlCallExpressionPath.scope
-									.bindings[callee.object.name].path as t.NodePath<t.VariableDeclarator>;
-								// parentArrayVariableDeclaratorPath.additionalInfo.memberExpressions.push(path.node);
-							} else {
-								check.unknownState(taggedTemplateHtmlCallExpressionPath);
+				>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
+				if (
+					parentArrayVariableDeclaratorPath &&
+					parentArrayVariableDeclaratorPath.additionalInfo &&
+					check.isPathDynamic(parentArrayVariableDeclaratorPath)
+				) {
+					const arrayMapItems = parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems;
+					if (arrayMapItems) {
+						for (var i = 0; i < arrayMapItems.length; i++) {
+							const memberExpressions = arrayMapItems[i].additionalInfo.memberExpressions;
+							for (var m = 0; m < memberExpressions.length; m++) {
+								let memberExprStr: string = generate(memberExpressions[m]).code;
+								memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
+								if (memberExprStr === pathStr) {
+									//TEST: todolist
+									path.node.value = modifiy.fidanValueInit(path.node.value);
+								}
 							}
 						}
-					} else {
-						check.unknownState(taggedTemplateHtmlCallExpressionPath);
 					}
 				}
 			},

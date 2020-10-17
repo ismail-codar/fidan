@@ -130,9 +130,12 @@ export default (babel) => {
 							const bindingNodePath = path.scope.bindings[expr.object.name].path;
 							modifiy.additionInfoToPath(bindingNodePath, expr);
 							findVariableReferencedPaths(bindingNodePath);
+							// TODO array...
 						} else {
 							check.unknownState(path);
 						}
+					} else if (t.isBinaryExpression(path.node)) {
+						debugger;
 					} else {
 						check.unknownState(path);
 					}

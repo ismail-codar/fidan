@@ -1,6 +1,11 @@
 export const App = () => {
-	let todos = [ { title: 'Todo1' } ];
-	todos.push({ title: 'Todo2' });
+	let todos = [
+		{ title: 'Todo1' },
+		{
+			title: 'Todo2'
+		}
+	];
+	todos.push({ title: 'Todo3' });
 
 	return (
 		<div>
