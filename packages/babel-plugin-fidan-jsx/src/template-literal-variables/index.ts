@@ -92,6 +92,54 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 	}
 };
 
+const checkExpression = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.Expression) => {
+	if (t.isIdentifier(expr)) {
+		const bindingNodePath = path.scope.bindings[expr.name].path;
+		findVariableReferencedPaths(bindingNodePath);
+	} else if (t.isCallExpression(expr)) {
+		expr.arguments.forEach((arg) => {
+			if (t.isObjectExpression(arg)) {
+				arg.properties.forEach((prop) => {
+					if (t.isObjectProperty(prop) && t.isIdentifier(prop.value)) {
+						const bindingNodePath = path.scope.bindings[prop.value.name].path;
+						findVariableReferencedPaths(bindingNodePath);
+					} else if (t.isObjectMethod(prop) || t.isSpreadElement(prop)) {
+						check.unknownState(path);
+					}
+				});
+			}
+		});
+		if (
+			t.isMemberExpression(expr.callee) &&
+			t.isIdentifier(expr.callee.object) &&
+			t.isIdentifier(expr.callee.property) &&
+			expr.callee.property.name === 'map'
+		) {
+			const bindingNodePath = path.scope.bindings[expr.callee.object.name].path;
+			findVariableReferencedPaths(bindingNodePath);
+		}
+	} else if (t.isMemberExpression(expr)) {
+		if (t.isIdentifier(expr.object)) {
+			const bindingNodePath = path.scope.bindings[expr.object.name].path;
+			modifiy.additionInfoToPath(bindingNodePath, expr);
+			findVariableReferencedPaths(bindingNodePath);
+			// TODO array...
+		} else {
+			check.unknownState(path);
+		}
+	} else if (t.isBinaryExpression(expr)) {
+		//todolist -> className={'cls_' + todo.title}
+		check.binaryExpressionItems(expr, (itemName) => {
+			const bindingNodePath = path.scope.bindings[itemName].path;
+			findVariableReferencedPaths(bindingNodePath);
+		});
+	} else if (t.isConditionalExpression(expr)) {
+		checkExpression(path, expr.test);
+	} else {
+		check.unknownState(path);
+	}
+};
+
 export default (babel) => {
 	return {
 		visitor: {
@@ -100,49 +148,7 @@ export default (babel) => {
 				state: { key; filename; file }
 			) => {
 				path.node.quasi.expressions.forEach((expr) => {
-					if (t.isIdentifier(expr)) {
-						const bindingNodePath = path.scope.bindings[expr.name].path;
-						findVariableReferencedPaths(bindingNodePath);
-					} else if (t.isCallExpression(expr)) {
-						expr.arguments.forEach((arg) => {
-							if (t.isObjectExpression(arg)) {
-								arg.properties.forEach((prop) => {
-									if (t.isObjectProperty(prop) && t.isIdentifier(prop.value)) {
-										const bindingNodePath = path.scope.bindings[prop.value.name].path;
-										findVariableReferencedPaths(bindingNodePath);
-									} else if (t.isObjectMethod(prop) || t.isSpreadElement(prop)) {
-										check.unknownState(path);
-									}
-								});
-							}
-						});
-						if (
-							t.isMemberExpression(expr.callee) &&
-							t.isIdentifier(expr.callee.object) &&
-							t.isIdentifier(expr.callee.property) &&
-							expr.callee.property.name === 'map'
-						) {
-							const bindingNodePath = path.scope.bindings[expr.callee.object.name].path;
-							findVariableReferencedPaths(bindingNodePath);
-						}
-					} else if (t.isMemberExpression(expr)) {
-						if (t.isIdentifier(expr.object)) {
-							const bindingNodePath = path.scope.bindings[expr.object.name].path;
-							modifiy.additionInfoToPath(bindingNodePath, expr);
-							findVariableReferencedPaths(bindingNodePath);
-							// TODO array...
-						} else {
-							check.unknownState(path);
-						}
-					} else if (t.isBinaryExpression(expr)) {
-						//todolist -> className={'cls_' + todo.title}
-						check.binaryExpressionItems(expr, (itemName) => {
-							const bindingNodePath = path.scope.bindings[itemName].path;
-							findVariableReferencedPaths(bindingNodePath);
-						});
-					} else {
-						check.unknownState(path);
-					}
+					checkExpression(path, expr);
 				});
 			}
 		}

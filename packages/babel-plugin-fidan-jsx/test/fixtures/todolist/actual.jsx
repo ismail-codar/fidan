@@ -1,15 +1,25 @@
 export const App = () => {
 	let todos = [
-		{ title: 'Todo1' },
 		{
-			title: 'Todo2'
+			title: 'Todo1',
+			completed: false
+		},
+		{
+			title: 'Todo2',
+			completed: false
 		}
 	];
-	todos.push({ title: 'Todo3' });
+	todos.push({ title: 'Todo3', completed: false });
 
 	return (
 		<div>
-			<ul>{todos.map((todo) => <li className={'cls_' + todo.title}>{todo.title}</li>)}</ul>
+			<ul className={todos.length === 0 ? 'empty' : ''}>
+				{todos.map((todo) => (
+					<li className={'cls_' + todo.title} data-completed={todo.completed ? true : false}>
+						{todo.title}
+					</li>
+				))}
+			</ul>
 		</div>
 	);
 };

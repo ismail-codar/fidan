@@ -32,6 +32,7 @@ export default (babel) => {
 					t.isArrayExpression(path.node.init) ||
 					t.isNewExpression(path.node.init) ||
 					t.isBinaryExpression(path.node.init) ||
+					t.isConditionalExpression(path.node.init) ||
 					t.isObjectExpression(path.node.init) ||
 					t.isCallExpression(path.node.init) // TODO or compute
 				) {
@@ -72,6 +73,7 @@ export default (babel) => {
 								if (
 									dynamics.length ||
 									t.isBinaryExpression(path.node.init) ||
+									t.isConditionalExpression(path.node.init) ||
 									t.isCallExpression(path.node.init)
 								) {
 									path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
@@ -90,7 +92,11 @@ export default (babel) => {
 				} else if (!t.isArrowFunctionExpression(path.node.init)) {
 					const isDynamic = check.isPathDynamic(path);
 					if (isDynamic) {
-						if (t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+						if (
+							t.isBinaryExpression(path.node.init) ||
+							t.isConditionalExpression(path.node.init) ||
+							t.isCallExpression(path.node.init)
+						) {
 							path.node.init = modifiy.fidanComputedExpressionInit(path.node.init);
 						} else if (t.isObjectExpression(path.node.init)) {
 							check.unknownState(path);
@@ -173,7 +179,15 @@ export default (babel) => {
 								memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
 								if (memberExprStr === pathStr) {
 									//TEST: todolist
-									path.node.value = modifiy.fidanValueInit(path.node.value);
+									if (t.isLiteral(path.node.value) || t.isIdentifier(path.node.value)) {
+										path.node.value = modifiy.fidanValueInit(path.node.value);
+									} else if (
+										t.isCallExpression(path.node.value) &&
+										t.isMemberExpression(path.node.value.callee) &&
+										check.isFidanMember(path.node.value.callee) === false
+									) {
+										check.unknownState(path);
+									}
 								}
 							}
 						}
@@ -253,7 +267,7 @@ export default (babel) => {
 								path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
 							}
 						}
-					} else if (t.isBinaryExpression(expr)) {
+					} else if (t.isBinaryExpression(expr) || t.isConditionalExpression(expr)) {
 						// todolist -> className={'cls_' + todo.title}
 						path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
 					}
