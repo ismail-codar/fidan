@@ -148,7 +148,6 @@ export default (babel) => {
 					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.object) &&
 					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.property) // TODO property.name mutation method check
 				) {
-					debugger;
 					// todolist -> todos.push({...
 					parentArrayVariableDeclaratorPath =
 						parentObjectExpressionPath.parentPath.scope.bindings[
@@ -241,6 +240,9 @@ export default (babel) => {
 								path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
 							}
 						}
+					} else if (t.isBinaryExpression(expr)) {
+						// todolist -> className={'cls_' + todo.title}
+						path.node.quasi.expressions[index] = modifiy.fidanComputedExpressionInit(expr);
 					}
 				});
 			}
