@@ -10,10 +10,22 @@ export const App = () => {
 			completed: fidan.value(false)
 		}
 	]);
+
 	todos.push({
 		title: fidan.value('Todo3'),
 		completed: fidan.value(false)
 	});
+
+	const handleDelete = (todo, index) => {
+		const idx = todos.indexOf(todo);
+		todos.splice(idx, 1);
+	};
+
+	const handleComplete = (todo) => {
+		const idx = todos.indexOf(todo);
+		todos[idx].completed = !todos[idx].completed;
+	};
+
 	return fidan.html`<div><ul className="${fidan.computed(() => {
 		return todos.length() === 0 ? 'empty' : '';
 	})}">${todos.map(
@@ -22,6 +34,10 @@ export const App = () => {
 				return 'cls_' + todo.title();
 			})}" data-completed="${fidan.computed(() => {
 				return todo.completed() ? true : false;
-			})}">${todo.title}</li>`
+			})}">
+			<input type="checkbox" checked="${todo.completed}" onchange="${() => handleComplete(todo)}" />
+			${todo.title}
+			<a onclick="${() => handleDelete(todo, index)}">X</a>
+		</li>`
 	)}</ul></div>`;
 };
