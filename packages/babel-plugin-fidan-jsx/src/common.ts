@@ -14,6 +14,5 @@ export const globalData = {
 		include: fileExtentions.map((ext) => '**/*' + ext)
 	},
 	openedTags: [],
-	isSvg: false,
-	dynamicPaths: [] as NodePath<t.Node>[]
+	isSvg: false
 };

@@ -6,39 +6,36 @@ import modifiy from '../modifiy';
 import check from '../check';
 
 const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
-	const dynamicPaths = globalData.dynamicPaths;
 	let declarationPath: NodePath<t.Node> = null;
-	if (!dynamicPaths.includes(path)) {
-		dynamicPaths.push(path);
-		if (t.isVariableDeclarator(path.node)) {
-			if (t.isBinaryExpression(path.node.init)) {
-				if (t.isIdentifier(path.node.init.left)) {
-					declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.left.name);
-					pushDynamicPaths(declarationPath);
-				}
-				if (t.isIdentifier(path.node.init.right)) {
-					declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.right.name);
-					pushDynamicPaths(declarationPath);
-				}
-			} else if (t.isCallExpression(path.node.init) || t.isNewExpression(path.node.init)) {
-				path.node.init.arguments.forEach((arg) => {
-					if (t.isIdentifier(arg)) {
-						declarationPath = declarationPathInScope(path.parentPath.scope, arg.name);
-						pushDynamicPaths(declarationPath);
-					} else {
-						check.unknownState(path);
-					}
-				});
-			} else if (
-				!t.isLiteral(path.node.init) &&
-				!t.isArrayExpression(path.node.init) &&
-				!t.isObjectExpression(path.node.init)
-			) {
-				check.unknownState(path);
+	if (t.isVariableDeclarator(path.node)) {
+		modifiy.createAdditionalData(path);
+		if (t.isBinaryExpression(path.node.init)) {
+			if (t.isIdentifier(path.node.init.left)) {
+				declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.left.name);
+				pushDynamicPaths(declarationPath);
 			}
-		} else {
+			if (t.isIdentifier(path.node.init.right)) {
+				declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.right.name);
+				pushDynamicPaths(declarationPath);
+			}
+		} else if (t.isCallExpression(path.node.init) || t.isNewExpression(path.node.init)) {
+			path.node.init.arguments.forEach((arg) => {
+				if (t.isIdentifier(arg)) {
+					declarationPath = declarationPathInScope(path.parentPath.scope, arg.name);
+					pushDynamicPaths(declarationPath);
+				} else {
+					check.unknownState(path);
+				}
+			});
+		} else if (
+			!t.isLiteral(path.node.init) &&
+			!t.isArrayExpression(path.node.init) &&
+			!t.isObjectExpression(path.node.init)
+		) {
 			check.unknownState(path);
 		}
+	} else {
+		check.unknownState(path);
 	}
 };
 

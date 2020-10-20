@@ -119,6 +119,12 @@ export const additionInfoToPath = (path: t.NodePath<t.Node>, info: t.Node) => {
 	}
 };
 
+const createAdditionalData = (path: t.NodePath<t.Node>) => {
+	if (!path.additionalInfo) {
+		path.additionalInfo = {};
+	}
+};
+
 export default {
 	fidanValueInit,
 	fidanValueSet,
@@ -126,5 +132,6 @@ export default {
 	fidanValAccess,
 	insertFidanImport,
 	fidanComputedExpressionInit,
-	additionInfoToPath
+	additionInfoToPath,
+	createAdditionalData
 };

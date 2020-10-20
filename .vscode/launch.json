@@ -42,7 +42,7 @@
       "runtimeArgs": ["-r", "ts-node/register"],
       "cwd": "${workspaceFolder}/packages/babel-plugin-fidan-jsx",
       "args": [
-        "${workspaceFolder}/packages/babel-plugin-fidan-jsx/test/index.ts", "todolist"
+        "${workspaceFolder}/packages/babel-plugin-fidan-jsx/test/index.ts", "array-1"
       ]
     },
     {

@@ -29,12 +29,11 @@ const isFidanTaggedTemplateHtmlCallExpression = (path: t.NodePath<t.Node>) =>
 	path.node.tag.property.name === 'html';
 
 const isPathDynamic = (path: t.NodePath<t.Node>, bindingName?: string) => {
-	const dynamicPaths = globalData.dynamicPaths;
 	if (bindingName) {
 		const declPath = declarationPathInScope(path.scope, bindingName);
-		return dynamicPaths.includes(declPath);
+		return declPath && declPath.additionalInfo !== undefined;
 	} else {
-		return dynamicPaths.includes(path);
+		return path.additionalInfo !== undefined;
 	}
 };
 

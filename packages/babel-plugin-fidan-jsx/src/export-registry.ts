@@ -2,12 +2,12 @@ import * as t from '@babel/types';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as babel from '@babel/core';
-import { NodePath, Scope, Binding } from '@babel/traverse';
+import { Scope, Binding } from '@babel/traverse';
 import { globalData } from './common';
 import { check } from 'prettier';
 
 const registryData: {
-	[key: string]: { fileName: string; paths: NodePath[] };
+	[key: string]: { fileName: string; paths: t.NodePath[] };
 } = {};
 
 function buildBabelConfig(plugin) {
@@ -16,8 +16,8 @@ function buildBabelConfig(plugin) {
 	};
 }
 
-const getDeclationsFromExports = (path: t.NodePath<t.Identifier>): NodePath[] => {
-	let parentPath: NodePath<any> = path.parentPath;
+const getDeclationsFromExports = (path: t.NodePath<t.Identifier>): t.NodePath[] => {
+	let parentPath: t.NodePath<any> = path.parentPath;
 	while (!t.isAssignmentExpression(parentPath.node)) {
 		parentPath = parentPath.parentPath;
 		if (!parentPath) {
@@ -32,8 +32,8 @@ const getDeclationsFromExports = (path: t.NodePath<t.Identifier>): NodePath[] =>
 	}
 };
 
-const getExportPaths = (fileName: string): NodePath[] => {
-	const localExports: NodePath[] = [];
+const getExportPaths = (fileName: string): t.NodePath[] => {
+	const localExports: t.NodePath[] = [];
 	if (fs.existsSync(fileName)) {
 		babel.transformFileSync(
 			fileName,
@@ -72,7 +72,7 @@ const loadImportedFileExports = (
 	importedFile: string
 ): {
 	fileName?: string;
-	paths: NodePath[];
+	paths: t.NodePath[];
 } => {
 	if (
 		importedFile.startsWith('.') === false &&
@@ -109,7 +109,7 @@ export const variableBindingInScope = (scope: Scope, searchName: string): Bindin
 	return null;
 };
 
-export const declarationPathInScope = (scope: Scope, searchName: string): NodePath => {
+export const declarationPathInScope = (scope: Scope, searchName: string): t.NodePath<any> => {
 	const variableBinding = variableBindingInScope(scope, searchName);
 	if (!variableBinding) return null;
 	if (t.isVariableDeclarator(variableBinding.path.node) || t.isIdentifier(variableBinding.path.node)) {
