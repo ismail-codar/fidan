@@ -2,13 +2,13 @@ import * as t from '@babel/types';
 import { NodePath } from '@babel/traverse';
 import { globalData } from '../common';
 import { declarationPathInScope } from '../export-registry';
-import modifiy from '../modifiy';
+import modify from '../modify';
 import check from '../check';
 
 const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
 	let declarationPath: NodePath<t.Node> = null;
 	if (t.isVariableDeclarator(path.node)) {
-		modifiy.createAdditionalData(path);
+		modify.createAdditionalData(path);
 		if (t.isBinaryExpression(path.node.init)) {
 			if (t.isIdentifier(path.node.init.left)) {
 				declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.left.name);
@@ -118,7 +118,7 @@ const checkExpression = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.E
 	} else if (t.isMemberExpression(expr)) {
 		if (t.isIdentifier(expr.object)) {
 			const bindingNodePath = path.scope.bindings[expr.object.name].path;
-			modifiy.additionInfoToPath(bindingNodePath, expr);
+			modify.additionInfoToPath(bindingNodePath, expr);
 			findVariableReferencedPaths(bindingNodePath);
 			// TODO array...
 		} else {

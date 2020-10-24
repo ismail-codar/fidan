@@ -6,7 +6,11 @@ declare module '@babel/types' {
 	export class NodePath<T = t.Node> {
 		node: T;
 		traverse: any;
-		scope: any;
+		scope: {
+			bindings: {
+				[key: string]: { path: t.NodePath<t.Node>; referencePaths: t.NodePath<t.Node>[] };
+			};
+		};
 		parentPath: NodePath<t.Node>;
 		parent: t.Node;
 		additionalInfo: {
