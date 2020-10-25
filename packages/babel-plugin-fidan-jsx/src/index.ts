@@ -101,8 +101,33 @@ export default (babel) => {
 			MemberExpression(path: t.NodePath<t.MemberExpression>) {
 				// .a, .a()
 				// modify.fidanValAccess(node)
-				// console.log(generate(path.node).code);
-				// debugger;
+				if (t.isIdentifier(path.node.object) && path.scope.bindings[path.node.object.name]) {
+					const bindingNodePath = path.scope.bindings[path.node.object.name].path;
+					if (bindingNodePath && !t.isCallExpression(path.parent)) {
+						// console.log(generate(path.node).code);
+						// debugger;
+						// let pathStr = '';
+						// const parentObjectExpressionPath = check.parentPathLoop<
+						// 	t.ObjectExpression
+						// >(path, (checkPath) => {
+						// 	if (t.isObjectProperty(checkPath.node) && t.isIdentifier(checkPath.node.key)) {
+						// 		pathStr += checkPath.node.key.name;
+						// 		pathStr += '.';
+						// 		return false;
+						// 	}
+						// 	return true;
+						// });
+						// pathStr = pathStr.substr(0, pathStr.length - 1);
+						// const memberExpressions = bindingNodePath.additionalInfo.memberExpressions;
+						// for (var m = 0; m < memberExpressions.length; m++) {
+						// 	let memberExprStr: string = generate(memberExpressions[m]).code;
+						// 	memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
+						// 	if (memberExprStr === pathStr) {
+						// 		//TEST: todolist
+						// 	}
+						// }
+					}
+				}
 			},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
