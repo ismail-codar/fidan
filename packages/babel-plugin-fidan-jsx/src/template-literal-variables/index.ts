@@ -59,14 +59,6 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 		} else {
 			check.unknownState(path);
 		}
-	} else if (t.isMemberExpression(path.node)) {
-		if (t.isIdentifier(path.node.object) && path.scope.bindings[path.node.object.name]) {
-			const bindingNodePath = path.scope.bindings[path.node.object.name].path;
-			additionalInfo.addDynamicMemberToObject(bindingNodePath, path.node);
-			findVariableReferencedPaths(bindingNodePath);
-		} else {
-			check.unknownState(path);
-		}
 	} else {
 		check.unknownState(path);
 	}
@@ -107,7 +99,13 @@ const checkTemplateExpression = (
 			findVariableReferencedPaths(bindingNodePath);
 		}
 	} else if (t.isMemberExpression(expr)) {
-		// findVariableReferencedPaths(path);
+		if (t.isIdentifier(expr.object) && path.scope.bindings[expr.object.name]) {
+			const bindingNodePath = path.scope.bindings[expr.object.name].path;
+			additionalInfo.addDynamicMemberToObject(bindingNodePath, expr);
+			findVariableReferencedPaths(bindingNodePath);
+		} else {
+			check.unknownState(path);
+		}
 	} else if (t.isBinaryExpression(expr)) {
 		//todolist -> className={'cls_' + todo.title}
 		check.binaryExpressionItems(expr, (itemName) => {

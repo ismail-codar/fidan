@@ -27,33 +27,6 @@ const isFidanTaggedTemplateHtmlCallExpression = (path: t.NodePath<t.Node>) =>
 	t.isIdentifier(path.node.tag.property) &&
 	path.node.tag.property.name === 'html';
 
-const isVariableDeclaratorPathUsedInView = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
-	return path && path.additionalInfo !== undefined;
-};
-
-const isVariableDeclaratorPathGivenCompoentProps = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
-	return false;
-};
-
-const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal) => {
-	return false;
-	// const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
-	// return (
-	// 	isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
-	// 	isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
-	// );
-};
-
-const isRequiredVariableDeclaratorComputedExpression = (path: t.NodePath<t.VariableDeclarator>) => {
-	let dynamics = [];
-	if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
-		dynamics = dynamicArguments(path, path.node.init.arguments);
-	}
-	if (dynamics.length || t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
-		return true;
-	}
-};
-
 const isEmptyLiteral = (literal: t.TemplateLiteral) => {
 	return literal.quasis.length == 1 && literal.quasis[0].value.raw === '';
 };
@@ -177,6 +150,38 @@ const unknownState = (path: t.NodePath<t.Node>) => {
 	// debugger;
 };
 
+const isVariableDeclaratorPathUsedInView = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
+	return path && path.additionalInfo !== undefined;
+};
+
+const isVariableDeclaratorPathGivenCompoentProps = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
+	debugger;
+	return false;
+};
+
+const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal) => {
+	if (t.isIdentifier(id)) {
+		const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
+		return (
+			isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
+			isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
+		);
+	} else {
+		return false;
+	}
+};
+
+const isRequiredComputedExpression = (path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>) => {
+	const expr = t.isVariableDeclarator(path.node) ? path.node.init : path.node.value;
+	let dynamics = [];
+	if (t.isNewExpression(expr) || t.isCallExpression(expr)) {
+		dynamics = dynamicArguments(path, expr.arguments);
+	}
+	if (dynamics.length || t.isBinaryExpression(expr) || t.isCallExpression(expr)) {
+		return true;
+	}
+};
+
 export default {
 	unknownState,
 	isFidanCall,
@@ -194,5 +199,5 @@ export default {
 	isVariableDeclaratorPathUsedInView,
 	isVariableDeclaratorPathGivenCompoentProps,
 	isRequiredIdentifierFidanValAccess,
-	isRequiredVariableDeclaratorComputedExpression
+	isRequiredComputedExpression
 };

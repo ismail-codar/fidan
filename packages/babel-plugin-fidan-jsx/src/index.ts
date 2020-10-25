@@ -26,7 +26,7 @@ export default (babel) => {
 				// }
 			},
 			VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-				if (check.isRequiredVariableDeclaratorComputedExpression(path)) {
+				if (check.isRequiredComputedExpression(path)) {
 					path.node.init = modify.fidanComputedExpressionInit(path.node.init);
 				} else if (
 					t.isIdentifier(path.node.id) &&
@@ -36,11 +36,73 @@ export default (babel) => {
 				}
 			},
 			ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
+				// https://github.com/ismail-codar/fidan/blob/b6f5dc4c0de4d8d799036b4447f7e316a1b5230c/packages/babel-plugin-fidan-jsx/src/index.ts#L139
 				// a: b, a: b(), a: fidan.computed(...);
+				let pathStr = '';
+				const parentObjectExpressionPath = check.parentPathLoop<t.ObjectExpression>(path, (checkPath) => {
+					if (t.isObjectProperty(checkPath.node) && t.isIdentifier(checkPath.node.key)) {
+						pathStr += checkPath.node.key.name;
+						pathStr += '.';
+						return false;
+					}
+					return true;
+				});
+				pathStr = pathStr.substr(0, pathStr.length - 1);
+				let parentArrayVariableDeclaratorPath: t.NodePath<t.VariableDeclarator> = null;
+				if (
+					t.isCallExpression(parentObjectExpressionPath.parentPath.node) &&
+					t.isMemberExpression(parentObjectExpressionPath.parentPath.node.callee) &&
+					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.object) &&
+					t.isIdentifier(parentObjectExpressionPath.parentPath.node.callee.property) // TODO property.name mutation method check
+				) {
+					// todolist -> todos.push({...
+					parentArrayVariableDeclaratorPath = declarationPathInScope(
+						parentObjectExpressionPath.parentPath.scope,
+						parentObjectExpressionPath.parentPath.node.callee.object.name
+					);
+				} else {
+					// todolist -> todos =  [{...}]
+					parentArrayVariableDeclaratorPath = check.parentPathLoop<
+						t.VariableDeclarator
+					>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
+				}
+				if (
+					parentArrayVariableDeclaratorPath &&
+					parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems
+				) {
+					const arrayMapItems = parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems;
+					if (arrayMapItems) {
+						for (var i = 0; i < arrayMapItems.length; i++) {
+							const memberExpressions = arrayMapItems[i].additionalInfo.memberExpressions;
+							for (var m = 0; m < memberExpressions.length; m++) {
+								let memberExprStr: string = generate(memberExpressions[m]).code;
+								memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
+								if (memberExprStr === pathStr) {
+									//TEST: todolist
+									if (t.isLiteral(path.node.value) || t.isIdentifier(path.node.value)) {
+										if (check.isRequiredComputedExpression(path)) {
+											path.node.value = modify.fidanComputedExpressionInit(path.node.value);
+										} else {
+											path.node.value = modify.fidanValueInit(path.node.value);
+										}
+									} else if (
+										t.isCallExpression(path.node.value) &&
+										t.isMemberExpression(path.node.value.callee) &&
+										check.isFidanMember(path.node.value.callee) === false
+									) {
+										check.unknownState(path);
+									}
+								}
+							}
+						}
+					}
+				}
 			},
 			MemberExpression(path: t.NodePath<t.MemberExpression>) {
 				// .a, .a()
 				// modify.fidanValAccess(node)
+				// console.log(generate(path.node).code);
+				// debugger;
 			},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
