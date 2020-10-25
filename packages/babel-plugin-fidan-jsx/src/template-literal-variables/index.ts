@@ -108,11 +108,12 @@ const checkTemplateExpression = (
 		}
 	} else if (t.isBinaryExpression(expr)) {
 		//todolist -> className={'cls_' + todo.title}
-		check.binaryExpressionItems(expr, (itemName) => {
-			if (path.scope.bindings[itemName]) {
-				const bindingNodePath = path.scope.bindings[itemName].path;
+		check.binaryExpressionItems(expr, (item) => {
+			if (path.scope.bindings[item.name]) {
+				const bindingNodePath = path.scope.bindings[item.name].path;
 				findVariableReferencedPaths(bindingNodePath);
 			}
+			return true;
 		});
 	} else if (t.isConditionalExpression(expr)) {
 		checkTemplateExpression(path, expr.test);

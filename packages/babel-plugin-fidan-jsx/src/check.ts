@@ -121,29 +121,31 @@ const parentPathLoop = <T>(path: t.NodePath<t.Node>, check: (path: t.NodePath<t.
 	return null;
 };
 
-const binaryExpressionItems = (expr: t.BinaryExpression, callback: (itemName: string) => void) => {
+const binaryExpressionItems = (expr: t.BinaryExpression, callback: (item: t.Identifier) => boolean) => {
+	let check = true;
 	if (t.isIdentifier(expr.left)) {
-		callback(expr.left.name);
+		check = callback(expr.left);
 	}
-	if (t.isIdentifier(expr.right)) {
-		callback(expr.right.name);
+	if (check && t.isIdentifier(expr.right)) {
+		check = callback(expr.right);
 	}
-	if (t.isMemberExpression(expr.left)) {
+	if (check && t.isMemberExpression(expr.left)) {
 		if (t.isIdentifier(expr.left.object)) {
-			callback(expr.left.object.name);
+			check = callback(expr.left.object);
 		}
 	}
-	if (t.isMemberExpression(expr.right)) {
+	if (check && t.isMemberExpression(expr.right)) {
 		if (t.isIdentifier(expr.right.object)) {
-			callback(expr.right.object.name);
+			check = callback(expr.right.object);
 		}
 	}
-	if (t.isBinaryExpression(expr.left)) {
-		binaryExpressionItems(expr.left, callback);
+	if (check && t.isBinaryExpression(expr.left)) {
+		check = binaryExpressionItems(expr.left, callback);
 	}
-	if (t.isBinaryExpression(expr.right)) {
-		binaryExpressionItems(expr.right, callback);
+	if (check && t.isBinaryExpression(expr.right)) {
+		check = binaryExpressionItems(expr.right, callback);
 	}
+	return check;
 };
 
 const unknownState = (path: t.NodePath<t.Node>) => {
@@ -155,12 +157,11 @@ const isVariableDeclaratorPathUsedInView = (path: t.NodePath<t.VariableDeclarato
 };
 
 const isVariableDeclaratorPathGivenCompoentProps = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
-	debugger;
 	return false;
 };
 
 const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal) => {
-	if (t.isIdentifier(id)) {
+	if (t.isIdentifier(id) && path.scope.bindings[id.name]) {
 		const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
 		return (
 			isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
@@ -173,12 +174,28 @@ const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal
 
 const isRequiredComputedExpression = (path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>) => {
 	const expr = t.isVariableDeclarator(path.node) ? path.node.init : path.node.value;
-	let dynamics = [];
 	if (t.isNewExpression(expr) || t.isCallExpression(expr)) {
-		dynamics = dynamicArguments(path, expr.arguments);
+		const dynamicArg = expr.arguments.find((arg, index) => {
+			if (t.isIdentifier(arg)) {
+				const isDynamic = isRequiredIdentifierFidanValAccess(path, arg);
+				return isDynamic;
+			} else {
+				// TODO ObjectExpression vs...
+				// debugger;
+				return false;
+			}
+		});
+		if (dynamicArg) {
+			return true;
+		}
 	}
-	if (dynamics.length || t.isBinaryExpression(expr) || t.isCallExpression(expr)) {
-		return true;
+	if (t.isBinaryExpression(expr)) {
+		let isDynamic = false;
+		binaryExpressionItems(expr, (item) => {
+			isDynamic = isRequiredIdentifierFidanValAccess(path, item);
+			return !isDynamic;
+		});
+		return isDynamic;
 	}
 };
 
