@@ -1,53 +1,57 @@
 import * as t from '@babel/types';
-import { NodePath } from '@babel/traverse';
-import { globalData } from '../common';
 import { declarationPathInScope } from '../export-registry';
 import modify from '../modify';
 import check from '../check';
-
-const pushDynamicPaths = (path: t.NodePath<t.Node>) => {
-	let declarationPath: NodePath<t.Node> = null;
-	if (t.isVariableDeclarator(path.node)) {
-		modify.createAdditionalData(path);
-		if (t.isBinaryExpression(path.node.init)) {
-			if (t.isIdentifier(path.node.init.left)) {
-				declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.left.name);
-				pushDynamicPaths(declarationPath);
-			}
-			if (t.isIdentifier(path.node.init.right)) {
-				declarationPath = declarationPathInScope(path.parentPath.scope, path.node.init.right.name);
-				pushDynamicPaths(declarationPath);
-			}
-		} else if (t.isCallExpression(path.node.init) || t.isNewExpression(path.node.init)) {
-			path.node.init.arguments.forEach((arg) => {
-				if (t.isIdentifier(arg)) {
-					declarationPath = declarationPathInScope(path.parentPath.scope, arg.name);
-					pushDynamicPaths(declarationPath);
-				} else {
-					check.unknownState(path);
-				}
-			});
-		} else if (
-			!t.isLiteral(path.node.init) &&
-			!t.isArrayExpression(path.node.init) &&
-			!t.isObjectExpression(path.node.init)
-		) {
-			check.unknownState(path);
-		}
-	} else {
-		check.unknownState(path);
-	}
-};
+import additionalInfo from '../additional-info';
+import generate from '@babel/generator';
 
 const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
-	if (t.isVariableDeclarator(path.node)) {
-		const bindingNames = [];
+	// modify.createAdditionalData(path);
+	// console.info('findVariableReferencedPaths: ' + generate(path.node).code);
+	if (t.isIdentifier(path.node)) {
+		additionalInfo.create(path);
+		const bindingNodePath = path.scope.bindings[path.node.name];
+		if (!bindingNodePath) {
+			return;
+		}
+		bindingNodePath.referencePaths.forEach((refPath) => {
+			if (t.isIdentifier(refPath.node)) {
+				const parentNode = refPath.parentPath.node;
+				if (t.isVariableDeclarator(parentNode)) {
+					additionalInfo.create(refPath.parentPath);
+				} else if (t.isAssignmentExpression(parentNode)) {
+					if (t.isIdentifier(parentNode.left)) {
+						const leftDeclarationPath = declarationPathInScope(
+							refPath.parentPath.scope,
+							parentNode.left.name
+						);
+						additionalInfo.create(leftDeclarationPath);
+					} else {
+						check.unknownState(path);
+					}
+				} else if (!t.isMemberExpression(parentNode)) {
+					check.unknownState(path);
+				}
+			} else {
+				check.unknownState(path);
+			}
+		});
+	} else if (t.isVariableDeclarator(path.node)) {
+		additionalInfo.create(path);
 		if (t.isIdentifier(path.node.id)) {
-			bindingNames.push(path.node.id.name);
+			// const a = 1
+			const referencePaths = path.scope.bindings[path.node.id.name].referencePaths.slice(0);
+			referencePaths.forEach((refPath) => {
+				findVariableReferencedPaths(refPath);
+			});
 		} else if (t.isObjectPattern(path.node.id)) {
+			//prop-1 -> const { value, text } = props;
 			path.node.id.properties.forEach((item) => {
-				if (t.isObjectProperty(item) && t.isIdentifier(item.key)) {
-					bindingNames.push(item.key.name);
+				if (t.isObjectProperty(item) && t.isIdentifier(item.key) && path.scope.bindings[item.key.name]) {
+					const referencePaths = path.scope.bindings[item.key.name].referencePaths.slice(0);
+					referencePaths.forEach((refPath) => {
+						findVariableReferencedPaths(refPath);
+					});
 				} else {
 					check.unknownState(path);
 				}
@@ -55,41 +59,24 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 		} else {
 			check.unknownState(path);
 		}
-		pushDynamicPaths(path);
-		bindingNames.forEach((bindingName) => {
-			const referencePaths = path.scope.bindings[bindingName].referencePaths.slice(0);
-			referencePaths.forEach((refPath) => {
-				if (t.isIdentifier(refPath.node)) {
-					const parentNode = refPath.parentPath.node;
-					if (t.isVariableDeclarator(parentNode)) {
-						pushDynamicPaths(refPath.parentPath);
-					} else if (t.isAssignmentExpression(parentNode)) {
-						if (t.isIdentifier(parentNode.left)) {
-							const leftDeclarationPath = declarationPathInScope(
-								refPath.parentPath.scope,
-								parentNode.left.name
-							);
-							pushDynamicPaths(leftDeclarationPath);
-						} else {
-							check.unknownState(path);
-						}
-					} else if (!t.isMemberExpression(parentNode)) {
-						check.unknownState(path);
-					}
-				} else {
-					check.unknownState(path);
-				}
-			});
-		});
-	} else if (t.isIdentifier(path.node)) {
-		// (todo) => ....
-		pushDynamicPaths(path);
+	} else if (t.isMemberExpression(path.node)) {
+		if (t.isIdentifier(path.node.object) && path.scope.bindings[path.node.object.name]) {
+			const bindingNodePath = path.scope.bindings[path.node.object.name].path;
+			additionalInfo.addDynamicMemberToObject(bindingNodePath, path.node);
+			findVariableReferencedPaths(bindingNodePath);
+		} else {
+			check.unknownState(path);
+		}
 	} else {
 		check.unknownState(path);
 	}
 };
 
-const checkExpression = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.Expression) => {
+const checkTemplateExpression = (
+	path: t.NodePath<t.TaggedTemplateExpression>,
+	expr: t.BlockStatement | t.Expression
+) => {
+	// console.log('checkTemplateExpression: ' + generate(expr).code);
 	if (t.isIdentifier(expr)) {
 		const bindingNodePath = path.scope.bindings[expr.name].path;
 		findVariableReferencedPaths(bindingNodePath);
@@ -97,7 +84,11 @@ const checkExpression = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.E
 		expr.arguments.forEach((arg) => {
 			if (t.isObjectExpression(arg)) {
 				arg.properties.forEach((prop) => {
-					if (t.isObjectProperty(prop) && t.isIdentifier(prop.value)) {
+					if (
+						t.isObjectProperty(prop) &&
+						t.isIdentifier(prop.value) &&
+						path.scope.bindings[prop.value.name]
+					) {
 						const bindingNodePath = path.scope.bindings[prop.value.name].path;
 						findVariableReferencedPaths(bindingNodePath);
 					} else if (t.isObjectMethod(prop) || t.isSpreadElement(prop)) {
@@ -116,22 +107,19 @@ const checkExpression = (path: t.NodePath<t.TaggedTemplateExpression>, expr: t.E
 			findVariableReferencedPaths(bindingNodePath);
 		}
 	} else if (t.isMemberExpression(expr)) {
-		if (t.isIdentifier(expr.object)) {
-			const bindingNodePath = path.scope.bindings[expr.object.name].path;
-			modify.additionInfoToPath(bindingNodePath, expr);
-			findVariableReferencedPaths(bindingNodePath);
-			// TODO array...
-		} else {
-			check.unknownState(path);
-		}
+		// findVariableReferencedPaths(path);
 	} else if (t.isBinaryExpression(expr)) {
 		//todolist -> className={'cls_' + todo.title}
 		check.binaryExpressionItems(expr, (itemName) => {
-			const bindingNodePath = path.scope.bindings[itemName].path;
-			findVariableReferencedPaths(bindingNodePath);
+			if (path.scope.bindings[itemName]) {
+				const bindingNodePath = path.scope.bindings[itemName].path;
+				findVariableReferencedPaths(bindingNodePath);
+			}
 		});
 	} else if (t.isConditionalExpression(expr)) {
-		checkExpression(path, expr.test);
+		checkTemplateExpression(path, expr.test);
+	} else if (t.isArrowFunctionExpression(expr)) {
+		checkTemplateExpression(path, expr.body);
 	} else {
 		check.unknownState(path);
 	}
@@ -145,7 +133,7 @@ export default (babel) => {
 				state: { key; filename; file }
 			) => {
 				path.node.quasi.expressions.forEach((expr) => {
-					checkExpression(path, expr);
+					checkTemplateExpression(path, expr);
 				});
 			}
 		}

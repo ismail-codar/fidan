@@ -1,6 +1,5 @@
 import * as t from '@babel/types';
-import { globalData } from './common';
-import { declarationPathInScope } from './export-registry';
+import generate from '@babel/generator';
 
 const isFidanCall = (node: t.Expression) => {
 	return (
@@ -29,19 +28,20 @@ const isFidanTaggedTemplateHtmlCallExpression = (path: t.NodePath<t.Node>) =>
 	path.node.tag.property.name === 'html';
 
 const isVariableDeclaratorPathUsedInView = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
-	return false;
+	return path && path.additionalInfo !== undefined;
 };
 
 const isVariableDeclaratorPathGivenCompoentProps = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
 	return false;
 };
 
-const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.Identifier) => {
-	const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
-	return (
-		isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
-		isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
-	);
+const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal) => {
+	return false;
+	// const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
+	// return (
+	// 	isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
+	// 	isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
+	// );
 };
 
 const isRequiredVariableDeclaratorComputedExpression = (path: t.NodePath<t.VariableDeclarator>) => {
@@ -164,6 +164,12 @@ const binaryExpressionItems = (expr: t.BinaryExpression, callback: (itemName: st
 		if (t.isIdentifier(expr.right.object)) {
 			callback(expr.right.object.name);
 		}
+	}
+	if (t.isBinaryExpression(expr.left)) {
+		binaryExpressionItems(expr.left, callback);
+	}
+	if (t.isBinaryExpression(expr.right)) {
+		binaryExpressionItems(expr.right, callback);
 	}
 };
 

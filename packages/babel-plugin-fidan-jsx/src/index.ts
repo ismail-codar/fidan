@@ -44,10 +44,7 @@ export default (babel) => {
 			},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
-					const leftIsDynamic = check.isRequiredIdentifierFidanValAccess(
-						path,
-						path.node.expression.left['name']
-					);
+					const leftIsDynamic = check.isRequiredIdentifierFidanValAccess(path, path.node.expression.left);
 					if (leftIsDynamic) {
 						let rightIsDynamic = false;
 						if (t.isIdentifier(path.node.expression.right)) {
