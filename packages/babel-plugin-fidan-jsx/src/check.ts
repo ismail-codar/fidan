@@ -28,12 +28,29 @@ const isFidanTaggedTemplateHtmlCallExpression = (path: t.NodePath<t.Node>) =>
 	t.isIdentifier(path.node.tag.property) &&
 	path.node.tag.property.name === 'html';
 
-const isPathDynamic = (path: t.NodePath<t.Node>, bindingName?: string) => {
-	if (bindingName) {
-		const declPath = declarationPathInScope(path.scope, bindingName);
-		return declPath && declPath.additionalInfo !== undefined;
-	} else {
-		return path.additionalInfo !== undefined;
+const isVariableDeclaratorPathUsedInView = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
+	return false;
+};
+
+const isVariableDeclaratorPathGivenCompoentProps = (path: t.NodePath<t.VariableDeclarator>, id: t.Identifier) => {
+	return false;
+};
+
+const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.Identifier) => {
+	const bindingNodePath = path.scope.bindings[id.name].path as t.NodePath<t.VariableDeclarator>;
+	return (
+		isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
+		isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
+	);
+};
+
+const isRequiredVariableDeclaratorComputedExpression = (path: t.NodePath<t.VariableDeclarator>) => {
+	let dynamics = [];
+	if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+		dynamics = dynamicArguments(path, path.node.init.arguments);
+	}
+	if (dynamics.length || t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+		return true;
 	}
 };
 
@@ -47,7 +64,7 @@ const dynamicArguments = (
 ) => {
 	return args.filter((arg, index) => {
 		if (t.isIdentifier(arg)) {
-			const isDynamic = isPathDynamic(path, arg.name);
+			const isDynamic = isRequiredIdentifierFidanValAccess(path, arg);
 			if (isDynamic) {
 				return true;
 			}
@@ -159,7 +176,6 @@ export default {
 	isFidanCall,
 	isFidanMember,
 	isComponentCall,
-	isPathDynamic,
 	isEmptyLiteral,
 	dynamicArguments,
 	isArrayVariableDeclarator,
@@ -168,5 +184,9 @@ export default {
 	nonComputedCallExpression,
 	parentPathLoop,
 	isFidanTaggedTemplateHtmlCallExpression,
-	binaryExpressionItems
+	binaryExpressionItems,
+	isVariableDeclaratorPathUsedInView,
+	isVariableDeclaratorPathGivenCompoentProps,
+	isRequiredIdentifierFidanValAccess,
+	isRequiredVariableDeclaratorComputedExpression
 };

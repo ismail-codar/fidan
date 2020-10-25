@@ -26,16 +26,13 @@ export default (babel) => {
 				// }
 			},
 			VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-				let dynamics = [];
-				if (t.isNewExpression(path.node.init) || t.isCallExpression(path.node.init)) {
-					dynamics = check.dynamicArguments(path, path.node.init.arguments);
-				}
-				if (dynamics.length || t.isBinaryExpression(path.node.init) || t.isCallExpression(path.node.init)) {
+				if (check.isRequiredVariableDeclaratorComputedExpression(path)) {
 					path.node.init = modify.fidanComputedExpressionInit(path.node.init);
-				} else {
-					if (check.isPathDynamic(path)) {
-						path.node.init = modify.fidanValueInit(path.node.init);
-					}
+				} else if (
+					t.isIdentifier(path.node.id) &&
+					check.isVariableDeclaratorPathUsedInView(path, path.node.id)
+				) {
+					path.node.init = modify.fidanValueInit(path.node.init);
 				}
 			},
 			ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
@@ -45,10 +42,12 @@ export default (babel) => {
 				// .a, .a()
 				// modify.fidanValAccess(node)
 			},
-			ArrayExpression(path: t.NodePath<t.ArrayExpression>) {},
 			ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
 				if (t.isAssignmentExpression(path.node.expression)) {
-					const leftIsDynamic = check.isPathDynamic(path, path.node.expression.left['name']);
+					const leftIsDynamic = check.isRequiredIdentifierFidanValAccess(
+						path,
+						path.node.expression.left['name']
+					);
 					if (leftIsDynamic) {
 						let rightIsDynamic = false;
 						if (t.isIdentifier(path.node.expression.right)) {
@@ -56,7 +55,10 @@ export default (babel) => {
 								path.scope,
 								path.node.expression.right.name
 							);
-							rightIsDynamic = check.isPathDynamic(initDeclarationPath);
+							rightIsDynamic = check.isRequiredIdentifierFidanValAccess(
+								initDeclarationPath,
+								path.node.expression.right
+							);
 						}
 						if (!rightIsDynamic) {
 							path.node.expression = modify.fidanValueSet(path.node.expression);
@@ -65,7 +67,7 @@ export default (babel) => {
 				} else if (t.isUpdateExpression(path.node.expression)) {
 					if (
 						t.isIdentifier(path.node.expression.argument) &&
-						check.isPathDynamic(path, path.node.expression.argument.name)
+						check.isRequiredIdentifierFidanValAccess(path, path.node.expression.argument)
 					) {
 						path.node.expression = modify.fidanValueSet(
 							t.assignmentExpression(
@@ -112,17 +114,27 @@ export default (babel) => {
 					}
 				});
 			},
-			// Identity a -> a()
+			//  #region Identity a -> a()
 			CallExpression(path: t.NodePath<t.CallExpression>) {
 				path.node.arguments.forEach((arg, index) => {
-					if (t.isIdentifier(arg)) {
-						const bindingNodePath = path.scope.bindings[arg.name].path;
-						if (t.isVariableDeclarator(bindingNodePath.node) && check.isPathDynamic(bindingNodePath)) {
-							path.node.arguments[index] = modify.fidanValAccess(arg);
-						}
+					if (t.isIdentifier(arg) && check.isRequiredIdentifierFidanValAccess(path, arg)) {
+						path.node.arguments[index] = modify.fidanValAccess(arg);
 					}
 				});
+			},
+			BinaryExpression(path: t.NodePath<t.BinaryExpression>) {
+				if (t.isIdentifier(path.node.left)) {
+					if (check.isRequiredIdentifierFidanValAccess(path, path.node.left)) {
+						path.node.left = modify.fidanValAccess(path.node.left);
+					}
+				}
+				if (t.isIdentifier(path.node.right)) {
+					if (check.isRequiredIdentifierFidanValAccess(path, path.node.right)) {
+						path.node.right = modify.fidanValAccess(path.node.right);
+					}
+				}
 			}
+			// #endregion Identity a -> a()
 		}
 	};
 };
