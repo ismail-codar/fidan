@@ -3,18 +3,15 @@ import check from './check';
 
 const create = (path: t.NodePath<t.Node>) => {
 	if (!path.additionalInfo) {
-		path.additionalInfo = {};
+		path.additionalInfo = {
+			memberExpressions: [],
+			arrayMapItems: []
+		};
 	}
 };
 
 // which members are dynamic on dynamic object variable ->  object-property-1
 export const addDynamicMemberToObject = (path: t.NodePath<t.Node>, info: t.MemberExpression) => {
-	if (!path.additionalInfo) {
-		path.additionalInfo = {};
-	}
-	if (!path.additionalInfo.memberExpressions) {
-		path.additionalInfo.memberExpressions = [];
-	}
 	const parentFunctionExpressionPath = check.parentPathLoop(
 		path,
 		(checkPath) => t.isArrowFunctionExpression(checkPath.node) || t.isFunctionExpression(checkPath.node)
@@ -35,15 +32,10 @@ export const addDynamicMemberToObject = (path: t.NodePath<t.Node>, info: t.Membe
 			t.isVariableDeclarator(parentObjectBinding.path.node) &&
 			t.isArrayExpression(parentObjectBinding.path.node.init)
 		) {
-			const arrayVariableDeclarator = parentObjectBinding.path as t.NodePath<t.VariableDeclarator>;
-			if (!arrayVariableDeclarator.additionalInfo) {
-				arrayVariableDeclarator.additionalInfo = {};
-			}
-			if (!arrayVariableDeclarator.additionalInfo.arrayMapItems) {
-				arrayVariableDeclarator.additionalInfo.arrayMapItems = [];
-			}
+			const arrayVariableDeclaratorPath = parentObjectBinding.path as t.NodePath<t.VariableDeclarator>;
 			//TEST: todolist
-			arrayVariableDeclarator.additionalInfo.arrayMapItems.push(path);
+			arrayVariableDeclaratorPath.additionalInfo.arrayMapItems.push(path);
+			path.additionalInfo.parentArrayPath = arrayVariableDeclaratorPath;
 		}
 	}
 	//TEST: object-property-1

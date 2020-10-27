@@ -66,10 +66,7 @@ export default (babel) => {
 						t.VariableDeclarator
 					>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
 				}
-				if (
-					parentArrayVariableDeclaratorPath &&
-					parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems
-				) {
+				if (parentArrayVariableDeclaratorPath) {
 					const arrayMapItems = parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems;
 					if (arrayMapItems) {
 						for (var i = 0; i < arrayMapItems.length; i++) {
@@ -95,37 +92,6 @@ export default (babel) => {
 								}
 							}
 						}
-					}
-				}
-			},
-			MemberExpression(path: t.NodePath<t.MemberExpression>) {
-				// .a, .a()
-				// modify.fidanValAccess(node)
-				if (t.isIdentifier(path.node.object) && path.scope.bindings[path.node.object.name]) {
-					const bindingNodePath = path.scope.bindings[path.node.object.name].path;
-					if (bindingNodePath && !t.isCallExpression(path.parent)) {
-						// console.log(generate(path.node).code);
-						// debugger;
-						// let pathStr = '';
-						// const parentObjectExpressionPath = check.parentPathLoop<
-						// 	t.ObjectExpression
-						// >(path, (checkPath) => {
-						// 	if (t.isObjectProperty(checkPath.node) && t.isIdentifier(checkPath.node.key)) {
-						// 		pathStr += checkPath.node.key.name;
-						// 		pathStr += '.';
-						// 		return false;
-						// 	}
-						// 	return true;
-						// });
-						// pathStr = pathStr.substr(0, pathStr.length - 1);
-						// const memberExpressions = bindingNodePath.additionalInfo.memberExpressions;
-						// for (var m = 0; m < memberExpressions.length; m++) {
-						// 	let memberExprStr: string = generate(memberExpressions[m]).code;
-						// 	memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
-						// 	if (memberExprStr === pathStr) {
-						// 		//TEST: todolist
-						// 	}
-						// }
 					}
 				}
 			},
@@ -207,15 +173,19 @@ export default (babel) => {
 				});
 			},
 			BinaryExpression(path: t.NodePath<t.BinaryExpression>) {
-				if (t.isIdentifier(path.node.left)) {
+				if (t.isIdentifier(path.node.left) || t.isMemberExpression(path.node.left)) {
 					if (check.isRequiredIdentifierFidanValAccess(path, path.node.left)) {
 						path.node.left = modify.fidanValAccess(path.node.left);
 					}
+				} else {
+					check.unknownState(path);
 				}
-				if (t.isIdentifier(path.node.right)) {
+				if (t.isIdentifier(path.node.right) || t.isMemberExpression(path.node.right)) {
 					if (check.isRequiredIdentifierFidanValAccess(path, path.node.right)) {
 						path.node.right = modify.fidanValAccess(path.node.right);
 					}
+				} else {
+					check.unknownState(path);
 				}
 			}
 			// #endregion Identity a -> a()

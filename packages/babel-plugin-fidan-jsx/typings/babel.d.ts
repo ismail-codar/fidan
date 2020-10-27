@@ -15,8 +15,9 @@ declare module '@babel/types' {
 		parentPath: NodePath<t.Node>;
 		parent: t.Node;
 		additionalInfo: {
-			memberExpressions?: t.MemberExpression[];
-			arrayMapItems?: t.NodePath<t.Node>[];
+			memberExpressions: t.MemberExpression[];
+			arrayMapItems: t.NodePath<t.Node>[];
+			parentArrayPath?: t.NodePath<t.VariableDeclarator>;
 		};
 	}
 }

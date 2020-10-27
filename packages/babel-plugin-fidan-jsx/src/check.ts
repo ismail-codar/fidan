@@ -167,6 +167,9 @@ const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal
 			isVariableDeclaratorPathUsedInView(bindingNodePath, id) ||
 			isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
 		);
+	} else if (t.isMemberExpression(id)) {
+		const bindingNodePath = path.scope.bindings['todo'].path as t.NodePath<t.VariableDeclarator>;
+		debugger;
 	} else {
 		return false;
 	}

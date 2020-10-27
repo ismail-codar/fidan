@@ -17,11 +17,13 @@ export const App = () => {
 	});
 
 	const handleDelete = (todo, index) => {
+		console.log(todo.completed());
 		const idx = todos.indexOf(todo);
 		todos.splice(idx, 1);
 	};
 
 	const handleComplete = (todo) => {
+		console.log(todo.title());
 		const idx = todos.indexOf(todo);
 		todos[idx].completed = !todos[idx].completed;
 	};
