@@ -4,12 +4,13 @@ import modify from '../modify';
 import check from '../check';
 import additionalInfo from '../additional-info';
 import generate from '@babel/generator';
+import { globalData } from '../common';
 
 const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 	// modify.createAdditionalData(path);
 	// console.info('findVariableReferencedPaths: ' + generate(path.node).code);
 	if (t.isIdentifier(path.node)) {
-		additionalInfo.create(path);
+		additionalInfo.createCheck(path);
 		const bindingNodePath = path.scope.bindings[path.node.name];
 		if (!bindingNodePath) {
 			return;
@@ -18,14 +19,14 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 			if (t.isIdentifier(refPath.node)) {
 				const parentNode = refPath.parentPath.node;
 				if (t.isVariableDeclarator(parentNode)) {
-					additionalInfo.create(refPath.parentPath);
+					additionalInfo.createCheck(refPath.parentPath);
 				} else if (t.isAssignmentExpression(parentNode)) {
 					if (t.isIdentifier(parentNode.left)) {
 						const leftDeclarationPath = declarationPathInScope(
 							refPath.parentPath.scope,
 							parentNode.left.name
 						);
-						additionalInfo.create(leftDeclarationPath);
+						additionalInfo.createCheck(leftDeclarationPath);
 					} else {
 						check.unknownState(path);
 					}
@@ -37,7 +38,7 @@ const findVariableReferencedPaths = (path: t.NodePath<t.Node>) => {
 			}
 		});
 	} else if (t.isVariableDeclarator(path.node)) {
-		additionalInfo.create(path);
+		additionalInfo.createCheck(path);
 		if (t.isIdentifier(path.node.id)) {
 			// const a = 1
 			const referencePaths = path.scope.bindings[path.node.id.name].referencePaths.slice(0);
@@ -101,7 +102,8 @@ const checkTemplateExpression = (
 	} else if (t.isMemberExpression(expr)) {
 		if (t.isIdentifier(expr.object) && path.scope.bindings[expr.object.name]) {
 			const bindingNodePath = path.scope.bindings[expr.object.name].path;
-			additionalInfo.addDynamicMemberToObject(bindingNodePath, expr);
+			// object-property-1
+			bindingNodePath.additionalInfo.objectVariableDeclarationDynamicMemberExpressions.push(expr);
 			findVariableReferencedPaths(bindingNodePath);
 		} else {
 			check.unknownState(path);
@@ -127,13 +129,51 @@ const checkTemplateExpression = (
 export default (babel) => {
 	return {
 		visitor: {
-			TaggedTemplateExpression: (
-				path: t.NodePath<t.TaggedTemplateExpression>,
-				state: { key; filename; file }
-			) => {
-				path.node.quasi.expressions.forEach((expr) => {
-					checkTemplateExpression(path, expr);
-				});
+			TaggedTemplateExpression: {
+				enter: (path: t.NodePath<t.TaggedTemplateExpression>) => {
+					globalData.isInTaggedTemplateExpression = true;
+					path.node.quasi.expressions.forEach((expr) => {
+						checkTemplateExpression(path, expr);
+					});
+				},
+				exit: (path: t.NodePath<t.TaggedTemplateExpression>) => {
+					globalData.isInTaggedTemplateExpression = false;
+				}
+			},
+			CallExpression: (path: t.NodePath<t.CallExpression>) => {
+				if (t.isIdentifier(path.node.callee)) {
+					const calleName = path.node.callee.name;
+					const scopedPath = check.parentPathLoop(path, (checkPath) => {
+						return checkPath.scope.bindings[calleName] !== undefined;
+					});
+					if (scopedPath) {
+						const callExpressionDeclarationPath = scopedPath.scope.bindings[calleName].path;
+						additionalInfo.createCheck(callExpressionDeclarationPath);
+						path.node.arguments.forEach((arg) => {
+							if (t.isIdentifier(arg)) {
+								// TODO isDynamic
+								callExpressionDeclarationPath.additionalInfo.callExpressionDeclarationDynamicParams.push(
+									arg.name
+								);
+							} else {
+								check.unknownState(path, arg);
+							}
+						});
+					}
+				} else if (t.isMemberExpression(path.node.callee)) {
+					if (
+						t.isIdentifier(path.node.callee.property) &&
+						path.node.callee.property.name === 'map' &&
+						t.isIdentifier(path.node.callee.object)
+					) {
+						const arrayVariableDeclaratorPath = path.scope.bindings[path.node.callee.object.name]
+							.path as t.NodePath<t.VariableDeclarator>;
+						//TEST: todolist
+						arrayVariableDeclaratorPath.additionalInfo.arrayVariableDeclarationMaps.push(path);
+					}
+				} else {
+					check.unknownState(path);
+				}
 			}
 		}
 	};

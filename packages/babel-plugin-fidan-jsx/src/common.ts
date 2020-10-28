@@ -14,5 +14,6 @@ export const globalData = {
 		include: fileExtentions.map((ext) => '**/*' + ext)
 	},
 	openedTags: [],
-	isSvg: false
+	isSvg: false,
+	isInTaggedTemplateExpression: false
 };

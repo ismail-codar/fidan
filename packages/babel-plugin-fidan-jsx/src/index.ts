@@ -67,10 +67,12 @@ export default (babel) => {
 					>(parentObjectExpressionPath, (checkPath) => t.isVariableDeclarator(checkPath.node));
 				}
 				if (parentArrayVariableDeclaratorPath) {
-					const arrayMapItems = parentArrayVariableDeclaratorPath.additionalInfo.arrayMapItems;
-					if (arrayMapItems) {
-						for (var i = 0; i < arrayMapItems.length; i++) {
-							const memberExpressions = arrayMapItems[i].additionalInfo.memberExpressions;
+					const { arrayVariableDeclarationMaps } = parentArrayVariableDeclaratorPath.additionalInfo;
+					if (arrayVariableDeclarationMaps) {
+						for (var i = 0; i < arrayVariableDeclarationMaps.length; i++) {
+							const memberExpressions =
+								arrayVariableDeclarationMaps[i].additionalInfo
+									.objectVariableDeclarationDynamicMemberExpressions;
 							for (var m = 0; m < memberExpressions.length; m++) {
 								let memberExprStr: string = generate(memberExpressions[m]).code;
 								memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);
