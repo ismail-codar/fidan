@@ -103,7 +103,7 @@ const checkTemplateExpression = (
 		if (t.isIdentifier(expr.object) && path.scope.bindings[expr.object.name]) {
 			const bindingNodePath = path.scope.bindings[expr.object.name].path;
 			// object-property-1
-			bindingNodePath.additionalInfo.objectVariableDeclarationDynamicMemberExpressions.push(expr);
+			bindingNodePath.additionalInfo.objectVariableDeclaratorDynamicMemberExpressions.push(expr);
 			findVariableReferencedPaths(bindingNodePath);
 		} else {
 			check.unknownState(path);
@@ -152,7 +152,7 @@ export default (babel) => {
 						path.node.arguments.forEach((arg) => {
 							if (t.isIdentifier(arg)) {
 								// TODO isDynamic
-								callExpressionDeclarationPath.additionalInfo.callExpressionDeclarationDynamicParams.push(
+								callExpressionDeclarationPath.additionalInfo.callExpressionDeclaratorDynamicParams.push(
 									arg.name
 								);
 							} else {
@@ -169,10 +169,19 @@ export default (babel) => {
 						const arrayVariableDeclaratorPath = path.scope.bindings[path.node.callee.object.name]
 							.path as t.NodePath<t.VariableDeclarator>;
 						//TEST: todolist
+						additionalInfo.createCheck(path);
 						arrayVariableDeclaratorPath.additionalInfo.arrayVariableDeclarationMaps.push(path);
 					}
 				} else {
 					check.unknownState(path);
+				}
+			},
+			VariableDeclarator: (path: t.NodePath<t.VariableDeclarator>) => {
+				for (var bindingName in path.scope.bindings) {
+					path.scope.bindings[bindingName].referencePaths.forEach((refPath) => {
+						additionalInfo.createCheck(refPath.parentPath);
+						refPath.parentPath.additionalInfo.referencedVariableDeclaratorPath = refPath;
+					});
 				}
 			}
 		}

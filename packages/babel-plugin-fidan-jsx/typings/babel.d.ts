@@ -15,10 +15,11 @@ declare module '@babel/types' {
 		parentPath: NodePath<t.Node>;
 		parent: t.Node;
 		additionalInfo: {
-			objectVariableDeclarationDynamicMemberExpressions: t.MemberExpression[];
+			objectVariableDeclaratorDynamicMemberExpressions: t.MemberExpression[];
 			arrayVariableDeclarationMaps: t.NodePath<t.Node>[];
 			parentArrayPath?: t.NodePath<t.VariableDeclarator>;
-			callExpressionDeclarationDynamicParams: string[];
+			callExpressionDeclaratorDynamicParams: string[];
+			referencedVariableDeclaratorPath?: t.NodePath<t.Node>;
 		};
 	}
 }

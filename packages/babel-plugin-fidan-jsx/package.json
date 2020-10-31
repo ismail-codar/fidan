@@ -17,7 +17,8 @@
 		"@babel/core": "^7.11.6",
 		"@babel/plugin-syntax-jsx": "^7.10.4",
 		"@fidanjs/runtime": "^0.0.25",
-		"anymatch": "^3.1.1"
+		"anymatch": "^3.1.1",
+		"flatted": "^3.1.0"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.11.6",

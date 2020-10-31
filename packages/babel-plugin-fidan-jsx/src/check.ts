@@ -49,6 +49,13 @@ const dynamicArguments = (
 	});
 };
 
+const rootMemberExpressionObject = (node: t.MemberExpression) => {
+	while (t.isMemberExpression(node.object)) {
+		node = node.object;
+	}
+	return node;
+};
+
 const isArrayVariableDeclarator = (node: t.VariableDeclarator) => {
 	return (
 		t.isArrayExpression(node.init) ||
@@ -168,8 +175,16 @@ const isRequiredIdentifierFidanValAccess = (path: t.NodePath<t.Node>, id: t.LVal
 			isVariableDeclaratorPathGivenCompoentProps(bindingNodePath, id)
 		);
 	} else if (t.isMemberExpression(id)) {
-		const bindingNodePath = path.scope.bindings['todo'].path as t.NodePath<t.VariableDeclarator>;
 		// TODO parentVariableDeclrataor arguments...
+		// const parentObjectPath = parentPathLoop(bindingNodePath)
+		const rootObject = rootMemberExpressionObject(id);
+		const bindingNodePath = parentPathLoop(path, (checkPath) => {
+			return (
+				t.isIdentifier(rootObject.object) &&
+				checkPath.scope.bindings[rootObject.object.name] !== undefined &&
+				t.isVariableDeclarator(checkPath.scope.bindings[rootObject.object.name].path.node)
+			);
+		});
 		debugger;
 	} else {
 		return false;

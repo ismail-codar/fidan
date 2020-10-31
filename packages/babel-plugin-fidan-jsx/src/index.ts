@@ -7,6 +7,8 @@ import templateLiteralVariables from './template-literal-variables';
 import modify from './modify';
 import check from './check';
 import { declarationPathInScope, variableBindingInScope } from './export-registry';
+import * as fs from 'fs';
+import { stringify } from 'flatted';
 
 export default (babel) => {
 	return {
@@ -14,6 +16,12 @@ export default (babel) => {
 		visitor: {
 			Program: {
 				enter(path: t.NodePath<t.Program>, state: { key; filename; file }) {
+					JSON.stringify(JSON.parse(stringify(path.node)), null, 1);
+					// fs.writeFileSync(
+					// 	state.filename.substr(0, state.filename.length - 4) + '.json',
+					// 	JSON.stringify(JSON.parse(stringify(path.node)), null, 1)
+					// );
+					// debugger;
 					modify.insertFidanImport(path.node.body);
 					path.traverse(jsxToTemplateLiteral(babel).visitor, state);
 					// console.log(generate(path.node).code);
@@ -72,7 +80,7 @@ export default (babel) => {
 						for (var i = 0; i < arrayVariableDeclarationMaps.length; i++) {
 							const memberExpressions =
 								arrayVariableDeclarationMaps[i].additionalInfo
-									.objectVariableDeclarationDynamicMemberExpressions;
+									.objectVariableDeclaratorDynamicMemberExpressions;
 							for (var m = 0; m < memberExpressions.length; m++) {
 								let memberExprStr: string = generate(memberExpressions[m]).code;
 								memberExprStr = memberExprStr.substr(memberExprStr.indexOf('.') + 1);

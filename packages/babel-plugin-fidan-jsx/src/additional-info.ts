@@ -4,9 +4,9 @@ import check from './check';
 const createCheck = (path: t.NodePath<t.Node>) => {
 	if (!path.additionalInfo) {
 		path.additionalInfo = {
-			objectVariableDeclarationDynamicMemberExpressions: [],
+			objectVariableDeclaratorDynamicMemberExpressions: [],
 			arrayVariableDeclarationMaps: [],
-			callExpressionDeclarationDynamicParams: []
+			callExpressionDeclaratorDynamicParams: []
 		};
 	}
 };
