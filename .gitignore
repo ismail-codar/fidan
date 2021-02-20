@@ -8,3 +8,4 @@ dist
 node_modules
 packages/fidan-integration-react/yarn-error.log
 yarn.lock
+build
