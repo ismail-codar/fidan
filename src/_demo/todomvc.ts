@@ -51,7 +51,7 @@ const updateTodo = (todo: Todo, title: string) => {
   }
 };
 const removeTodo = id => {
-  todos().splice(
+  todos.splice(
     shownTodos().findIndex(item => item.id == id),
     1
   );

@@ -76,7 +76,6 @@ export const html = (literals, ...vars): DocumentFragment => {
 
   template = template.cloneNode(false) as HTMLTemplateElement;
   template.innerHTML = result;
-  console.log(result);
 
   const element = template.content;
   const commentNodes = [];
@@ -130,7 +129,10 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     if (paramType & TEXT_OR_DOM) {
       if (paramType === TEXT) {
         attributeName = 'textContent';
-        element = document.createTextNode(isDynamic ? param.$val : param);
+        element =
+          param.$val instanceof Node
+            ? param.$val
+            : document.createTextNode(isDynamic ? param.$val : param);
         commentNode.parentElement.insertBefore(
           element,
           commentNode.nextSibling
@@ -173,6 +175,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         param(commentNode.parentElement, commentNode.nextElementSibling);
         commentNode.remove();
       } else {
+        debugger;
         //conditionalDom can be place on root
         window.requestAnimationFrame(() => {
           param(commentNode.parentElement, commentNode.nextElementSibling);
