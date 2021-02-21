@@ -214,8 +214,7 @@ export const arrayMap = <T>(
   const prevElement = nextElement ? document.createTextNode('') : undefined;
   nextElement && parentDom.insertBefore(prevElement, nextElement);
   computed<any[]>(
-    (nextVal, { caller }) => {
-      const beforeVal = caller.$val;
+    (nextVal, { caller, prevVal }) => {
       const renderFunction: (
         parent,
         renderedValues,
@@ -227,7 +226,7 @@ export const arrayMap = <T>(
       ) => void = renderMode === 'reconcile' ? reconcile : reuseNodes;
       renderFunction(
         parentDom,
-        beforeVal || [],
+        prevVal || [],
         nextVal || [],
         (nextItem, index) => {
           let rendered = renderCallback(nextItem, index) as any;

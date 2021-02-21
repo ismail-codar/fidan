@@ -184,8 +184,7 @@ const APP = html`
                       }}"
                       onblur="${e => updateTodo(todo, e.target.value)}"
                     />
-                  </li>
-                `
+                  </li>`
               )}
             </ul>
           </section>

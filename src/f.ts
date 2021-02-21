@@ -41,27 +41,22 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
         autoTracks.push(innerFn);
       return innerFn['$val'];
     } else {
-      const updateAfter = Array.isArray(val);
-      if (!updateAfter) {
-        innerFn['$val'] = val;
-        if (Array.isArray(val)) {
-          innerFn.size(val.length);
-        }
+      const prevVal = innerFn['$val'];
+      if (Array.isArray(val)) {
+        innerFn.size(val.length);
       }
+      innerFn['$val'] = val;
       let depends: FidanValue<any>[] = innerFn['c_depends'];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
           if (depends[i].compute) {
-            depends[i](depends[i].compute(val, { caller: innerFn }), {
+            depends[i](depends[i].compute(val, { caller: innerFn, prevVal }), {
               caller: depends[i],
             });
           } else {
             depends[i](innerFn.$val, innerFn);
           }
         }
-      if (updateAfter) {
-        innerFn['$val'] = val;
-      }
     }
   };
 
@@ -131,15 +126,13 @@ export const createFidanArray = (dataArray: FidanArray<any[]>) => {
   mutationMethods.forEach(method => {
     dataArray[method] = function() {
       const arr = dataArray.$val.slice(0);
-      const size1 = arr.length;
       const ret = Array.prototype[method].apply(arr, arguments);
-      const size2 = arr.length;
-      if (size1 !== size2) dataArray.size(size2);
       // TODO event based strategy for -> simpleMutationMethods
       dataArray(arr, {
         method,
         caller: dataArray,
         args: [...arguments],
+        prevVal: dataArray.$val,
       });
       return ret;
     };
