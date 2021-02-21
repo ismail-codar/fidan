@@ -29,7 +29,7 @@ const todos = value<Todo[]>([
 ]) as FidanArray<Todo[]>;
 const allChecked = value(false);
 
-const shownTodos: FidanArray<Todo[]> = computed(() => {
+const shownTodos: FidanArray<Todo[]> = computed(val => {
   let _todos = todos();
   const filter = hashFilter();
   if (filter !== '') {
@@ -108,7 +108,8 @@ _savedTodos.forEach(item => {
   item.editing = value(false).depends(() => [saveTodo]);
   item.completed = value(item.completed).depends(() => [todoCount]);
 });
-todos(_savedTodos);
+// debugger;
+// todos(_savedTodos);
 allChecked(todoCount() === 0);
 
 // view

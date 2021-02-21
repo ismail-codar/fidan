@@ -44,6 +44,9 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
       const updateAfter = Array.isArray(val);
       if (!updateAfter) {
         innerFn['$val'] = val;
+        if (Array.isArray(val)) {
+          innerFn.size(val.length);
+        }
       }
       let depends: FidanValue<any>[] = innerFn['c_depends'];
       if (depends.length)
