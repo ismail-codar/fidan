@@ -75,7 +75,7 @@ export const html = (literals, ...vars): DocumentFragment => {
   result += extra;
 
   template = template.cloneNode(false) as HTMLTemplateElement;
-  template.innerHTML = result;
+  template.innerHTML = result.trim();
 
   const element = template.content;
   const commentNodes = [];
@@ -86,19 +86,14 @@ export const html = (literals, ...vars): DocumentFragment => {
 };
 
 const walkForCommentNodes = (element, commentNodes) => {
-  var treeWalker = document.createTreeWalker(
-    element,
-    NodeFilter.SHOW_COMMENT,
-    {
-      acceptNode: function(node) {
-        var nodeValue = node.nodeValue.trim();
-        return nodeValue.startsWith('$cmt')
-          ? NodeFilter.FILTER_ACCEPT
-          : NodeFilter.FILTER_REJECT;
-      },
+  var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_COMMENT, {
+    acceptNode: function(node) {
+      var nodeValue = node.nodeValue.trim();
+      return nodeValue.startsWith('$cmt')
+        ? NodeFilter.FILTER_ACCEPT
+        : NodeFilter.FILTER_REJECT;
     },
-    false
-  );
+  });
 
   while (treeWalker.nextNode()) {
     commentNodes.push(treeWalker.currentNode);

@@ -42,10 +42,10 @@ export const value = <T>(val?: T): FidanValueFn<T> => {
       return innerFn['$val'];
     } else {
       const prevVal = innerFn['$val'];
+      innerFn['$val'] = val;
       if (Array.isArray(val)) {
         innerFn.size(val.length);
       }
-      innerFn['$val'] = val;
       let depends: FidanValue<any>[] = innerFn['c_depends'];
       if (depends.length)
         for (var i = 0; i < depends.length; i++) {
