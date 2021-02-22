@@ -27,7 +27,7 @@ export interface FidanValue<T> {
   compute: (val?: T, opt?: ComputionMethodArguments<T>) => T;
 }
 
-type FidanArrayType<T> = FidanValue<T> & Array<T>;
+type FidanArrayType<T extends Array<T[0]>> = FidanValue<T> & Array<T[0]>;
 export interface FidanArray<T extends Array<any>> extends FidanArrayType<T> {
   size: FidanValue<number>;
   map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;

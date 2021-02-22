@@ -14,18 +14,18 @@ interface Todo {
 const STORAGE_KEY = 'fidan_todomvc';
 const hashFilter = value<FilterType>('');
 const todos = value<Todo[]>([
-  {
-    id: 1,
-    title: value('test1'),
-    completed: value(false),
-    editing: value(false),
-  },
-  {
-    id: 2,
-    title: value('test'),
-    completed: value(false),
-    editing: value(false),
-  },
+  // {
+  //   id: 1,
+  //   title: value('test1'),
+  //   completed: value(false),
+  //   editing: value(false),
+  // },
+  // {
+  //   id: 2,
+  //   title: value('test'),
+  //   completed: value(false),
+  //   editing: value(false),
+  // },
 ]) as FidanArray<Todo[]>;
 const allChecked = value(false);
 
@@ -52,16 +52,16 @@ const updateTodo = (todo: Todo, title: string) => {
 };
 const removeTodo = id => {
   todos.splice(
-    shownTodos().findIndex(item => item.id == id),
+    shownTodos.findIndex(item => item.id == id),
     1
   );
 };
 const clearCompleted = e => {
   const removes = [];
-  todos().forEach(todo => {
+  todos.forEach(todo => {
     if (todo.completed()) removes.push(todo);
   });
-  while (removes.length) todos().splice(todos().indexOf(removes.pop()), 1);
+  while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
 
 // css computations
@@ -78,7 +78,7 @@ const editItemCss = (todo: Todo) =>
 
 // footer
 const todoCount = computed(() => {
-  const count = todos().filter(item => !item.completed()).length;
+  const count = todos.filter(item => !item.completed()).length;
   if (count === 0 && !allChecked()) {
     allChecked(true);
   }
@@ -109,7 +109,7 @@ _savedTodos.forEach(item => {
   item.completed = value(item.completed).depends(() => [todoCount]);
 });
 // debugger;
-// todos(_savedTodos);
+todos(_savedTodos);
 allChecked(todoCount() === 0);
 
 // view
@@ -125,7 +125,7 @@ const APP = html`
           if (e.key === 'Enter') {
             const title = e.target.value.trim();
             title &&
-              todos().push({
+              todos.push({
                 id: Math.random(),
                 title: value(title).depends(() => [saveTodo]),
                 editing: value(false),
@@ -146,7 +146,7 @@ const APP = html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos().forEach(todo => todo.completed(e.target.checked))}"
+                todos.forEach(todo => todo.completed(e.target.checked))}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
@@ -210,7 +210,7 @@ const APP = html`
               </li>
             </ul>
             ${computed(() => {
-              if (todos().length - todoCount() > 0) {
+              if (todos.length - todoCount() > 0) {
                 return html`
                   <button class="clear-completed" onclick="${clearCompleted}">
                     Clear completed
