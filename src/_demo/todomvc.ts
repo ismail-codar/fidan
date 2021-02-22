@@ -1,44 +1,49 @@
-import { FidanValue, FidanArray, value, html, debounce } from '../';
-import { computed } from '../f';
+import trkl, { Observable } from 'trkl';
+import { debounce, html } from '../';
+import { observableArray, ObservableArray } from '../array';
 
 // interface & types
 type FilterType = '' | 'active' | 'completed';
 interface Todo {
   id: number;
-  title: FidanValue<string>;
-  editing: FidanValue<boolean>;
-  completed: FidanValue<boolean>;
+  title: Observable<string>;
+  editing: Observable<boolean>;
+  completed: Observable<boolean>;
 }
 
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
-const hashFilter = value<FilterType>('');
-const todos = value<Todo[]>([
-  // {
-  //   id: 1,
-  //   title: value('test1'),
-  //   completed: value(false),
-  //   editing: value(false),
-  // },
-  // {
-  //   id: 2,
-  //   title: value('test'),
-  //   completed: value(false),
-  //   editing: value(false),
-  // },
-]) as FidanArray<Todo[]>;
-const allChecked = value(false);
+const hashFilter = trkl<FilterType>('');
+const todos = observableArray(
+  trkl<Todo[]>([
+    {
+      id: 1,
+      title: trkl('test1'),
+      completed: trkl(false),
+      editing: trkl(false),
+    },
+    {
+      id: 2,
+      title: trkl('test'),
+      completed: trkl(false),
+      editing: trkl(false),
+    },
+  ])
+) as ObservableArray<Todo[]>;
+const allChecked = trkl(false);
 
-const shownTodos: FidanArray<Todo[]> = computed(val => {
-  let _todos = todos();
-  const filter = hashFilter();
-  if (filter !== '') {
-    _todos = _todos.filter(todo =>
-      filter === 'active' ? !todo.completed() : todo.completed()
-    ) as any;
-  }
-  return _todos;
-});
+const shownTodos: ObservableArray<Todo[]> = observableArray(
+  trkl.computed(() => {
+    let _todos = todos();
+    const filter = hashFilter();
+    if (filter !== '') {
+      _todos = _todos.filter(todo =>
+        filter === 'active' ? !todo.completed() : todo.completed()
+      ) as any;
+    }
+    return _todos;
+  })
+);
 
 // methods
 const updateTodo = (todo: Todo, title: string) => {
@@ -66,10 +71,10 @@ const clearCompleted = e => {
 
 // css computations
 const footerLinkCss = (waiting: FilterType) =>
-  computed(() => (hashFilter() === waiting ? 'selected' : ''));
+  trkl.computed(() => (hashFilter() === waiting ? 'selected' : ''));
 
 const editItemCss = (todo: Todo) =>
-  computed(() => {
+  trkl.computed(() => {
     const classes = [];
     todo.completed() && classes.push('completed');
     todo.editing() && classes.push('editing');
@@ -77,16 +82,18 @@ const editItemCss = (todo: Todo) =>
   });
 
 // footer
-const todoCount = computed(() => {
-  const count = todos.filter(item => !item.completed()).length;
-  if (count === 0 && !allChecked()) {
-    allChecked(true);
-  }
-  if (count && allChecked()) {
-    allChecked(false);
-  }
+const todoCount = trkl.computed(() => {
+  const count = todos.filter(item => {
+    return !item.completed();
+  }).length;
+  // if (count === 0 && !allChecked()) {
+  //   allChecked(true);
+  // }
+  // if (count && allChecked()) {
+  //   allChecked(false);
+  // }
   return count;
-}, [todos.size]);
+});
 
 // router
 window.addEventListener('hashchange', () => {
@@ -95,18 +102,19 @@ window.addEventListener('hashchange', () => {
 hashFilter(window.location.hash.substr(2) as FilterType);
 
 // storage
-const saveTodo = computed(
+const saveTodo = trkl.computed(
   debounce(() => {
     const strTodos = JSON.stringify(todos());
     localStorage.setItem(STORAGE_KEY, strTodos);
-  }, 0),
-  [todoCount]
+  }, 0)
 );
 const _savedTodos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 _savedTodos.forEach(item => {
-  item.title = value(item.title);
-  item.editing = value(false).depends(() => [saveTodo]);
-  item.completed = value(item.completed).depends(() => [todoCount]);
+  item.title = trkl(item.title);
+  item.editing = trkl(false);
+  item.completed = trkl(item.completed);
+  item.editing.subscribe(saveTodo);
+  item.completed.subscribe(todoCount);
 });
 // debugger;
 todos(_savedTodos);
@@ -124,19 +132,23 @@ const APP = html`
         onkeypress="${e => {
           if (e.key === 'Enter') {
             const title = e.target.value.trim();
-            title &&
-              todos.push({
+            if (title) {
+              const todo = {
                 id: Math.random(),
-                title: value(title).depends(() => [saveTodo]),
-                editing: value(false),
-                completed: value(false).depends(() => [todoCount]),
-              });
+                title: trkl(title),
+                editing: trkl(false),
+                completed: trkl(false),
+              };
+              todo.title.subscribe(saveTodo);
+              todo.completed.subscribe(todoCount);
+              todos.push(todo);
+            }
             e.target.value = '';
           }
         }}"
       />
     </header>
-    ${computed(() => {
+    ${trkl.computed(() => {
       if (todos.size() > 0) {
         return html`
           <section class="main">
@@ -191,7 +203,7 @@ const APP = html`
           </section>
           <footer class="footer">
             <span class="todo-count"
-              ><strong>${todoCount}</strong> item${computed(() =>
+              ><strong>${todoCount}</strong> item${trkl.computed(() =>
                 todoCount() > 1 ? 's' : ''
               )}
               left</span
@@ -209,7 +221,7 @@ const APP = html`
                 >
               </li>
             </ul>
-            ${computed(() => {
+            ${trkl.computed(() => {
               if (todos.length - todoCount() > 0) {
                 return html`
                   <button class="clear-completed" onclick="${clearCompleted}">

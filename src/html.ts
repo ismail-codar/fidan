@@ -1,7 +1,4 @@
-// https://github.com/ismail-codar/fidan/blob/master/src/html.ts
-
-import { computed } from './f';
-import { FidanValue } from './types';
+import trkl from 'trkl';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 
@@ -148,13 +145,13 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (isDynamic) {
         if (htmlProps[attributeName]) {
-          computed(() => {
+          trkl.computed(() => {
             element[attributeName] = param();
-          }, [param]);
+          });
         } else {
-          computed(() => {
+          trkl.computed(() => {
             element.setAttribute(attributeName, param());
-          }, [param]);
+          });
         }
       } else {
         if (htmlProps[attributeName]) {
@@ -200,7 +197,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 };
 
 export const arrayMap = <T>(
-  arr: FidanValue<T[]>,
+  arr: trkl.Observable<T[]>,
   parentDom: Node & ParentNode,
   nextElement: Element,
   renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
@@ -208,35 +205,34 @@ export const arrayMap = <T>(
 ) => {
   const prevElement = nextElement ? document.createTextNode('') : undefined;
   nextElement && parentDom.insertBefore(prevElement, nextElement);
-  computed<any[]>(
-    (nextVal, { caller, prevVal }) => {
-      const renderFunction: (
-        parent,
-        renderedValues,
-        data,
-        createFn,
-        noOp,
-        beforeNode?,
-        afterNode?
-      ) => void = renderMode === 'reconcile' ? reconcile : reuseNodes;
-      renderFunction(
-        parentDom,
-        prevVal || [],
-        nextVal || [],
-        (nextItem, index) => {
-          let rendered = renderCallback(nextItem, index) as any;
-          return rendered instanceof Node
-            ? rendered
-            : document.createTextNode(rendered);
-        },
-        () => {},
-        prevElement,
-        nextElement
-      );
-    },
-    [arr]
-  );
-  const nextVal = arr.$val.slice(0);
-  arr.$val = [];
-  arr(nextVal);
+  const arrVal = arr();
+  let prevVal = [];
+  arr.subscribe(nextVal => {
+    debugger;
+    const renderFunction: (
+      parent,
+      renderedValues,
+      data,
+      createFn,
+      noOp,
+      beforeNode?,
+      afterNode?
+    ) => void = renderMode === 'reconcile' ? reconcile : reuseNodes;
+    renderFunction(
+      parentDom,
+      prevVal || [],
+      nextVal || [],
+      (nextItem, index) => {
+        let rendered = renderCallback(nextItem, index) as any;
+        return rendered instanceof Node
+          ? rendered
+          : document.createTextNode(rendered);
+      },
+      () => {},
+      prevElement,
+      nextElement
+    );
+    prevVal = nextVal.slice(0);
+  });
+  arr(arrVal);
 };

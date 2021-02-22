@@ -53,5 +53,8 @@
     "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
     "typescript": "^4.1.5"
+  },
+  "dependencies": {
+    "trkl": "^2.0.0"
   }
 }
