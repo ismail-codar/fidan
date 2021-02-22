@@ -1,4 +1,6 @@
-import trkl, { Observable } from 'trkl';
+import { Observable, trkl } from './trkl';
+import reconcile from './reconcile';
+import { reuseNodes } from './reuse-nodes';
 
 const simpleMutationMethods = ['pop', 'push', 'shift', 'splice', 'unshift'];
 const complexMutationMethods = ['copyWithin', 'fill', 'reverse', 'sort'];
@@ -34,7 +36,7 @@ export interface ObservableArray<T extends Array<any>>
   map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;
 }
 
-export const observableArray = <T>(dataArray: Observable<T[]>) => {
+export const observableArray = <T>(dataArray?: Observable<T[]>) => {
   const arrVal = dataArray();
   if (!dataArray['size']) dataArray['size'] = trkl(arrVal.length);
   else dataArray['size'](arrVal.length);
@@ -65,4 +67,44 @@ export const observableArray = <T>(dataArray: Observable<T[]>) => {
     };
   });
   return dataArray as ObservableArray<T[]>;
+};
+
+export const arrayMap = <T>(
+  arr: Observable<T[]>,
+  parentDom: Node & ParentNode,
+  nextElement: Element,
+  renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
+  renderMode: 'reuse' | 'reconcile' = 'reconcile'
+) => {
+  const prevElement = nextElement ? document.createTextNode('') : undefined;
+  nextElement && parentDom.insertBefore(prevElement, nextElement);
+  const arrVal = arr();
+  let prevVal = [];
+  arr.subscribe(nextVal => {
+    debugger;
+    const renderFunction: (
+      parent,
+      renderedValues,
+      data,
+      createFn,
+      noOp,
+      beforeNode?,
+      afterNode?
+    ) => void = renderMode === 'reconcile' ? reconcile : reuseNodes;
+    renderFunction(
+      parentDom,
+      prevVal || [],
+      nextVal || [],
+      (nextItem, index) => {
+        let rendered = renderCallback(nextItem, index) as any;
+        return rendered instanceof Node
+          ? rendered
+          : document.createTextNode(rendered);
+      },
+      () => {},
+      prevElement,
+      nextElement
+    );
+    prevVal = nextVal.slice(0);
+  });
 };

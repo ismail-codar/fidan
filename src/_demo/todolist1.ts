@@ -1,30 +1,31 @@
-import { value } from '../f';
 import { html } from '../html';
-import { FidanValue } from '..';
+import { trkl } from '../trkl';
 
 interface ITodo {
-	title: string;
-	completed?: boolean;
+  title: string;
+  completed?: boolean;
 }
 
 const todos: ITodo[] = [
-	{
-		title: 'item 1'
-	},
-	{
-		title: 'item 2'
-	},
-	{
-		title: 'item 3'
-	}
+  {
+    title: 'item 1',
+  },
+  {
+    title: 'item 2',
+  },
+  {
+    title: 'item 3',
+  },
 ];
 
 const app = html`
   <div>
     <ul>
-    ${todos.map((todo) => {
-		return html`<li>${todo.title}</li>`;
-	})}
+      ${todos.map(todo => {
+        return html`
+          <li>${todo.title}</li>
+        `;
+      })}
     </ul>
   </div>
 `;

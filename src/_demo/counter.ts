@@ -1,15 +1,14 @@
-import { value } from '../f';
 import { html } from '../html';
-import { FidanValue } from '..';
+import { Observable, trkl } from '../trkl';
 
-const count: FidanValue<number> = value(0).debugName('count');
+const count: Observable<number> = trkl(0);
 
 const decrement = () => {
-	count(count() - 1);
+  count(count() - 1);
 };
 
 const increment = () => {
-	count(count() + 1);
+  count(count() + 1);
 };
 
 let btnIncrement: HTMLButtonElement = null;
@@ -21,9 +20,9 @@ const app = html`
     </button>
     ${count}
     <button
-      ref="${(element) => {
-			btnIncrement = element;
-		}}"
+      ref="${element => {
+        btnIncrement = element;
+      }}"
       onclick="${increment}"
     >
       +

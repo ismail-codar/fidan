@@ -1,4 +1,4 @@
-import trkl, { Observable } from 'trkl';
+import { trkl, Observable } from './trkl';
 
 export const injectToProperty = (
   obj: Object,

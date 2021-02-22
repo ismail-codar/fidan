@@ -1,5 +1,4 @@
-import trkl, { Observable } from 'trkl';
-import { debounce, html } from '../';
+import { debounce, html, Observable, trkl } from '../';
 import { observableArray, ObservableArray } from '../array';
 
 // interface & types

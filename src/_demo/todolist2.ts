@@ -1,44 +1,50 @@
-import { value } from '../f';
+import { observableArray } from '../array';
 import { html } from '../html';
-import { FidanValue } from '..';
-
+import { Observable, trkl } from '../trkl';
 interface ITodo {
-	title: FidanValue<string>;
-	completed: FidanValue<boolean>;
+  title: Observable<string>;
+  completed: Observable<boolean>;
 }
 
-const todos = value<ITodo[]>([
-	{
-		title: value('item 1'),
-		completed: value(false)
-	},
-	{
-		title: value('item 2'),
-		completed: value(false)
-	},
-	{
-		title: value('item 3'),
-		completed: value(false)
-	}
-]);
+const todos = observableArray(
+  trkl<ITodo[]>([
+    {
+      title: trkl('item 1'),
+      completed: trkl(false),
+    },
+    {
+      title: trkl('item 2'),
+      completed: trkl(false),
+    },
+    {
+      title: trkl('item 3'),
+      completed: trkl(false),
+    },
+  ])
+);
 
 setTimeout(() => {
-	const arr = todos().slice(0);
-	arr.push({
-		title: value('item 4'),
-		completed: value(false)
-	});
-	todos(arr);
+  const arr = todos().slice(0);
+  arr.push({
+    title: trkl('item 4'),
+    completed: trkl(false),
+  });
+  todos(arr);
 
-	setTimeout(() => {
-		todos()[1].title('item 2 x');
-	}, 1000);
+  setTimeout(() => {
+    todos()[1].title('item 2 x');
+  }, 1000);
 }, 1000);
 
 const app = html`
   <div>
     <ul>
-    ${todos.map((todo) => html`<li>${todo.title}</li>`)}
+      ${todos.map(
+        todo =>
+          html`
+            <li>${todo.title}</li>
+          `
+      )}
     </ul>
   </div>
 `;

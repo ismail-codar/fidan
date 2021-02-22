@@ -1,6 +1,5 @@
-import trkl from 'trkl';
-import reconcile from './reconcile';
-import { reuseNodes } from './reuse-nodes';
+import { arrayMap } from './array';
+import { trkl } from './trkl';
 
 const TEXT = 1;
 const DOM = 2;
@@ -194,45 +193,4 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
       }
     }
   }
-};
-
-export const arrayMap = <T>(
-  arr: trkl.Observable<T[]>,
-  parentDom: Node & ParentNode,
-  nextElement: Element,
-  renderCallback: (item: any, idx?: number, isInsert?: boolean) => Node,
-  renderMode: 'reuse' | 'reconcile' = 'reconcile'
-) => {
-  const prevElement = nextElement ? document.createTextNode('') : undefined;
-  nextElement && parentDom.insertBefore(prevElement, nextElement);
-  const arrVal = arr();
-  let prevVal = [];
-  arr.subscribe(nextVal => {
-    debugger;
-    const renderFunction: (
-      parent,
-      renderedValues,
-      data,
-      createFn,
-      noOp,
-      beforeNode?,
-      afterNode?
-    ) => void = renderMode === 'reconcile' ? reconcile : reuseNodes;
-    renderFunction(
-      parentDom,
-      prevVal || [],
-      nextVal || [],
-      (nextItem, index) => {
-        let rendered = renderCallback(nextItem, index) as any;
-        return rendered instanceof Node
-          ? rendered
-          : document.createTextNode(rendered);
-      },
-      () => {},
-      prevElement,
-      nextElement
-    );
-    prevVal = nextVal.slice(0);
-  });
-  arr(arrVal);
 };
