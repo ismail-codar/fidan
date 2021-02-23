@@ -15,25 +15,25 @@ const STORAGE_KEY = 'fidan_todomvc';
 const hashFilter = trkl<FilterType>('');
 const todos = observableArray(
   trkl<Todo[]>([
-    {
-      id: 1,
-      title: trkl('test1'),
-      completed: trkl(false),
-      editing: trkl(false),
-    },
-    {
-      id: 2,
-      title: trkl('test'),
-      completed: trkl(false),
-      editing: trkl(false),
-    },
+    // {
+    //   id: 1,
+    //   title: trkl('test1'),
+    //   completed: trkl(false),
+    //   editing: trkl(false),
+    // },
+    // {
+    //   id: 2,
+    //   title: trkl('test'),
+    //   completed: trkl(false),
+    //   editing: trkl(false),
+    // },
   ])
 ) as ObservableArray<Todo[]>;
 const allChecked = trkl(false);
 
 const shownTodos: ObservableArray<Todo[]> = observableArray(
   trkl.computed(() => {
-    let _todos = todos.$val;
+    let _todos = todos();
     const filter = hashFilter();
     if (filter !== '') {
       _todos = _todos.filter(todo =>
@@ -85,12 +85,12 @@ const todoCount = trkl.computed(() => {
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
-  if (count === 0 && !allChecked()) {
-    allChecked(true);
-  }
-  if (count && allChecked()) {
-    allChecked(false);
-  }
+  // if (count === 0 && !allChecked()) {
+  //   allChecked(true);
+  // }
+  // if (count && allChecked()) {
+  //   allChecked(false);
+  // }
   return count;
 });
 
@@ -101,23 +101,27 @@ window.addEventListener('hashchange', () => {
 hashFilter(window.location.hash.substr(2) as FilterType);
 
 // storage
-const saveTodo = trkl.computed(
-  debounce(() => {
-    const strTodos = JSON.stringify(todos());
-    localStorage.setItem(STORAGE_KEY, strTodos);
-  }, 0)
+const saveTodo = debounce(() => {
+  const strTodos = JSON.stringify(todos());
+  localStorage.setItem(STORAGE_KEY, strTodos);
+}, 0);
+
+const _savedTodos: any[] = JSON.parse(
+  localStorage.getItem(STORAGE_KEY) || '[]'
 );
-const _savedTodos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 _savedTodos.forEach(item => {
   item.title = trkl(item.title);
   item.editing = trkl(false);
   item.completed = trkl(item.completed);
-  item.editing.subscribe(saveTodo);
-  item.completed.subscribe(todoCount);
+  // item.editing.subscribe(saveTodo);
+  // item.completed.subscribe(todoCount);
 });
 // debugger;
-todos(_savedTodos);
-allChecked(todoCount() === 0);
+setTimeout(() => {
+  todos(_savedTodos);
+  // allChecked(todoCount() === 0);
+  todos.subscribe(saveTodo);
+}, 100);
 
 // view
 const APP = html`
@@ -138,8 +142,8 @@ const APP = html`
                 editing: trkl(false),
                 completed: trkl(false),
               };
-              todo.title.subscribe(saveTodo);
-              todo.completed.subscribe(todoCount);
+              // todo.title.subscribe(saveTodo);
+              // todo.completed.subscribe(todoCount);
               todos.push(todo);
             }
             e.target.value = '';
@@ -148,7 +152,7 @@ const APP = html`
       />
     </header>
     ${trkl.computed(() => {
-      if (todos.size() > 0) {
+      if (todos().length > 0) {
         return html`
           <section class="main">
             <input
@@ -230,6 +234,10 @@ const APP = html`
               }
             })}
           </footer>
+        `;
+      } else {
+        return html`
+          <span>1111</span>
         `;
       }
     })}

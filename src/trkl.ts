@@ -78,6 +78,9 @@ export function trkl<T>(value?: T): Observable<T> {
     return value;
   }
 
+  self.toString = self['toJSON'] = () =>
+    self.$val && self.$val['toJSON'] ? self.$val['toJSON']() : self.$val;
+
   return self;
 }
 

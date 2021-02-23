@@ -32,7 +32,6 @@ const nonMutationmethods = [
 type ObservableArrayType<T extends Array<T[0]>> = Observable<T> & Array<T[0]>;
 export interface ObservableArray<T extends Array<any>>
   extends ObservableArrayType<T> {
-  size: Observable<number>;
   map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;
 }
 

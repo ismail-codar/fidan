@@ -11,7 +11,6 @@ const TEXT_OR_DOM = TEXT | DOM;
 export const htmlProps = {
   id: true,
   nodeValue: true,
-  textContent: true,
   className: true,
   innerHTML: true,
   innerText: true,
@@ -119,16 +118,28 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 
     if (paramType & TEXT_OR_DOM) {
       if (paramType === TEXT) {
-        attributeName = 'textContent';
-        element =
-          param.$val instanceof Node
-            ? param.$val
-            : document.createTextNode(isDynamic ? param.$val : param);
-        commentNode.parentElement.insertBefore(
-          element,
-          commentNode.nextSibling
-        );
-        if (!isDynamic) {
+        if (isDynamic) {
+          element =
+            param.$val instanceof Node
+              ? param.$val
+              : document.createTextNode(param.$val);
+          commentNode.parentElement.insertBefore(
+            element,
+            commentNode.nextSibling
+          );
+          (parentElement => {
+            param.subscribe((value, oldValue) => {
+              parentElement.replaceChild(value, oldValue);
+            });
+          })(commentNode.parentElement);
+
+          return;
+        } else {
+          element = document.createTextNode(param);
+          commentNode.parentElement.insertBefore(
+            element,
+            commentNode.nextSibling
+          );
           if (Array.isArray(param)) {
             for (var p = 0; p < param.length; p++) {
               commentNode.parentElement.appendChild(param[p]);
@@ -139,16 +150,16 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         attributeName = commentValue.substr(attrIdx + 1);
         element = commentNode.nextElementSibling;
       }
-      paramType !== FN && commentNode.remove();
+      // paramType !== FN && commentNode.remove();
       if (attributeName.startsWith('on')) {
         (element as Element).addEventListener(attributeName.substr(2), param);
       } else if (isDynamic) {
         if (htmlProps[attributeName]) {
-          trkl.computed(() => {
+          param.subscribe(() => {
             element[attributeName] = param();
           });
         } else {
-          trkl.computed(() => {
+          param.subscribe(() => {
             element.setAttribute(attributeName, param());
           });
         }
