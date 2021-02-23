@@ -4,6 +4,7 @@ export interface Observable<T> {
 
   subscribe: AddSubscriber<T>;
   unsubscribe: RemoveSubscriber;
+  $val: T;
 }
 
 interface Subscriber<T> {
@@ -34,7 +35,7 @@ export function trkl<T>(value?: T): Observable<T> {
 
   var self = function(...args) {
     return args.length ? write(args[0]) : read();
-  };
+  } as Observable<T>;
 
   // declaring as a private function means the minifier can scrub its name on internal references
   var subscribe = (subscriber, immediate?) => {
@@ -75,7 +76,8 @@ export function trkl<T>(value?: T): Observable<T> {
     return value;
   }
 
-  return self as any;
+  self.$val = value;
+  return self;
 }
 
 trkl['computed'] = <T>(fn: Computation<T>): Observable<T> => {

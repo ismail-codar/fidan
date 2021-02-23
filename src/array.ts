@@ -78,10 +78,8 @@ export const arrayMap = <T>(
 ) => {
   const prevElement = nextElement ? document.createTextNode('') : undefined;
   nextElement && parentDom.insertBefore(prevElement, nextElement);
-  const arrVal = arr();
   let prevVal = [];
   arr.subscribe(nextVal => {
-    debugger;
     const renderFunction: (
       parent,
       renderedValues,
@@ -107,4 +105,5 @@ export const arrayMap = <T>(
     );
     prevVal = nextVal.slice(0);
   });
+  arr(arr());
 };

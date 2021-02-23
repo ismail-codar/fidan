@@ -236,4 +236,10 @@ const APP = html`
   </div>
 `;
 
+const styleSheets = html`
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-common/base.css" />
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css/index.css" />
+`;
+document.head.appendChild(styleSheets);
+
 document.getElementById('main').appendChild(APP);
