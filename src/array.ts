@@ -36,12 +36,11 @@ export interface ObservableArray<T extends Array<any>>
 }
 
 export const observableArray = <T>(dataArray?: Observable<T[]>) => {
-  const arrVal = dataArray();
-  if (!dataArray['size']) dataArray['size'] = trkl(arrVal.length);
-  else dataArray['size'](arrVal.length);
-
   nonMutationmethods.forEach(method => {
-    dataArray[method] = (...args) => arrVal[method].apply(arrVal, args);
+    dataArray[method] = (...args) => {
+      const arrVal = dataArray();
+      return arrVal[method].apply(arrVal, args);
+    };
   });
   dataArray['map'] = (renderFn, renderMode) => ({
     arr: dataArray,
@@ -52,13 +51,13 @@ export const observableArray = <T>(dataArray?: Observable<T[]>) => {
     configurable: true,
     enumerable: true,
     get: () => {
-      return arrVal.length;
+      return dataArray().length;
     },
-    set: v => (arrVal.length = v),
+    set: v => (dataArray().length = v),
   });
   mutationMethods.forEach(method => {
     dataArray[method] = function() {
-      const arr = arrVal.slice(0);
+      const arr = dataArray().slice(0);
       const ret = Array.prototype[method].apply(arr, arguments);
       // TODO event based strategy for -> simpleMutationMethods
       dataArray(arr);

@@ -152,7 +152,7 @@ const APP = html`
       />
     </header>
     ${trkl.computed(() => {
-      if (todos().length > 0) {
+      if (todos.length > 0) {
         return html`
           <section class="main">
             <input
@@ -234,10 +234,6 @@ const APP = html`
               }
             })}
           </footer>
-        `;
-      } else {
-        return html`
-          <span>1111</span>
         `;
       }
     })}
