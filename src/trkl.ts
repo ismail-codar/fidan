@@ -36,6 +36,7 @@ export function trkl<T>(value?: T): Observable<T> {
   var self = function(...args) {
     return args.length ? write(args[0]) : read();
   } as Observable<T>;
+  self.$val = value;
 
   // declaring as a private function means the minifier can scrub its name on internal references
   var subscribe = (subscriber, immediate?) => {
@@ -55,6 +56,7 @@ export function trkl<T>(value?: T): Observable<T> {
   };
 
   function write(newValue) {
+    self.$val = newValue;
     if (newValue === value && (value === null || typeof value !== 'object')) {
       return;
     }
@@ -76,7 +78,6 @@ export function trkl<T>(value?: T): Observable<T> {
     return value;
   }
 
-  self.$val = value;
   return self;
 }
 

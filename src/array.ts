@@ -104,6 +104,5 @@ export const arrayMap = <T>(
       nextElement
     );
     prevVal = nextVal.slice(0);
-  });
-  arr(arr());
+  }, true);
 };

@@ -33,7 +33,7 @@ const allChecked = trkl(false);
 
 const shownTodos: ObservableArray<Todo[]> = observableArray(
   trkl.computed(() => {
-    let _todos = todos();
+    let _todos = todos.$val;
     const filter = hashFilter();
     if (filter !== '') {
       _todos = _todos.filter(todo =>
@@ -85,12 +85,12 @@ const todoCount = trkl.computed(() => {
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
-  // if (count === 0 && !allChecked()) {
-  //   allChecked(true);
-  // }
-  // if (count && allChecked()) {
-  //   allChecked(false);
-  // }
+  if (count === 0 && !allChecked()) {
+    allChecked(true);
+  }
+  if (count && allChecked()) {
+    allChecked(false);
+  }
   return count;
 });
 
@@ -241,5 +241,6 @@ const styleSheets = html`
   <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css/index.css" />
 `;
 document.head.appendChild(styleSheets);
-
-document.getElementById('main').appendChild(APP);
+setTimeout(() => {
+  document.getElementById('main').appendChild(APP);
+}, 50);
