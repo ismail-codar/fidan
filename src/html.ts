@@ -119,19 +119,64 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     if (paramType & TEXT_OR_DOM) {
       if (paramType === TEXT) {
         if (isDynamic) {
-          element =
-            param.$val instanceof Node
-              ? param.$val
-              : document.createTextNode(param.$val);
-          commentNode.parentElement.insertBefore(
-            element,
-            commentNode.nextSibling
-          );
-          (parentElement => {
-            param.subscribe((value, oldValue) => {
-              parentElement.replaceChild(value, oldValue);
+          //COMPUTED
+          const value = param.$val;
+          let valueElement: Node =
+            value == null
+              ? null
+              : value instanceof Node
+              ? value
+              : document.createTextNode(value);
+          let firstChild: Node = null;
+          let lastChild: Node = null;
+          if (value != null) {
+            firstChild = valueElement.firstChild;
+            lastChild = valueElement.lastChild;
+            commentNode.parentElement.insertBefore(
+              valueElement,
+              commentNode.nextSibling
+            );
+          }
+          ((
+            parentElement: Node,
+            valueElement: Node,
+            firstChild: Node,
+            lastChild: Node
+          ) => {
+            param.subscribe(value => {
+              let nextLastSibling: Node = null;
+              if (firstChild && lastChild) {
+                //fragment childs remove
+                nextLastSibling = lastChild.nextSibling;
+                let element = firstChild;
+                while (element) {
+                  const nextSibling = element.nextSibling;
+                  element.parentElement.removeChild(element);
+                  if (element === lastChild) {
+                    break;
+                  } else {
+                    element = nextSibling;
+                  }
+                }
+              } else if (valueElement) {
+                //text remove
+                nextLastSibling = valueElement.nextSibling;
+                valueElement.parentElement.removeChild(valueElement);
+              }
+              // add & variables restore
+              if (value != null) {
+                valueElement =
+                  value == null
+                    ? null
+                    : value instanceof Node
+                    ? value
+                    : document.createTextNode(value);
+                firstChild = valueElement.firstChild;
+                lastChild = valueElement.lastChild;
+                parentElement.insertBefore(valueElement, nextLastSibling);
+              }
             });
-          })(commentNode.parentElement);
+          })(commentNode.parentElement, valueElement, firstChild, lastChild);
 
           return;
         } else {
