@@ -149,7 +149,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
                 //fragment childs remove
                 nextLastSibling = lastChild.nextSibling;
                 let element = firstChild;
-                while (element) {
+                while (element && element.parentElement) {
                   const nextSibling = element.nextSibling;
                   element.parentElement.removeChild(element);
                   if (element === lastChild) {
@@ -177,8 +177,6 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
               }
             });
           })(commentNode.parentElement, valueElement, firstChild, lastChild);
-
-          return;
         } else {
           element = document.createTextNode(param);
           commentNode.parentElement.insertBefore(
@@ -195,40 +193,34 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         attributeName = commentValue.substr(attrIdx + 1);
         element = commentNode.nextElementSibling;
       }
-      // paramType !== FN && commentNode.remove();
-      if (attributeName.startsWith('on')) {
-        (element as Element).addEventListener(attributeName.substr(2), param);
-      } else if (isDynamic) {
-        if (htmlProps[attributeName]) {
-          param.subscribe(() => {
+
+      if (attributeName) {
+        if (attributeName.startsWith('on')) {
+          (element as Element).addEventListener(attributeName.substr(2), param);
+        } else if (isDynamic) {
+          if (htmlProps[attributeName]) {
             element[attributeName] = param();
-          });
-        } else {
-          param.subscribe(() => {
+            param.subscribe(() => {
+              element[attributeName] = param();
+            });
+          } else {
             element.setAttribute(attributeName, param());
-          });
-        }
-      } else {
-        if (htmlProps[attributeName]) {
-          element[attributeName] = param;
-        } else if (typeof param === 'function') {
-          param(element);
+            param.subscribe(() => {
+              element.setAttribute(attributeName, param());
+            });
+          }
         } else {
-          element.setAttribute(attributeName, param);
+          if (htmlProps[attributeName]) {
+            element[attributeName] = param;
+          } else if (typeof param === 'function') {
+            param(element);
+          } else {
+            element.setAttribute(attributeName, param);
+          }
         }
       }
     } else if (paramType === FN) {
-      if (commentNode.parentElement) {
-        param(commentNode.parentElement, commentNode.nextElementSibling);
-        commentNode.remove();
-      } else {
-        debugger;
-        //conditionalDom can be place on root
-        window.requestAnimationFrame(() => {
-          param(commentNode.parentElement, commentNode.nextElementSibling);
-          commentNode.remove();
-        });
-      }
+      param(commentNode.parentElement, commentNode.nextElementSibling);
     } else if (paramType === ARRAY) {
       const fragment = document.createDocumentFragment();
       param.forEach(p => {
@@ -248,5 +240,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
       }
     }
+
+    commentNode.remove();
   }
 };

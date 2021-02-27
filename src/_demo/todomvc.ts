@@ -82,6 +82,7 @@ const editItemCss = (todo: Todo) =>
 
 // footer
 const todoCount = trkl.computed(() => {
+  //  TODO todo.completed.subscribe(todoCount) problem
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
@@ -106,15 +107,20 @@ const saveTodo = debounce(() => {
   localStorage.setItem(STORAGE_KEY, strTodos);
 }, 0);
 
+const todoItemSubscriptions = (todo: Todo) => {
+  todo.editing.subscribe(saveTodo);
+  todo.completed.subscribe(saveTodo);
+  todo.completed.subscribe(todoCount);
+};
+
 const _savedTodos: any[] = JSON.parse(
   localStorage.getItem(STORAGE_KEY) || '[]'
-);
-_savedTodos.forEach(item => {
+).map(item => {
   item.title = trkl(item.title);
   item.editing = trkl(false);
   item.completed = trkl(item.completed);
-  // item.editing.subscribe(saveTodo);
-  // item.completed.subscribe(todoCount);
+  todoItemSubscriptions(item);
+  return item;
 });
 // debugger;
 setTimeout(() => {
@@ -142,8 +148,7 @@ const APP = html`
                 editing: trkl(false),
                 completed: trkl(false),
               };
-              // todo.title.subscribe(saveTodo);
-              // todo.completed.subscribe(todoCount);
+              todoItemSubscriptions(todo);
               todos.push(todo);
             }
             e.target.value = '';
