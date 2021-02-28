@@ -13,22 +13,7 @@ interface Todo {
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
 const hashFilter = trkl<FilterType>('');
-const todos = observableArray(
-  trkl<Todo[]>([
-    // {
-    //   id: 1,
-    //   title: trkl('test1'),
-    //   completed: trkl(false),
-    //   editing: trkl(false),
-    // },
-    // {
-    //   id: 2,
-    //   title: trkl('test'),
-    //   completed: trkl(false),
-    //   editing: trkl(false),
-    // },
-  ])
-) as ObservableArray<Todo[]>;
+const todos = observableArray(trkl<Todo[]>([])) as ObservableArray<Todo[]>;
 const allChecked = trkl(false);
 
 const shownTodos: ObservableArray<Todo[]> = observableArray(
@@ -86,12 +71,14 @@ const todoCount = trkl.computed(() => {
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
-  // if (count === 0 && !allChecked()) {
-  //   allChecked(true);
-  // }
-  // if (count && allChecked()) {
-  //   allChecked(false);
-  // }
+  window.requestAnimationFrame(() => {
+    if (count === 0 && !allChecked()) {
+      allChecked(true);
+    }
+    if (count && allChecked()) {
+      allChecked(false);
+    }
+  });
   return count;
 });
 
@@ -110,7 +97,6 @@ const saveTodo = debounce(() => {
 const todoItemSubscriptions = (todo: Todo) => {
   todo.editing.subscribe(saveTodo);
   todo.completed.subscribe(saveTodo);
-  todo.completed.subscribe(todoCount);
 };
 
 const _savedTodos: any[] = JSON.parse(
@@ -125,7 +111,7 @@ const _savedTodos: any[] = JSON.parse(
 // debugger;
 setTimeout(() => {
   todos(_savedTodos);
-  // allChecked(todoCount() === 0);
+  allChecked(todoCount() === 0);
   todos.subscribe(saveTodo);
 }, 100);
 
@@ -252,4 +238,4 @@ const styleSheets = html`
 document.head.appendChild(styleSheets);
 setTimeout(() => {
   document.getElementById('main').appendChild(APP);
-}, 50);
+}, 150);
