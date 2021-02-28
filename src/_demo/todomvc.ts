@@ -67,7 +67,6 @@ const editItemCss = (todo: Todo) =>
 
 // footer
 const todoCount = trkl.computed(() => {
-  //  TODO todo.completed.subscribe(todoCount) problem
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
@@ -89,31 +88,20 @@ window.addEventListener('hashchange', () => {
 hashFilter(window.location.hash.substr(2) as FilterType);
 
 // storage
-const saveTodo = () => {
-  const strTodos = JSON.stringify(todos());
-  localStorage.setItem(STORAGE_KEY, strTodos);
-};
+trkl
+  .computed(() => JSON.stringify(todos()))
+  .subscribe(strTodos => {
+    localStorage.setItem(STORAGE_KEY, strTodos);
+  });
 
-const todoItemSubscriptions = (todo: Todo) => {
-  todo.editing.subscribe(saveTodo);
-  todo.completed.subscribe(saveTodo);
-};
-
-const _savedTodos: any[] = JSON.parse(
-  localStorage.getItem(STORAGE_KEY) || '[]'
-).map(item => {
-  item.title = trkl(item.title);
-  item.editing = trkl(false);
-  item.completed = trkl(item.completed);
-  todoItemSubscriptions(item);
-  return item;
-});
-// debugger;
-setTimeout(() => {
-  todos(_savedTodos);
-  allChecked(todoCount() === 0);
-  todos.subscribe(saveTodo);
-}, 100);
+todos(
+  JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').map(item => {
+    item.title = trkl(item.title);
+    item.editing = trkl(false);
+    item.completed = trkl(item.completed);
+    return item;
+  })
+);
 
 // view
 const APP = html`
@@ -134,7 +122,6 @@ const APP = html`
                 editing: trkl(false),
                 completed: trkl(false),
               };
-              todoItemSubscriptions(todo);
               todos.push(todo);
             }
             e.target.value = '';

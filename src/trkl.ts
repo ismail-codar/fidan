@@ -12,7 +12,7 @@ interface Subscriber<T> {
 }
 
 interface AddSubscriber<T> {
-  (subscriber: Subscriber<T>, runImmediate?: boolean): void;
+  (subscriber: Subscriber<T>, runImmediate?: boolean): Observable<T>;
 }
 
 interface RemoveSubscriber {
@@ -46,6 +46,7 @@ export function trkl<T>(value?: T): Observable<T> {
     if (immediate) {
       subscriber(value);
     }
+    return self;
   };
 
   // Using string keys tells Uglify that we intend to export these symbols
@@ -78,8 +79,10 @@ export function trkl<T>(value?: T): Observable<T> {
     return value;
   }
 
-  self.toString = self['toJSON'] = () =>
-    self.$val && self.$val['toJSON'] ? self.$val['toJSON']() : self.$val;
+  self.toString = self['toJSON'] = () => {
+    const val = self();
+    return val && val['toJSON'] ? val['toJSON']() : val;
+  };
 
   return self;
 }

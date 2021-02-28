@@ -1,4 +1,4 @@
-import { html } from '../../../../src';
+import { html, useComputed, useSubscribe } from '../../../../src';
 
 // interface & types
 type FilterType = '' | 'active' | 'completed';
@@ -11,11 +11,11 @@ interface Todo {
 
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
-let todos: Todo[] = [];
 let hashFilter = '';
+let todos: Todo[] = [];
 let allChecked = false;
 
-const shownTodos = (() => {
+const shownTodos = useComputed(() => {
   let _todos = todos;
   const filter = hashFilter;
   if (filter !== '') {
@@ -24,7 +24,7 @@ const shownTodos = (() => {
     ) as any;
   }
   return _todos;
-})();
+});
 
 // methods
 const updateTodo = (todo: Todo, title: string) => {
@@ -51,19 +51,18 @@ const clearCompleted = e => {
 };
 
 // css computations
-const footerLinkCss = (waiting: FilterType) =>
+const footerLinkCss = (waiting: FilterType) => () =>
   hashFilter === waiting ? 'selected' : '';
 
-const editItemCss = (todo: Todo) =>
-  (() => {
-    const classes = [];
-    todo.completed && classes.push('completed');
-    todo.editing && classes.push('editing');
-    return classes.join(' ');
-  })();
+const editItemCss = (todo: Todo) => () => {
+  const classes = [];
+  todo.completed && classes.push('completed');
+  todo.editing && classes.push('editing');
+  return classes.join(' ');
+};
 
 // footer
-const todoCount = (() => {
+const todoCount = useComputed(() => {
   const count = todos.filter(item => {
     return !item.completed;
   }).length;
@@ -76,7 +75,7 @@ const todoCount = (() => {
     }
   });
   return count;
-})();
+});
 
 // router
 window.addEventListener('hashchange', () => {
@@ -85,24 +84,24 @@ window.addEventListener('hashchange', () => {
 hashFilter = window.location.hash.substr(2) as FilterType;
 
 // storage
-const saveTodo = () => {
-  const strTodos = JSON.stringify(todos);
-  localStorage.setItem(STORAGE_KEY, strTodos);
-};
+useSubscribe(
+  useComputed(() => JSON.stringify(todos)),
+  strTodos => {
+    localStorage.setItem(STORAGE_KEY, strTodos);
+  }
+);
 
-const todoItemSubscriptions = (todo: Todo) => {
-  // TODO todo.editing.subscribe(saveTodo);
-  // todo.completed.subscribe(saveTodo);
-};
-
-const _savedTodos: any[] = JSON.parse(
-  localStorage.getItem(STORAGE_KEY) || '[]'
-).map(todo => todoItemSubscriptions(todo));
-setTimeout(() => {
-  todos = _savedTodos;
-  allChecked = todoCount === 0;
-  // todos.subscribe(saveTodo);
-}, 100);
+todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').map(
+  (item: Todo) => {
+    const todo: Todo = {
+      id: item.id,
+      completed: item.completed,
+      editing: item.editing,
+      title: item.title,
+    };
+    return todo;
+  }
+);
 
 // view
 const APP = html`
@@ -123,7 +122,6 @@ const APP = html`
                 editing: false,
                 completed: false,
               };
-              todoItemSubscriptions(todo);
               todos.push(todo);
             }
             e.target.value = '';
@@ -131,7 +129,7 @@ const APP = html`
         }}"
       />
     </header>
-    ${(() => {
+    ${useComputed(() => {
       if (todos.length > 0) {
         return html`
           <section class="main">
@@ -186,8 +184,9 @@ const APP = html`
           </section>
           <footer class="footer">
             <span class="todo-count"
-              ><strong>${todoCount}</strong> item${(() =>
-                todoCount > 1 ? 's' : '')()}
+              ><strong>${todoCount}</strong> item${useComputed(() =>
+                todoCount > 1 ? 's' : ''
+              )}
               left</span
             >
             <ul class="filters">
@@ -203,7 +202,7 @@ const APP = html`
                 >
               </li>
             </ul>
-            ${(() => {
+            ${useComputed(() => {
               if (todos.length - todoCount > 0) {
                 return html`
                   <button class="clear-completed" onclick="${clearCompleted}">
@@ -211,11 +210,11 @@ const APP = html`
                   </button>
                 `;
               }
-            })()}
+            })}
           </footer>
         `;
       }
-    })()}
+    })}
   </div>
 `;
 
