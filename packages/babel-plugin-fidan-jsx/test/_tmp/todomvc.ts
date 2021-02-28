@@ -1,40 +1,37 @@
-import { html, Observable, trkl } from '../';
-import { observableArray, ObservableArray } from '../array';
+import { html } from '../../../../src';
 
 // interface & types
 type FilterType = '' | 'active' | 'completed';
 interface Todo {
   id: number;
-  title: Observable<string>;
-  editing: Observable<boolean>;
-  completed: Observable<boolean>;
+  title: string;
+  editing: boolean;
+  completed: boolean;
 }
 
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
-const hashFilter = trkl<FilterType>('');
-const todos = observableArray(trkl<Todo[]>([])) as ObservableArray<Todo[]>;
-const allChecked = trkl(false);
+let todos: Todo[] = [];
+let hashFilter = '';
+let allChecked = false;
 
-const shownTodos: ObservableArray<Todo[]> = observableArray(
-  trkl.computed(() => {
-    let _todos = todos();
-    const filter = hashFilter();
-    if (filter !== '') {
-      _todos = _todos.filter(todo =>
-        filter === 'active' ? !todo.completed() : todo.completed()
-      ) as any;
-    }
-    return _todos;
-  })
-);
+const shownTodos = (() => {
+  let _todos = todos;
+  const filter = hashFilter;
+  if (filter !== '') {
+    _todos = _todos.filter(todo =>
+      filter === 'active' ? !todo.completed : todo.completed
+    ) as any;
+  }
+  return _todos;
+})();
 
 // methods
 const updateTodo = (todo: Todo, title: string) => {
   title = title.trim();
   if (title) {
-    todo.title(title);
-    todo.editing(false);
+    todo.title = title;
+    todo.editing = false;
   } else {
     removeTodo(todo.id);
   }
@@ -48,71 +45,63 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = [];
   todos.forEach(todo => {
-    if (todo.completed()) removes.push(todo);
+    if (todo.completed) removes.push(todo);
   });
   while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
 
 // css computations
 const footerLinkCss = (waiting: FilterType) =>
-  trkl.computed(() => (hashFilter() === waiting ? 'selected' : ''));
+  hashFilter === waiting ? 'selected' : '';
 
 const editItemCss = (todo: Todo) =>
-  trkl.computed(() => {
+  (() => {
     const classes = [];
-    todo.completed() && classes.push('completed');
-    todo.editing() && classes.push('editing');
+    todo.completed && classes.push('completed');
+    todo.editing && classes.push('editing');
     return classes.join(' ');
-  });
+  })();
 
 // footer
-const todoCount = trkl.computed(() => {
-  //  TODO todo.completed.subscribe(todoCount) problem
+const todoCount = (() => {
   const count = todos.filter(item => {
-    return !item.completed();
+    return !item.completed;
   }).length;
   window.requestAnimationFrame(() => {
-    if (count === 0 && !allChecked()) {
-      allChecked(true);
+    if (count === 0 && !allChecked) {
+      allChecked = true;
     }
-    if (count && allChecked()) {
-      allChecked(false);
+    if (count && allChecked) {
+      allChecked = false;
     }
   });
   return count;
-});
+})();
 
 // router
 window.addEventListener('hashchange', () => {
-  hashFilter(window.location.hash.substr(2) as FilterType);
+  hashFilter = window.location.hash.substr(2) as FilterType;
 });
-hashFilter(window.location.hash.substr(2) as FilterType);
+hashFilter = window.location.hash.substr(2) as FilterType;
 
 // storage
 const saveTodo = () => {
-  const strTodos = JSON.stringify(todos());
+  const strTodos = JSON.stringify(todos);
   localStorage.setItem(STORAGE_KEY, strTodos);
 };
 
 const todoItemSubscriptions = (todo: Todo) => {
-  todo.editing.subscribe(saveTodo);
-  todo.completed.subscribe(saveTodo);
+  // TODO todo.editing.subscribe(saveTodo);
+  // todo.completed.subscribe(saveTodo);
 };
 
 const _savedTodos: any[] = JSON.parse(
   localStorage.getItem(STORAGE_KEY) || '[]'
-).map(item => {
-  item.title = trkl(item.title);
-  item.editing = trkl(false);
-  item.completed = trkl(item.completed);
-  todoItemSubscriptions(item);
-  return item;
-});
-// debugger;
+).map(todo => todoItemSubscriptions(todo));
 setTimeout(() => {
-  todos(_savedTodos);
-  allChecked(todoCount() === 0);
-  todos.subscribe(saveTodo);
+  todos = _savedTodos;
+  allChecked = todoCount === 0;
+  // todos.subscribe(saveTodo);
 }, 100);
 
 // view
@@ -130,9 +119,9 @@ const APP = html`
             if (title) {
               const todo = {
                 id: Math.random(),
-                title: trkl(title),
-                editing: trkl(false),
-                completed: trkl(false),
+                title: title,
+                editing: false,
+                completed: false,
               };
               todoItemSubscriptions(todo);
               todos.push(todo);
@@ -142,7 +131,7 @@ const APP = html`
         }}"
       />
     </header>
-    ${trkl.computed(() => {
+    ${(() => {
       if (todos.length > 0) {
         return html`
           <section class="main">
@@ -152,7 +141,7 @@ const APP = html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos.forEach(todo => todo.completed(e.target.checked))}"
+                todos.forEach(todo => (todo.completed = e.target.checked))}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
@@ -161,7 +150,7 @@ const APP = html`
                   <li
                     class="${editItemCss(todo)}"
                     ondblclick="${(e: any) => {
-                      todo.editing(true);
+                      todo.editing = true;
                       e.currentTarget.lastElementChild.focus();
                     }}"
                   >
@@ -170,7 +159,7 @@ const APP = html`
                         class="toggle"
                         type="checkbox"
                         onchange="${e => {
-                          todo.completed(e.target.checked);
+                          todo.completed = e.target.checked;
                         }}"
                         checked="${todo.completed}"
                       />
@@ -197,9 +186,8 @@ const APP = html`
           </section>
           <footer class="footer">
             <span class="todo-count"
-              ><strong>${todoCount}</strong> item${trkl.computed(() =>
-                todoCount() > 1 ? 's' : ''
-              )}
+              ><strong>${todoCount}</strong> item${(() =>
+                todoCount > 1 ? 's' : '')()}
               left</span
             >
             <ul class="filters">
@@ -215,19 +203,19 @@ const APP = html`
                 >
               </li>
             </ul>
-            ${trkl.computed(() => {
-              if (todos.length - todoCount() > 0) {
+            ${(() => {
+              if (todos.length - todoCount > 0) {
                 return html`
                   <button class="clear-completed" onclick="${clearCompleted}">
                     Clear completed
                   </button>
                 `;
               }
-            })}
+            })()}
           </footer>
         `;
       }
-    })}
+    })()}
   </div>
 `;
 
