@@ -1,7 +1,7 @@
 import { html } from '../html';
-import { trkl } from '../trkl';
+import { frvl } from '../frvl';
 
-const name = trkl('ismail');
+const name = frvl('ismail');
 
 setTimeout(() => {
   name('codar');

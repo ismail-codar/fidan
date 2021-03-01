@@ -1,3 +1,5 @@
+// https://github.com/jbreckmckye/trkl/blob/master/trkl.js
+
 export interface Observable<T> {
   (newValue: T): void; // write
   (): T; // read
@@ -30,7 +32,7 @@ interface Writer {
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];
 
-export function trkl<T>(value?: T): Observable<T> {
+export function frvl<T>(value?: T): Observable<T> {
   var subscribers = [];
 
   var self = function(...args) {
@@ -87,8 +89,8 @@ export function trkl<T>(value?: T): Observable<T> {
   return self;
 }
 
-trkl['computed'] = <T>(fn: Computation<T>): Observable<T> => {
-  var self = trkl<T>();
+frvl['computed'] = <T>(fn: Computation<T>): Observable<T> => {
+  var self = frvl<T>();
   var computationToken = [runComputed];
 
   runComputed();
@@ -111,8 +113,8 @@ trkl['computed'] = <T>(fn: Computation<T>): Observable<T> => {
   }
 };
 
-trkl['from'] = executor => {
-  var self = trkl();
+frvl['from'] = executor => {
+  var self = frvl();
   executor(self);
   return self;
 };

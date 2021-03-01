@@ -1,4 +1,4 @@
-import { trkl, Observable } from './trkl';
+import { frvl, Observable } from './frvl';
 
 export const injectToProperty = (
   obj: Object,
@@ -24,7 +24,7 @@ export const injectToProperty = (
 
 export const inject = <T extends Object>(obj: T): T => {
   for (var key in obj) {
-    injectToProperty(obj, key, trkl(obj[key]));
+    injectToProperty(obj, key, frvl(obj[key]));
   }
   return obj;
 };

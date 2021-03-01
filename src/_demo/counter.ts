@@ -1,7 +1,7 @@
 import { html } from '../html';
-import { Observable, trkl } from '../trkl';
+import { Observable, frvl } from '../frvl';
 
-const count: Observable<number> = trkl(0);
+const count: Observable<number> = frvl(0);
 
 const decrement = () => {
   count(count() - 1);

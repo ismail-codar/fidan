@@ -1,4 +1,4 @@
-import { Observable, trkl } from './trkl';
+import { Observable, frvl } from './frvl';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 

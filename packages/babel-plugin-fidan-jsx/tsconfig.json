@@ -36,6 +36,6 @@
     "allowSyntheticDefaultImports": true,
     "strictFunctionTypes": false,
     "downlevelIteration": true,
-    "strictNullChecks": false
+    "strictNullChecks": false,
   }
 }

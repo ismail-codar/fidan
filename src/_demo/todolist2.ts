@@ -1,24 +1,24 @@
 import { observableArray } from '../array';
 import { html } from '../html';
-import { Observable, trkl } from '../trkl';
+import { Observable, frvl } from '../frvl';
 interface ITodo {
   title: Observable<string>;
   completed: Observable<boolean>;
 }
 
 const todos = observableArray(
-  trkl<ITodo[]>([
+  frvl<ITodo[]>([
     {
-      title: trkl('item 1'),
-      completed: trkl(false),
+      title: frvl('item 1'),
+      completed: frvl(false),
     },
     {
-      title: trkl('item 2'),
-      completed: trkl(false),
+      title: frvl('item 2'),
+      completed: frvl(false),
     },
     {
-      title: trkl('item 3'),
-      completed: trkl(false),
+      title: frvl('item 3'),
+      completed: frvl(false),
     },
   ])
 );
@@ -26,8 +26,8 @@ const todos = observableArray(
 setTimeout(() => {
   const arr = todos().slice(0);
   arr.push({
-    title: trkl('item 4'),
-    completed: trkl(false),
+    title: frvl('item 4'),
+    completed: frvl(false),
   });
   todos(arr);
 
