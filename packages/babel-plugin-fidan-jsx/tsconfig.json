@@ -31,5 +31,11 @@
     "forceConsistentCasingInFileNames": true,
     // `tsdx build` ignores this option, but it is commonly used when type-checking separately with `tsc`
     "noEmit": true,
+    "noImplicitAny": false,
+    "allowUnreachableCode": true,
+    "allowSyntheticDefaultImports": true,
+    "strictFunctionTypes": false,
+    "downlevelIteration": true,
+    "strictNullChecks": false
   }
 }
