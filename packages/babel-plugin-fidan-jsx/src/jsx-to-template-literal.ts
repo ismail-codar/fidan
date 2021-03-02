@@ -199,7 +199,7 @@ function replaceNode(path, state) {
   }
 }
 
-export default declare((api, options) => {
+export default declare(api => {
   api.assertVersion(7);
 
   return {

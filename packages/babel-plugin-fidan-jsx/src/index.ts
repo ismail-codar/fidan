@@ -29,16 +29,20 @@ export default (babel: any) => {
         // 	console.log(generate(path.node).code);
         // }
       },
-      VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {},
-      ObjectProperty(path: t.NodePath<t.ObjectProperty>) {},
+      VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
+        console.log(path);
+      },
+      ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
+        console.log(path);
+      },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
         if (t.isAssignmentExpression(path.node.expression)) {
         } else if (t.isUpdateExpression(path.node.expression)) {
         }
       },
-      TaggedTemplateExpression(path: t.NodePath<t.TaggedTemplateExpression>) {
-        path.node.quasi.expressions.forEach((expr, index) => {});
-      },
+      // TaggedTemplateExpression(path: t.NodePath<t.TaggedTemplateExpression>) {
+      // path.node.quasi.expressions.forEach((expr, index) => {});
+      // },
       //  #region Identity a -> a()
       CallExpression(path: t.NodePath<t.CallExpression>) {
         path.node.arguments.forEach((arg, index) => {

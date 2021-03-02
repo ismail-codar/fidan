@@ -17,7 +17,10 @@
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
-    "analyze": "size-limit --why"
+    "analyze": "size-limit --why",
+    "local": "yarn build && yalc publish && yalc push",
+    "demo": "parcel src/_demo/index.html --no-cache",
+    "yalc-link": "yalc link @fidanjs/runtime"
   },
   "peerDependencies": {},
   "husky": {

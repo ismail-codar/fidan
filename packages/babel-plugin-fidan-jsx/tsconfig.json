@@ -37,5 +37,6 @@
     "strictFunctionTypes": false,
     "downlevelIteration": true,
     "strictNullChecks": false,
-  }
+  },
+  "exclude": ["node_modules", "build", "test", "packages"]
 }

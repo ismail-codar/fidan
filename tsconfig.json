@@ -36,6 +36,7 @@
     "allowSyntheticDefaultImports": true,
     "strictFunctionTypes": false,
     "downlevelIteration": true,
-    "strictNullChecks": false
-  }
+    "strictNullChecks": false,
+  },
+  "exclude": ["node_modules", "build", "test", "packages"]
 }
