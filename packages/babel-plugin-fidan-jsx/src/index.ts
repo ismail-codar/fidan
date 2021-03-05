@@ -22,7 +22,7 @@ export default (babel: any) => {
           // 	JSON.stringify(JSON.parse(stringify(path.node)), null, 1)
           // );
           // debugger;
-          modify.insertFidanImport(path.node.body);
+          // modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
           // console.log(generate(path.node).code);
         },

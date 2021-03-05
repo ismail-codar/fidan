@@ -50,10 +50,18 @@ function runTest(dir) {
     return 0;
   }
   let testFile = dir.path + '/actual.jsx';
-  if (fs.existsSync(testFile) == false) {
-    testFile = dir.path + '/actual.tsx';
-  }
-  var output = babel.transformFileSync(testFile);
+  // if (fs.existsSync(testFile) === false) {
+  //   testFile = dir.path + '/actual.tsx';
+  // }
+  var output = babel.transformFileSync(testFile, {
+    plugins: [
+      process.env.IS_TEST ? './src/index.ts' : './dist/index.js',
+      {
+        // lowercaseEventNames: true,
+        // eventNamesPrefix: 'on',
+      },
+    ],
+  });
 
   var expected = fs.readFileSync(dir.path + '/expected.js', 'utf-8');
 
