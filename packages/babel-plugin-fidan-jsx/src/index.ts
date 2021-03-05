@@ -8,6 +8,8 @@ import check from './check';
 // import * as fs from 'fs';
 // import generate from '@babel/generator';
 
+// https://github.com/ismail-codar/fidan/tree/58ed3b07faeb93fb3da18b3f8bb570462c96f48e/packages/babel-plugin-fidan-jsx
+
 export default (babel: any) => {
   return {
     inherits: jsx,
