@@ -1,4 +1,4 @@
-import { Observable, frvl } from './frvl';
+import { Observable, value } from './value';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 

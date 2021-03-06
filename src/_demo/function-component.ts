@@ -1,5 +1,5 @@
 import { html } from '../html';
-import { Observable, frvl } from '../frvl';
+import { Observable, value } from '../value';
 
 const CountItem = (props: { value: number }) => {
   const { value } = props;

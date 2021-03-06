@@ -1,7 +1,7 @@
 import { html } from '../html';
-import { frvl } from '../frvl';
+import { value } from '../value';
 
-const name = frvl('ismail');
+const name = value('ismail');
 
 setTimeout(() => {
   name('codar');

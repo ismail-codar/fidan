@@ -1,4 +1,4 @@
-import { frvl, Observable } from './frvl';
+import { value, Observable } from './value';
 
 export const injectToProperty = (
   obj: Object,
@@ -24,7 +24,7 @@ export const injectToProperty = (
 
 export const inject = <T extends Object>(obj: T): T => {
   for (var key in obj) {
-    injectToProperty(obj, key, frvl(obj[key]));
+    injectToProperty(obj, key, value(obj[key]));
   }
   return obj;
 };

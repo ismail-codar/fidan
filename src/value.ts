@@ -32,7 +32,7 @@ interface Writer {
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];
 
-export function frvl<T>(value?: T): Observable<T> {
+export function value<T>(value?: T): Observable<T> {
   var subscribers = [];
 
   var self = function(...args) {
@@ -89,8 +89,8 @@ export function frvl<T>(value?: T): Observable<T> {
   return self;
 }
 
-frvl['computed'] = <T>(fn: Computation<T>): Observable<T> => {
-  var self = frvl<T>();
+value['computed'] = <T>(fn: Computation<T>): Observable<T> => {
+  var self = value<T>();
   var computationToken = [runComputed];
 
   runComputed();
@@ -113,8 +113,8 @@ frvl['computed'] = <T>(fn: Computation<T>): Observable<T> => {
   }
 };
 
-frvl['from'] = executor => {
-  var self = frvl();
+value['from'] = executor => {
+  var self = value();
   executor(self);
   return self;
 };

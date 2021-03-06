@@ -1,4 +1,4 @@
-import { html, Observable, frvl } from '../';
+import { html, Observable, value } from '../';
 import { observableArray, ObservableArray } from '../array';
 
 // interface & types
@@ -12,12 +12,12 @@ interface Todo {
 
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
-const hashFilter = frvl<FilterType>('');
-const todos = observableArray(frvl<Todo[]>([])) as ObservableArray<Todo[]>;
-const allChecked = frvl(false);
+const hashFilter = value<FilterType>('');
+const todos = observableArray(value<Todo[]>([])) as ObservableArray<Todo[]>;
+const allChecked = value(false);
 
 const shownTodos: ObservableArray<Todo[]> = observableArray(
-  frvl.computed(() => {
+  value.computed(() => {
     let _todos = todos();
     const filter = hashFilter();
     if (filter !== '') {
@@ -55,10 +55,10 @@ const clearCompleted = e => {
 
 // css computations
 const footerLinkCss = (waiting: FilterType) =>
-  frvl.computed(() => (hashFilter() === waiting ? 'selected' : ''));
+  value.computed(() => (hashFilter() === waiting ? 'selected' : ''));
 
 const editItemCss = (todo: Todo) =>
-  frvl.computed(() => {
+  value.computed(() => {
     const classes = [];
     todo.completed() && classes.push('completed');
     todo.editing() && classes.push('editing');
@@ -66,7 +66,7 @@ const editItemCss = (todo: Todo) =>
   });
 
 // footer
-const todoCount = frvl.computed(() => {
+const todoCount = value.computed(() => {
   const count = todos.filter(item => {
     return !item.completed();
   }).length;
@@ -88,7 +88,7 @@ window.addEventListener('hashchange', () => {
 hashFilter(window.location.hash.substr(2) as FilterType);
 
 // storage
-frvl
+value
   .computed(() => JSON.stringify(todos()))
   .subscribe(strTodos => {
     localStorage.setItem(STORAGE_KEY, strTodos);
@@ -96,9 +96,9 @@ frvl
 
 todos(
   JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').map(item => {
-    item.title = frvl(item.title);
-    item.editing = frvl(false);
-    item.completed = frvl(item.completed);
+    item.title = value(item.title);
+    item.editing = value(false);
+    item.completed = value(item.completed);
     return item;
   })
 );
@@ -118,9 +118,9 @@ const APP = html`
             if (title) {
               const todo = {
                 id: Math.random(),
-                title: frvl(title),
-                editing: frvl(false),
-                completed: frvl(false),
+                title: value(title),
+                editing: value(false),
+                completed: value(false),
               };
               todos.push(todo);
             }
@@ -129,7 +129,7 @@ const APP = html`
         }}"
       />
     </header>
-    ${frvl.computed(() => {
+    ${value.computed(() => {
       if (todos.length > 0) {
         return html`
           <section class="main">
@@ -184,7 +184,7 @@ const APP = html`
           </section>
           <footer class="footer">
             <span class="todo-count"
-              ><strong>${todoCount}</strong> item${frvl.computed(() =>
+              ><strong>${todoCount}</strong> item${value.computed(() =>
                 todoCount() > 1 ? 's' : ''
               )}
               left</span
@@ -202,7 +202,7 @@ const APP = html`
                 >
               </li>
             </ul>
-            ${frvl.computed(() => {
+            ${value.computed(() => {
               if (todos.length - todoCount() > 0) {
                 return html`
                   <button class="clear-completed" onclick="${clearCompleted}">

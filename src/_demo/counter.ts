@@ -1,33 +1,28 @@
-import { html } from '../html';
-import { Observable, frvl } from '../frvl';
+import * as fidan from '..';
 
-const count: Observable<number> = frvl(0);
-
-const decrement = () => {
-  count(count() - 1);
+const CountItem = props => {
+  const { value } = props;
+  console.log(value());
+  return fidan.html`<span>${value}</span>`;
+};
+const CounterButton = ({ text, onClick }) => {
+  return fidan.html`<button onclick="${onClick}">${text}</button>`;
+};
+export const App = () => {
+  let count = fidan.value(0);
+  return fidan.html`<div>${CounterButton({
+    onClick: () => {
+      count(count() + 1);
+    },
+    text: fidan.value('+'),
+  })}${CountItem({
+    value: count,
+  })}${CounterButton({
+    onClick: () => {
+      count(count() - 1);
+    },
+    text: fidan.value('-'),
+  })}</div>`;
 };
 
-const increment = () => {
-  count(count() + 1);
-};
-
-let btnIncrement: HTMLButtonElement = null;
-
-const app = html`
-  <div>
-    <button onclick="${decrement}">
-      -
-    </button>
-    ${count}
-    <button
-      ref="${element => {
-        btnIncrement = element;
-      }}"
-      onclick="${increment}"
-    >
-      +
-    </button>
-  </div>
-`;
-
-document.getElementById('main').appendChild(app);
+document.getElementById('main').appendChild(App());

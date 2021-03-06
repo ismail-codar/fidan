@@ -1,5 +1,5 @@
 import { html } from '../html';
-import { frvl } from '../frvl';
+import { value } from '../value';
 
 interface ITodo {
   title: string;
