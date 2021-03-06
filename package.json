@@ -15,6 +15,7 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
+    "testp": "cd packages/babel-plugin-fidan-jsx && npm run testp && cd ..",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
