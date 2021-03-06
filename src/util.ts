@@ -54,3 +54,16 @@ export const argumentValue = (arg: Observable<any>) => {
   });
   return newArg;
 };
+
+export const assign = (left: any, right: any) => {
+  if (typeof left === 'function') {
+    left(typeof right === 'function' ? right() : right);
+  } else {
+    left;
+  }
+  return left;
+};
+
+export const binary = (left, operator?, right?) => {
+  return false;
+};

@@ -1,30 +1,26 @@
 import * as fidan from '@fidanjs/runtime';
-
-// variables
-const STORAGE_KEY = 'fidan_todomvc';
-const hashFilter = fidan.value('');
-const todos = fidan.observableArray(fidan.value([]));
-const allChecked = fidan.value(false);
-
-const shownTodos = vobservableArray(
-  fidan.computed(() => {
-    let _todos = todos();
-    const filter = hashFilter();
-    if (filter !== '') {
-      _todos = _todos.filter(todo =>
-        filter === 'active' ? !todo.completed() : todo.completed()
-      );
-    }
-    return _todos;
-  })
-);
-
-// methods
+const STORAGE_KEY = fidan.value('fidan_todomvc');
+let hashFilter = fidan.value('');
+let todos = fidan.value([]);
+let allChecked = fidan.value(false);
+const shownTodos = fidan.useComputed(() => {
+  let _todos = fidan.value(todos);
+  const filter = fidan.value(hashFilter);
+  if (filter !== '') {
+    fidan.assign(
+      _todos,
+      _todos.filter(todo =>
+        filter === 'active' ? !todo.completed : todo.completed
+      )
+    );
+  }
+  return _todos;
+});
 const updateTodo = (todo, title) => {
-  title = title.trim();
+  fidan.assign(title, title.trim());
   if (title) {
-    todo.title(title);
-    todo.editing(false);
+    fidan.assign(todo.title, title);
+    fidan.assign(todo.editing, false);
   } else {
     removeTodo(todo.id);
   }
@@ -36,65 +32,59 @@ const removeTodo = id => {
   );
 };
 const clearCompleted = e => {
-  const removes = [];
+  const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (todo.completed()) removes.push(todo);
+    if (todo.completed) removes.push(todo());
   });
   while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
-
-// css computations
-const footerLinkCss = waiting =>
-  fidan.computed(() => (hashFilter() === waiting ? 'selected' : ''));
-
-const editItemCss = todo =>
-  fidan.computed(() => {
-    const classes = [];
-    todo.completed() && classes.push('completed');
-    todo.editing() && classes.push('editing');
-    return classes.join(' ');
-  });
-
-// footer
-const todoCount = fidan.computed(() => {
-  const count = todos.filter(item => {
-    return !item.completed();
-  }).length;
+const footerLinkCss = waiting => () =>
+  hashFilter === waiting ? 'selected' : '';
+const editItemCss = todo => () => {
+  const classes = fidan.value([]);
+  todo.completed && classes.push('completed');
+  todo.editing && classes.push('editing');
+  return classes.join(' ');
+};
+const todoCount = fidan.useComputed(() => {
+  const count = fidan.value(
+    todos.filter(item => {
+      return !item.completed;
+    }).length
+  );
   window.requestAnimationFrame(() => {
-    if (count === 0 && !allChecked()) {
-      allChecked(true);
+    if (count === 0 && !allChecked) {
+      fidan.assign(allChecked, true);
     }
-    if (count && allChecked()) {
-      allChecked(false);
+    if (count && allChecked) {
+      fidan.assign(allChecked, false);
     }
   });
   return count;
 });
-
-// router
 window.addEventListener('hashchange', () => {
-  hashFilter(window.location.hash.substr(2));
+  fidan.assign(hashFilter, window.location.hash.substr(2));
 });
-hashFilter(window.location.hash.substr(2));
-
-// storage
-value
-  .computed(() => JSON.stringify(todos()))
-  .subscribe(strTodos => {
-    localStorage.setItem(STORAGE_KEY, strTodos);
-  });
-
-todos(
-  JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').map(item => {
-    item.title = value(item.title);
-    item.editing = value(false);
-    item.completed = value(item.completed);
-    return item;
+fidan.assign(hashFilter, window.location.hash.substr(2));
+fidan.useSubscribe(
+  fidan.useComputed(() => JSON.stringify(todos())),
+  strTodos => {
+    localStorage.setItem(STORAGE_KEY(), strTodos());
+  }
+);
+fidan.assign(
+  todos,
+  JSON.parse(localStorage.getItem(STORAGE_KEY()) || '[]').map(item => {
+    const todo = fidan.value({
+      id: item.id,
+      completed: item.completed,
+      editing: item.editing,
+      title: item.title,
+    });
+    return todo;
   })
 );
-
-// view
-const APP = html`
+const APP = fidan.value(fidan.html`
   <div>
     <header class="header">
       <h1>todos</h1>
@@ -104,24 +94,26 @@ const APP = html`
         autofocus
         onkeypress="${e => {
           if (e.key === 'Enter') {
-            const title = e.target.value.trim();
+            const title = fidan.computed(() => {
+              return e.target.value.trim();
+            });
             if (title) {
-              const todo = {
+              const todo = fidan.value({
                 id: Math.random(),
-                title: value(title),
-                editing: value(false),
-                completed: value(false),
-              };
-              todos.push(todo);
+                title: title,
+                editing: fidan.value(false),
+                completed: fidan.value(false),
+              });
+              todos.push(todo());
             }
-            e.target.value = '';
+            fidan.assign(e.target.value, '');
           }
         }}"
       />
     </header>
-    ${fidan.computed(() => {
+    ${fidan.useComputed(() => {
       if (todos.length > 0) {
-        return html`
+        return fidan.html`
           <section class="main">
             <input
               id="toggle-all"
@@ -129,16 +121,16 @@ const APP = html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos.forEach(todo => todo.completed(e.target.checked))}"
+                todos.forEach(todo => (todo.completed = e.target.checked))}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
               ${shownTodos.map(
-                todo => html`
+                todo => fidan.html`
                   <li
-                    class="${editItemCss(todo)}"
+                    class="${editItemCss(todo())}"
                     ondblclick="${e => {
-                      todo.editing(true);
+                      fidan.assign(todo.editing, true);
                       e.currentTarget.lastElementChild.focus();
                     }}"
                   >
@@ -147,7 +139,7 @@ const APP = html`
                         class="toggle"
                         type="checkbox"
                         onchange="${e => {
-                          todo.completed(e.target.checked);
+                          fidan.assign(todo.completed, e.target.checked);
                         }}"
                         checked="${todo.completed}"
                       />
@@ -162,10 +154,10 @@ const APP = html`
                       value="${todo.title}"
                       onkeypress="${e => {
                         if (e.key === 'Enter') {
-                          updateTodo(todo, e.target.value);
+                          updateTodo(todo(), e.target.value);
                         }
                       }}"
-                      onblur="${e => updateTodo(todo, e.target.value)}"
+                      onblur="${e => updateTodo(todo(), e.target.value)}"
                     />
                   </li>
                 `
@@ -174,9 +166,9 @@ const APP = html`
           </section>
           <footer class="footer">
             <span class="todo-count"
-              ><strong>${todoCount}</strong> item${fidan.computed(() =>
-                todoCount() > 1 ? 's' : ''
-              )}
+              ><strong>${todoCount}</strong> item${fidan.useComputed(() =>
+          todoCount > 1 ? 's' : ''
+        )}
               left</span
             >
             <ul class="filters">
@@ -192,9 +184,9 @@ const APP = html`
                 >
               </li>
             </ul>
-            ${fidan.computed(() => {
-              if (todos.length - todoCount() > 0) {
-                return html`
+            ${fidan.useComputed(() => {
+              if (todos.length - todoCount > 0) {
+                return fidan.html`
                   <button class="clear-completed" onclick="${clearCompleted}">
                     Clear completed
                   </button>
@@ -206,4 +198,4 @@ const APP = html`
       }
     })}
   </div>
-`;
+`);

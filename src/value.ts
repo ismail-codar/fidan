@@ -29,10 +29,22 @@ interface Writer {
   (observable: Observable<any>): void;
 }
 
+type ObservableArrayType<T extends Array<T[0]>> = Observable<T> & Array<T[0]>;
+export interface ObservableArray<T extends Array<any>>
+  extends ObservableArrayType<T> {
+  map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;
+}
+
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];
 
-export function value<T>(value?: T): Observable<T> {
+export function value<T>(
+  value?: T
+): T extends Observable<any>
+  ? ReturnType<T>
+  : T extends Array<T>
+  ? ObservableArray<T>
+  : Observable<T> {
   var subscribers = [];
 
   var self = function(...args) {
@@ -86,7 +98,7 @@ export function value<T>(value?: T): Observable<T> {
     return val && val['toJSON'] ? val['toJSON']() : val;
   };
 
-  return self;
+  return self as any;
 }
 
 value['computed'] = <T>(fn: Computation<T>): Observable<T> => {

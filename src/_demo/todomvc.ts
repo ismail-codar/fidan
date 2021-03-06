@@ -1,8 +1,7 @@
-import { html, Observable, value } from '../';
-import { observableArray, ObservableArray } from '../array';
+import { html, Observable, value, observableArray, ObservableArray } from '../';
 
 // interface & types
-type FilterType = '' | 'active' | 'completed';
+type FilterType = void | '' | 'active' | 'completed';
 interface Todo {
   id: number;
   title: Observable<string>;
@@ -13,10 +12,10 @@ interface Todo {
 // variables
 const STORAGE_KEY = 'fidan_todomvc';
 const hashFilter = value<FilterType>('');
-const todos = observableArray(value<Todo[]>([])) as ObservableArray<Todo[]>;
+const todos = observableArray(value<Todo[]>([]));
 const allChecked = value(false);
 
-const shownTodos: ObservableArray<Todo[]> = observableArray(
+const shownTodos = observableArray(
   value.computed(() => {
     let _todos = todos();
     const filter = hashFilter();
@@ -83,9 +82,9 @@ const todoCount = value.computed(() => {
 
 // router
 window.addEventListener('hashchange', () => {
-  hashFilter(window.location.hash.substr(2) as FilterType);
+  hashFilter(window.location.hash.substr(2) as any);
 });
-hashFilter(window.location.hash.substr(2) as FilterType);
+hashFilter(window.location.hash.substr(2) as any);
 
 // storage
 value

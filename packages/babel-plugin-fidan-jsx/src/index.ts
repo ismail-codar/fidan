@@ -44,16 +44,17 @@ export default (babel: any, options: any) => {
         // }
       },
       VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-        // console.log(path);
-        if (check.isRequiredComputedExpression(path)) {
-          path.node.init = modify.fidanComputedExpressionInit(path.node.init);
-        } else {
-          if (
-            t.isFunctionExpression(path.node.init) === false &&
-            t.isArrowFunctionExpression(path.node.init) === false &&
-            t.isObjectPattern(path.node.id) === false // counter -> const { value } = props;
-          ) {
-            path.node.init = modify.fidanValueInit(path.node.init);
+        if (check.isFidanCall(path.node.init) === false) {
+          if (check.isRequiredComputedExpression(path)) {
+            path.node.init = modify.fidanComputedExpressionInit(path.node.init);
+          } else {
+            if (
+              t.isFunctionExpression(path.node.init) === false &&
+              t.isArrowFunctionExpression(path.node.init) === false &&
+              t.isObjectPattern(path.node.id) === false // counter -> const { value } = props;
+            ) {
+              path.node.init = modify.fidanValueInit(path.node.init);
+            }
           }
         }
       },
@@ -64,11 +65,11 @@ export default (babel: any, options: any) => {
       },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
         if (t.isAssignmentExpression(path.node.expression)) {
-          console.log(generate(path.node).code);
-          path.node.expression = modify.fidanValueSet(path.node.expression);
-          console.log(generate(path.node).code);
+          path.node.expression.right = modify.fidanValueAssign(
+            path.node.expression
+          );
         } else if (t.isUpdateExpression(path.node.expression)) {
-          path.node.expression = modify.fidanValueSet(
+          path.node.expression = modify.fidanValueAssign(
             t.assignmentExpression(
               '=',
               path.node.expression.argument as t.LVal,
@@ -81,34 +82,17 @@ export default (babel: any, options: any) => {
           );
         }
       },
-      // TaggedTemplateExpression(path: t.NodePath<t.TaggedTemplateExpression>) {
-      // path.node.quasi.expressions.forEach((expr, index) => {});
-      // },
-      //  #region Identity a -> a()
       CallExpression(path: t.NodePath<t.CallExpression>) {
-        path.node.arguments.forEach((arg, index) => {
-          if (t.isIdentifier(arg)) {
-            path.node.arguments[index] = modify.fidanValAccess(arg);
-          }
-        });
+        if (check.isFidanCall(path.node) === false) {
+          path.node.arguments.forEach((arg, index) => {
+            if (t.isIdentifier(arg)) {
+              path.node.arguments[index] = modify.fidanValAccess(arg);
+            }
+          });
+        }
       },
-      BinaryExpression(path: t.NodePath<t.BinaryExpression>) {
-        // if (
-        //   t.isIdentifier(path.node.left) ||
-        //   t.isMemberExpression(path.node.left)
-        // ) {
-        //   path.node.left = modify.fidanValAccess(path.node.left);
-        // } else {
-        //   check.unknownState(path);
-        // }
-        // if (
-        //   t.isIdentifier(path.node.right) ||
-        //   t.isMemberExpression(path.node.right)
-        // ) {
-        //   path.node.right = modify.fidanValAccess(path.node.right);
-        // } else {
-        //   check.unknownState(path);
-        // }
+      IfStatement(path: t.NodePath<t.IfStatement>) {
+        path.node.test = modify.fidanBinaryTest(path.node.test);
       },
     },
   };

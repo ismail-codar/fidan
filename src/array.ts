@@ -1,4 +1,4 @@
-import { Observable, value } from './value';
+import { Observable, ObservableArray, value } from './value';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 
@@ -28,12 +28,6 @@ const nonMutationmethods = [
   'toString',
   'valueOf',
 ];
-
-type ObservableArrayType<T extends Array<T[0]>> = Observable<T> & Array<T[0]>;
-export interface ObservableArray<T extends Array<any>>
-  extends ObservableArrayType<T> {
-  map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;
-}
 
 export const observableArray = <T>(dataArray?: Observable<T[]>) => {
   nonMutationmethods.forEach(method => {

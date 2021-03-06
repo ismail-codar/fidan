@@ -22,8 +22,18 @@ const isRequiredComputedExpression = (
   );
 };
 
+const isFidanCall = (node: t.Node) => {
+  return (
+    t.isCallExpression(node) &&
+    t.isMemberExpression(node.callee) &&
+    t.isIdentifier(node.callee.object) &&
+    node.callee.object.name === 'fidan'
+  );
+};
+
 export default {
   unknownState,
   isEmptyLiteral,
   isRequiredComputedExpression,
+  isFidanCall,
 };
