@@ -45,14 +45,34 @@ export default (babel: any, options: any) => {
       },
       VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
         if (check.isFidanCall(path.node.init) === false) {
-          if (check.isRequiredComputedExpression(path)) {
+          if (
+            t.isCallExpression(path.node.init) &&
+            path.node.init.arguments.length === 0 &&
+            (t.isArrowFunctionExpression(path.node.init.callee) ||
+              t.isFunctionExpression(path.node.init.callee))
+          ) {
+            // const shownTodos = (() => {return ...})
+            path.node.init = modify.fidanComputedFunction(
+              path.node.init.callee
+            );
+          } else if (check.isRequiredComputedExpression(path)) {
             path.node.init = modify.fidanComputedExpressionInit(path.node.init);
           } else {
             if (
-              t.isFunctionExpression(path.node.init) === false &&
-              t.isArrowFunctionExpression(path.node.init) === false &&
-              t.isObjectPattern(path.node.id) === false // counter -> const { value } = props;
+              t.isFunctionExpression(path.node.init) ||
+              t.isArrowFunctionExpression(path.node.init)
             ) {
+              if (
+                t.isFunctionExpression(path.node.init.body) ||
+                t.isArrowFunctionExpression(path.node.init.body)
+              ) {
+                // const footerLinkCss = waiting => () => hashFilter === waiting ? 'selected' : '';
+                path.node.init.body = modify.fidanComputedFunction(
+                  path.node.init.body
+                );
+              }
+            } else if (t.isObjectPattern(path.node.id) === false) {
+              // counter -> const { value } = props;)
               path.node.init = modify.fidanValueInit(path.node.init);
             }
           }

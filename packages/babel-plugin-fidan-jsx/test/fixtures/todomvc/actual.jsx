@@ -5,7 +5,7 @@ let hashFilter = '';
 let todos = [];
 let allChecked = false;
 
-const shownTodos = fidan.useComputed(() => {
+const shownTodos = (() => {
   let _todos = todos;
   const filter = hashFilter;
   if (filter !== '') {
@@ -14,7 +14,7 @@ const shownTodos = fidan.useComputed(() => {
     ) 
   }
   return _todos;
-});
+})();
 
 const updateTodo = (todo, title) => {
   title = title.trim();

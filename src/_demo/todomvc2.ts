@@ -13,7 +13,7 @@ const STORAGE_KEY = fidan.value('fidan_todomvc');
 let hashFilter = fidan.value('');
 let todos = fidan.value([]);
 let allChecked = fidan.value(false);
-const shownTodos = fidan.useComputed(() => {
+const shownTodos = fidan.computed(() => {
   let _todos = fidan.value(todos);
   const filter = fidan.value(hashFilter);
   if (fidan.binary(filter, '!==', '')) {
@@ -48,14 +48,17 @@ const clearCompleted = e => {
   });
   while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
-const footerLinkCss = waiting => () =>
-  fidan.binary(hashFilter, '===', waiting) ? 'selected' : '';
-const editItemCss = todo => () => {
-  const classes = fidan.value([]);
-  fidan.binary(todo.completed, '&&', () => classes.push('completed'));
-  fidan.binary(todo.editing, '&&', () => classes.push('editing'));
-  return classes.join(' ');
-};
+const footerLinkCss = waiting =>
+  fidan.computed(() =>
+    fidan.binary(hashFilter, '===', waiting) ? 'selected' : ''
+  );
+const editItemCss = todo =>
+  fidan.computed(() => {
+    const classes = fidan.value([]);
+    fidan.binary(todo.completed, '&&', () => classes.push('completed'));
+    fidan.binary(todo.editing, '&&', () => classes.push('editing'));
+    return classes.join(' ');
+  });
 const todoCount = fidan.useComputed(() => {
   const count = fidan.value(
     todos.filter(item => {

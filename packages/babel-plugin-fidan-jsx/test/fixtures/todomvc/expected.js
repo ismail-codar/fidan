@@ -1,16 +1,17 @@
 import * as fidan from '@fidanjs/runtime';
+
 const STORAGE_KEY = fidan.value('fidan_todomvc');
 let hashFilter = fidan.value('');
 let todos = fidan.value([]);
 let allChecked = fidan.value(false);
-const shownTodos = fidan.useComputed(() => {
+const shownTodos = fidan.computed(() => {
   let _todos = fidan.value(todos);
   const filter = fidan.value(hashFilter);
   if (fidan.binary(filter, '!==', '')) {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        filter === 'active' ? !todo.completed : todo.completed
+        fidan.binary(filter, '===', 'active') ? !todo.completed : todo.completed
       )
     );
   }
@@ -18,7 +19,7 @@ const shownTodos = fidan.useComputed(() => {
 });
 const updateTodo = (todo, title) => {
   title = fidan.assign(title, title.trim());
-  if (fidan.binary(title)) {
+  if (title) {
     todo.title = fidan.assign(todo.title, title);
     todo.editing = fidan.assign(todo.editing, false);
   } else {
@@ -34,18 +35,21 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (fidan.binary(todo.completed)) removes.push(todo());
+    if (todo.completed) removes.push(todo());
   });
   while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
-const footerLinkCss = waiting => () =>
-  hashFilter === waiting ? 'selected' : '';
-const editItemCss = todo => () => {
-  const classes = fidan.value([]);
-  todo.completed && classes.push('completed');
-  todo.editing && classes.push('editing');
-  return classes.join(' ');
-};
+const footerLinkCss = waiting =>
+  fidan.computed(() =>
+    fidan.binary(hashFilter, '===', waiting) ? 'selected' : ''
+  );
+const editItemCss = todo =>
+  fidan.computed(() => {
+    const classes = fidan.value([]);
+    fidan.binary(todo.completed, '&&', () => classes.push('completed'));
+    fidan.binary(todo.editing, '&&', () => classes.push('editing'));
+    return classes.join(' ');
+  });
 const todoCount = fidan.useComputed(() => {
   const count = fidan.value(
     todos.filter(item => {
@@ -53,10 +57,16 @@ const todoCount = fidan.useComputed(() => {
     }).length
   );
   window.requestAnimationFrame(() => {
-    if (fidan.binary(count === 0 && !allChecked)) {
+    if (
+      fidan.binary(
+        fidan.binary(count, '===', 0),
+        '&&',
+        fidan.unary(allChecked, '!')
+      )
+    ) {
       allChecked = fidan.assign(allChecked, true);
     }
-    if (fidan.binary(count && allChecked)) {
+    if (fidan.binary(count, '&&', allChecked)) {
       allChecked = fidan.assign(allChecked, false);
     }
   });
@@ -97,7 +107,7 @@ const APP = fidan.value(fidan.html`
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
-            if (fidan.binary(title)) {
+            if (title) {
               const todo = fidan.value({
                 id: Math.random(),
                 title: title,
@@ -170,7 +180,7 @@ const APP = fidan.value(fidan.html`
           <footer class="footer">
             <span class="todo-count"
               ><strong>${todoCount}</strong> item${fidan.useComputed(() =>
-          todoCount > 1 ? 's' : ''
+          fidan.binary(todoCount, '>', 1) ? 's' : ''
         )}
               left</span
             >

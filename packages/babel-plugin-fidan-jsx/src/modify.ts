@@ -17,6 +17,15 @@ const fidanComputedExpressionInit = (init: t.Expression) => {
   );
 };
 
+const fidanComputedFunction = (
+  init: t.ArrowFunctionExpression | t.FunctionExpression
+) => {
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('computed')),
+    [init]
+  );
+};
+
 const insertFidanImport = (body: t.Node[]) => {
   const imports = body.filter(item =>
     t.isImportDeclaration(item)
@@ -103,6 +112,7 @@ export default {
   fidanValAccess,
   insertFidanImport,
   fidanComputedExpressionInit,
+  fidanComputedFunction,
   fidanValueAssign,
   fidanBinary,
 };
