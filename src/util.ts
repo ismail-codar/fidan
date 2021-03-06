@@ -65,5 +65,9 @@ export const assign = (left: any, right: any) => {
 };
 
 export const binary = (left, operator?, right?) => {
+  return null;
+};
+
+export const unary = (left, operator?, right?) => {
   return false;
 };

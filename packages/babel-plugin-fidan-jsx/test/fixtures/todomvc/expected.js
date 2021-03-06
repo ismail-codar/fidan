@@ -6,8 +6,8 @@ let allChecked = fidan.value(false);
 const shownTodos = fidan.useComputed(() => {
   let _todos = fidan.value(todos);
   const filter = fidan.value(hashFilter);
-  if (filter !== '') {
-    fidan.assign(
+  if (fidan.binary(filter, '!==', '')) {
+    _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
         filter === 'active' ? !todo.completed : todo.completed
@@ -17,10 +17,10 @@ const shownTodos = fidan.useComputed(() => {
   return _todos;
 });
 const updateTodo = (todo, title) => {
-  fidan.assign(title, title.trim());
-  if (title) {
-    fidan.assign(todo.title, title);
-    fidan.assign(todo.editing, false);
+  title = fidan.assign(title, title.trim());
+  if (fidan.binary(title)) {
+    todo.title = fidan.assign(todo.title, title);
+    todo.editing = fidan.assign(todo.editing, false);
   } else {
     removeTodo(todo.id);
   }
@@ -34,7 +34,7 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (todo.completed) removes.push(todo());
+    if (fidan.binary(todo.completed)) removes.push(todo());
   });
   while (removes.length) todos.splice(todos.indexOf(removes.pop()), 1);
 };
@@ -53,26 +53,26 @@ const todoCount = fidan.useComputed(() => {
     }).length
   );
   window.requestAnimationFrame(() => {
-    if (count === 0 && !allChecked) {
-      fidan.assign(allChecked, true);
+    if (fidan.binary(count === 0 && !allChecked)) {
+      allChecked = fidan.assign(allChecked, true);
     }
-    if (count && allChecked) {
-      fidan.assign(allChecked, false);
+    if (fidan.binary(count && allChecked)) {
+      allChecked = fidan.assign(allChecked, false);
     }
   });
   return count;
 });
 window.addEventListener('hashchange', () => {
-  fidan.assign(hashFilter, window.location.hash.substr(2));
+  hashFilter = fidan.assign(hashFilter, window.location.hash.substr(2));
 });
-fidan.assign(hashFilter, window.location.hash.substr(2));
+hashFilter = fidan.assign(hashFilter, window.location.hash.substr(2));
 fidan.useSubscribe(
   fidan.useComputed(() => JSON.stringify(todos())),
   strTodos => {
     localStorage.setItem(STORAGE_KEY(), strTodos());
   }
 );
-fidan.assign(
+todos = fidan.assign(
   todos,
   JSON.parse(localStorage.getItem(STORAGE_KEY()) || '[]').map(item => {
     const todo = fidan.value({
@@ -93,11 +93,11 @@ const APP = fidan.value(fidan.html`
         placeholder="What needs to be done?"
         autofocus
         onkeypress="${e => {
-          if (e.key === 'Enter') {
+          if (fidan.binary(e.key, '===', 'Enter')) {
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
-            if (title) {
+            if (fidan.binary(title)) {
               const todo = fidan.value({
                 id: Math.random(),
                 title: title,
@@ -106,13 +106,13 @@ const APP = fidan.value(fidan.html`
               });
               todos.push(todo());
             }
-            fidan.assign(e.target.value, '');
+            e.target.value = fidan.assign(e.target.value, '');
           }
         }}"
       />
     </header>
     ${fidan.useComputed(() => {
-      if (todos.length > 0) {
+      if (fidan.binary(todos.length, '>', 0)) {
         return fidan.html`
           <section class="main">
             <input
@@ -130,7 +130,7 @@ const APP = fidan.value(fidan.html`
                   <li
                     class="${editItemCss(todo())}"
                     ondblclick="${e => {
-                      fidan.assign(todo.editing, true);
+                      todo.editing = fidan.assign(todo.editing, true);
                       e.currentTarget.lastElementChild.focus();
                     }}"
                   >
@@ -139,7 +139,10 @@ const APP = fidan.value(fidan.html`
                         class="toggle"
                         type="checkbox"
                         onchange="${e => {
-                          fidan.assign(todo.completed, e.target.checked);
+                          todo.completed = fidan.assign(
+                            todo.completed,
+                            e.target.checked
+                          );
                         }}"
                         checked="${todo.completed}"
                       />
@@ -153,7 +156,7 @@ const APP = fidan.value(fidan.html`
                       class="edit"
                       value="${todo.title}"
                       onkeypress="${e => {
-                        if (e.key === 'Enter') {
+                        if (fidan.binary(e.key, '===', 'Enter')) {
                           updateTodo(todo(), e.target.value);
                         }
                       }}"
@@ -185,7 +188,9 @@ const APP = fidan.value(fidan.html`
               </li>
             </ul>
             ${fidan.useComputed(() => {
-              if (todos.length - todoCount > 0) {
+              if (
+                fidan.binary(fidan.binary(todos.length, '-', todoCount), '>', 0)
+              ) {
                 return fidan.html`
                   <button class="clear-completed" onclick="${clearCompleted}">
                     Clear completed

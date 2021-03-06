@@ -80,6 +80,8 @@ export default (babel: any, options: any) => {
               )
             )
           );
+        } else if (t.isLogicalExpression(path.node.expression)) {
+          path.node.expression = modify.fidanBinary(path.node.expression);
         }
       },
       CallExpression(path: t.NodePath<t.CallExpression>) {
@@ -92,7 +94,10 @@ export default (babel: any, options: any) => {
         }
       },
       IfStatement(path: t.NodePath<t.IfStatement>) {
-        path.node.test = modify.fidanBinaryTest(path.node.test);
+        path.node.test = modify.fidanBinary(path.node.test);
+      },
+      ConditionalExpression(path: t.NodePath<t.ConditionalExpression>) {
+        path.node.test = modify.fidanBinary(path.node.test);
       },
     },
   };

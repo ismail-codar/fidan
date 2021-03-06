@@ -70,18 +70,32 @@ const fidanValueAssign = (expr: t.AssignmentExpression) => {
   );
 };
 
+const fidanBinaryArg = (expr: t.Expression) => {
+  return t.isBinaryExpression(expr)
+    ? fidanBinary(expr)
+    : t.isUnaryExpression(expr)
+    ? t.callExpression(
+        t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
+        [fidanBinary(expr.argument), t.stringLiteral(expr.operator)]
+      )
+    : t.isCallExpression(expr)
+    ? t.arrowFunctionExpression([], expr)
+    : expr;
+};
+
 const fidanBinary = (expr: t.Expression) => {
-  const args = t.isBinaryExpression(expr)
-    ? [
-        t.isBinaryExpression(expr.left) ? fidanBinary(expr.left) : expr.left,
+  if (t.isBinaryExpression(expr) || t.isLogicalExpression(expr)) {
+    return t.callExpression(
+      t.memberExpression(t.identifier('fidan'), t.identifier('binary')),
+      [
+        fidanBinaryArg(expr.left as t.Expression),
         t.stringLiteral(expr.operator),
-        t.isBinaryExpression(expr.right) ? fidanBinary(expr.right) : expr.right,
+        fidanBinaryArg(expr.right),
       ]
-    : [expr];
-  return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('binary')),
-    args
-  );
+    );
+  } else {
+    return expr;
+  }
 };
 
 export default {
@@ -90,5 +104,5 @@ export default {
   insertFidanImport,
   fidanComputedExpressionInit,
   fidanValueAssign,
-  fidanBinaryTest: fidanBinary,
+  fidanBinary,
 };
