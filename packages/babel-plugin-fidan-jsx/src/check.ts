@@ -9,7 +9,21 @@ const isEmptyLiteral = (literal: t.TemplateLiteral) => {
   return literal.quasis.length == 1 && literal.quasis[0].value.raw === '';
 };
 
+const isRequiredComputedExpression = (
+  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>
+) => {
+  const expr = t.isVariableDeclarator(path.node)
+    ? path.node.init
+    : path.node.value;
+  return (
+    t.isNewExpression(expr) ||
+    t.isCallExpression(expr) ||
+    t.isBinaryExpression(expr)
+  );
+};
+
 export default {
   unknownState,
   isEmptyLiteral,
+  isRequiredComputedExpression,
 };

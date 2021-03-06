@@ -1,6 +1,6 @@
 import { format } from 'prettier';
+import chalk from 'chalk';
 import * as babel from '@babel/core';
-import * as chalk from 'chalk';
 import * as diff from 'diff';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -55,17 +55,18 @@ function runTest(dir) {
   // }
   var output = babel.transformFileSync(testFile, {
     plugins: [
-      process.env.IS_TEST ? './src/index.ts' : './dist/index.js',
-      {
-        // lowercaseEventNames: true,
-        // eventNamesPrefix: 'on',
-      },
+      [
+        process.env.IS_TEST ? './src/index.ts' : './dist/index.js',
+        {
+          lowercaseEventNames: true,
+          eventNamesPrefix: 'on',
+        },
+      ],
     ],
   });
 
   var expected = fs.readFileSync(dir.path + '/expected.js', 'utf-8');
-
-  process.stdout.write(chalk.bgWhite.black(dir.name));
+  process.stdout.write(chalk.bgWhite.blue(dir.name));
   process.stdout.write('\n');
 
   function normalizeLines(str: string) {
@@ -99,7 +100,7 @@ function runTest(dir) {
     process.stdout.write('√');
   } else {
     if (diffParts.length == 1) process.stdout.write('√');
-    else
+    else {
       diffParts.forEach(function(part) {
         var value = part.value;
         if (part.added) {
@@ -110,12 +111,27 @@ function runTest(dir) {
         }
         process.stdout.write(value);
       });
+      drawLine('Expected ' + dir.path);
+      process.stdout.write(chalk.red(formattedExpected));
+      drawLine('Output ' + dir.path);
+      process.stdout.write(chalk.yellow(formattedOutput));
+    }
   }
 
   process.stdout.write('\n');
 
   return exitCode;
 }
+
+const drawLine = (title?: string) => {
+  process.stdout.write(
+    chalk.bgWhite.black(
+      '\n------------' +
+        (title || '') +
+        '-------------------------------------------------------------------------------------------\n'
+    )
+  );
+};
 
 if (process.argv.indexOf('--watch') >= 0) {
   // require('watch').watchTree(__dirname + '/..', function() {

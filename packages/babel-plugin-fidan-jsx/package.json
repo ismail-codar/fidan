@@ -49,22 +49,23 @@
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.10.0",
-    "husky": "^5.1.3",
-    "size-limit": "^4.10.0",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.1.0",
-    "typescript": "^4.2.3",
-    "diff": "^5.0.0",
-    "better-log": "^1.3.3",
-    "@babel/register": "^7.13.8",
     "@babel/generator": "^7.13.9",
     "@babel/plugin-syntax-jsx": "^7.12.13",
+    "@babel/register": "^7.13.8",
     "@babel/types": "^7.13.0",
-    "ts-node": "^9.1.1"
+    "@size-limit/preset-small-lib": "^4.10.0",
+    "better-log": "^1.3.3",
+    "chalk": "^4.1.0",
+    "diff": "^5.0.0",
+    "husky": "^5.1.3",
+    "size-limit": "^4.10.0",
+    "ts-node": "^9.1.1",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.1.0",
+    "typescript": "^4.2.3"
   },
   "dependencies": {
-    "flatted": "^3.1.1",
-    "@fidanjs/runtime": "^0.0.25"
+    "@fidanjs/runtime": "^0.0.25",
+    "flatted": "^3.1.1"
   }
 }

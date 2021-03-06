@@ -32,7 +32,10 @@ const insertFidanImport = (body: t.Node[]) => {
           item =>
             item && typeof item === 'object' && t.isVariableDeclaration(item)
         )
-        .map((item: t.VariableDeclaration) => item.declarations[0].id['name'])
+        .map(
+          (item: t.Node) =>
+            t.isVariableDeclaration(item) && item.declarations[0].id['name']
+        )
         .find(item => item === 'fidan') !== undefined;
     if (!exists) {
       body.splice(
@@ -54,14 +57,22 @@ const insertFidanImport = (body: t.Node[]) => {
 };
 
 const fidanValueInit = (init: t.Node) => {
-  return t.callExpression(t.identifier('fidan'), [
-    init == null ? t.nullLiteral() : (init as any),
-  ]);
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('value')),
+    [init == null ? t.nullLiteral() : (init as any)]
+  );
+};
+
+const fidanValueSet = (expr: t.AssignmentExpression) => {
+  if (t.isIdentifier(expr.left)) {
+    return t.callExpression(expr.left, [expr.right]);
+  }
 };
 
 export default {
   fidanValueInit,
   fidanValAccess,
+  fidanValueSet,
   insertFidanImport,
   fidanComputedExpressionInit,
 };
