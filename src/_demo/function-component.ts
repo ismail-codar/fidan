@@ -1,39 +1,25 @@
-import { html } from '../html';
-import { Observable, value } from '../value';
+import * as fidan from '..';
+import { countValue } from './function-component-util';
 
-const CountItem = (props: { value: number }) => {
-  const { value } = props;
-  return html`
-    <span> ${value} </span>
-  `;
+const CountItem = props => {
+  return fidan.html`<div>CountItem-count:${
+    props.count
+  }<button onclick="${() => {
+    props.count(props.count() + 1);
+  }}">CountItem-count</button></div>`;
 };
 
-const CounterButton = (props: { text: string; onClick: () => void }) => {
-  return html`
-    <button onClick="${props.onClick}">${props.text}</button>
-  `;
+export const App = () => {
+  let a = fidan.value(0);
+  return fidan.html`<div>${CountItem({
+    count: a,
+  })}App-count: ${a}<button onclick="${() => {
+    a(a() + 1);
+  }}">App-count</button>
+count-value: ${countValue(a(), val => {
+    a(val);
+  })}
+</div>`;
 };
 
-const CounterApp = () => {
-  let count = 0;
-
-  return html`
-    <div>
-      ${CounterButton({
-        onClick: () => {
-          count = count - 1;
-        },
-        text: '-',
-      })}
-      ${CountItem({
-        value: count,
-      })}
-      ${CounterButton({
-        onClick: () => {
-          count = count++;
-        },
-        text: '+',
-      })}
-    </div>
-  `;
-};
+document.getElementById('main').appendChild(App());

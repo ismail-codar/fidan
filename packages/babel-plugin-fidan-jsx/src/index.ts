@@ -64,7 +64,9 @@ export default (babel: any, options: any) => {
       },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
         if (t.isAssignmentExpression(path.node.expression)) {
+          console.log(generate(path.node).code);
           path.node.expression = modify.fidanValueSet(path.node.expression);
+          console.log(generate(path.node).code);
         } else if (t.isUpdateExpression(path.node.expression)) {
           path.node.expression = modify.fidanValueSet(
             t.assignmentExpression(
@@ -91,22 +93,22 @@ export default (babel: any, options: any) => {
         });
       },
       BinaryExpression(path: t.NodePath<t.BinaryExpression>) {
-        if (
-          t.isIdentifier(path.node.left) ||
-          t.isMemberExpression(path.node.left)
-        ) {
-          path.node.left = modify.fidanValAccess(path.node.left);
-        } else {
-          check.unknownState(path);
-        }
-        if (
-          t.isIdentifier(path.node.right) ||
-          t.isMemberExpression(path.node.right)
-        ) {
-          path.node.right = modify.fidanValAccess(path.node.right);
-        } else {
-          check.unknownState(path);
-        }
+        // if (
+        //   t.isIdentifier(path.node.left) ||
+        //   t.isMemberExpression(path.node.left)
+        // ) {
+        //   path.node.left = modify.fidanValAccess(path.node.left);
+        // } else {
+        //   check.unknownState(path);
+        // }
+        // if (
+        //   t.isIdentifier(path.node.right) ||
+        //   t.isMemberExpression(path.node.right)
+        // ) {
+        //   path.node.right = modify.fidanValAccess(path.node.right);
+        // } else {
+        //   check.unknownState(path);
+        // }
       },
     },
   };

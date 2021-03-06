@@ -14,7 +14,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
 if (!RUN_SINGLE_TEST) {
-  RUN_SINGLE_TEST = 'counter';
+  RUN_SINGLE_TEST = 'todomvc';
 }
 
 var exitCode = 0;
@@ -50,9 +50,9 @@ function runTest(dir) {
     return 0;
   }
   let testFile = dir.path + '/actual.jsx';
-  // if (fs.existsSync(testFile) === false) {
-  //   testFile = dir.path + '/actual.tsx';
-  // }
+  if (fs.existsSync(testFile) === false) {
+    testFile = dir.path + '/actual.tsx';
+  }
   var output = babel.transformFileSync(testFile, {
     plugins: [
       [

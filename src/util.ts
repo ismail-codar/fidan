@@ -46,3 +46,11 @@ export const debounce = (func, wait, immediate?) => {
     if (callNow) func.apply(context, args);
   };
 };
+
+export const argumentValue = (arg: Observable<any>) => {
+  const newArg = value(arg());
+  arg.subscribe(val => {
+    newArg(val);
+  });
+  return newArg;
+};
