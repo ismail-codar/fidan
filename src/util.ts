@@ -1,4 +1,5 @@
-import { value, Observable } from './value';
+import { Observable } from '../typings/fidan';
+import { value } from './value';
 
 export const injectToProperty = (
   obj: Object,
@@ -52,10 +53,11 @@ export const arg = arg => {
 };
 
 export const assign = (left: any, right: any) => {
+  const rightValue = typeof right === 'function' ? right() : right;
   if (typeof left === 'function') {
-    left(typeof right === 'function' ? right() : right);
+    left(rightValue);
+    return left;
   } else {
-    left;
+    return rightValue;
   }
-  return left;
 };

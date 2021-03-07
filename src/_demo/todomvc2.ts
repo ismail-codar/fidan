@@ -105,7 +105,7 @@ todos = fidan.assign(
     return todo;
   })
 );
-const APP = fidan.value(fidan.html`
+const APP = fidan.html`
   <div>
     <header class="header">
       <h1>todos</h1>
@@ -228,4 +228,13 @@ const APP = fidan.value(fidan.html`
       }
     })}
   </div>
-`);
+`;
+
+const styleSheets = fidan.html`
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-common/base.css" />
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css/index.css" />
+`;
+document.head.appendChild(styleSheets);
+setTimeout(() => {
+  document.getElementById('main').appendChild(APP);
+}, 150);

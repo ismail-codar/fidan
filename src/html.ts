@@ -1,5 +1,4 @@
 import { arrayMap } from './array';
-import { value } from './value';
 
 const TEXT = 1;
 const DOM = 2;

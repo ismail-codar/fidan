@@ -1,40 +1,6 @@
 // https://github.com/jbreckmckye/trkl/blob/master/trkl.js
-
-export interface Observable<T> {
-  (newValue: T): void; // write
-  (): T; // read
-
-  subscribe: AddSubscriber<T>;
-  unsubscribe: RemoveSubscriber;
-  $val: T;
-}
-
-interface Subscriber<T> {
-  (latest: T, last?: T): any | void;
-}
-
-interface AddSubscriber<T> {
-  (subscriber: Subscriber<T>, runImmediate?: boolean): Observable<T>;
-}
-
-interface RemoveSubscriber {
-  (subscriber: Subscriber<any>): void;
-}
-
-interface Computation<T> {
-  (): T;
-}
-
-interface Writer {
-  (observable: Observable<any>): void;
-}
-
-type ObservableArrayType<T extends Array<T[0]>> = Observable<T> & Array<T[0]>;
-export interface ObservableArray<T extends Array<any>>
-  extends ObservableArrayType<T> {
-  map: (item: any, index?: number, renderMode?: 'reuse' | 'reconcile') => any;
-}
-
+import { Observable, ObservableArray, Computation } from '../typings/fidan';
+import { observableArray } from './array';
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];
 
@@ -45,12 +11,18 @@ export function value<T>(
   : T extends Array<T>
   ? ObservableArray<T>
   : Observable<T> {
+  if (typeof value === 'function' && value.hasOwnProperty('$val')) {
+    value = value['$val'];
+  }
   var subscribers = [];
 
   var self = function(...args) {
     return args.length ? write(args[0]) : read();
   } as Observable<T>;
   self.$val = value;
+  if (Array.isArray(value)) {
+    observableArray(self as any);
+  }
 
   // declaring as a private function means the minifier can scrub its name on internal references
   var subscribe = (subscriber, immediate?) => {
@@ -71,7 +43,13 @@ export function value<T>(
   };
 
   function write(newValue) {
+    if (typeof newValue === 'function' && newValue.hasOwnProperty('$val')) {
+      newValue = newValue['$val'];
+    }
     self.$val = newValue;
+    if (Array.isArray(newValue)) {
+      observableArray(self as any);
+    }
     if (newValue === value && (value === null || typeof value !== 'object')) {
       return;
     }

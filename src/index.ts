@@ -1,5 +1,6 @@
 import { value } from './value';
 
+export * from '../typings/fidan';
 export * from './value';
 export * from './array';
 export * from './util';
