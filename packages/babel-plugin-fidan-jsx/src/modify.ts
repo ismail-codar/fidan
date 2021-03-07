@@ -1,13 +1,17 @@
 import * as t from '@babel/types';
 
 const fidanValAccess = (node: t.Node) => {
-  let name = null;
-  if (t.isIdentifier(node)) {
-    name = node.name;
-  } else {
-    debugger;
-  }
-  return t.callExpression(t.identifier(name), []);
+  // let name = null;
+  // if (t.isIdentifier(node)) {
+  //   name = node.name;
+  // } else {
+  //   debugger;
+  // }
+  // return t.callExpression(t.identifier(name), []);
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('arg')),
+    [node as t.Expression]
+  );
 };
 
 const fidanComputedExpressionInit = (init: t.Expression) => {
@@ -83,10 +87,7 @@ const fidanBinaryArg = (expr: t.Expression) => {
   return t.isBinaryExpression(expr)
     ? fidanBinary(expr)
     : t.isUnaryExpression(expr)
-    ? t.callExpression(
-        t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
-        [fidanBinary(expr.argument), t.stringLiteral(expr.operator)]
-      )
+    ? fidanUnary(expr)
     : t.isCallExpression(expr)
     ? t.arrowFunctionExpression([], expr)
     : expr;
@@ -107,6 +108,13 @@ const fidanBinary = (expr: t.Expression) => {
   }
 };
 
+const fidanUnary = (expr: t.UnaryExpression) => {
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
+    [fidanBinary(expr.argument), t.stringLiteral(expr.operator)]
+  );
+};
+
 export default {
   fidanValueInit,
   fidanValAccess,
@@ -115,4 +123,5 @@ export default {
   fidanComputedFunction,
   fidanValueAssign,
   fidanBinary,
+  fidanUnary,
 };

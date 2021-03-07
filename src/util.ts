@@ -69,5 +69,9 @@ export const binary = (left, operator?, right?) => {
 };
 
 export const unary = (left, operator?, right?) => {
-  return false;
+  return null;
+};
+
+export const arg = arg => {
+  return typeof arg === 'function' ? arg() : arg;
 };

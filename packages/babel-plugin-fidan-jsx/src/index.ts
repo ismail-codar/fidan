@@ -107,10 +107,19 @@ export default (babel: any, options: any) => {
       CallExpression(path: t.NodePath<t.CallExpression>) {
         if (check.isFidanCall(path.node) === false) {
           path.node.arguments.forEach((arg, index) => {
-            if (t.isIdentifier(arg)) {
+            if (
+              t.isLiteral(arg) === false &&
+              t.isArrowFunctionExpression(arg) === false &&
+              t.isFunctionExpression(arg) === false
+            ) {
               path.node.arguments[index] = modify.fidanValAccess(arg);
             }
           });
+        }
+      },
+      ReturnStatement(path: t.NodePath<t.ReturnStatement>) {
+        if (t.isUnaryExpression(path.node.argument)) {
+          path.node.argument = modify.fidanUnary(path.node.argument);
         }
       },
       IfStatement(path: t.NodePath<t.IfStatement>) {
@@ -118,6 +127,11 @@ export default (babel: any, options: any) => {
       },
       ConditionalExpression(path: t.NodePath<t.ConditionalExpression>) {
         path.node.test = modify.fidanBinary(path.node.test);
+      },
+      ArrowFunctionExpression(path: t.NodePath<t.ArrowFunctionExpression>) {
+        if (t.isExpression(path.node.body)) {
+          path.node.body = modify.fidanBinary(path.node.body);
+        }
       },
     },
   };
