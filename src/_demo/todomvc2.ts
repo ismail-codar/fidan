@@ -96,12 +96,12 @@ todos = fidan.assign(
   JSON.parse(
     fidan.arg(localStorage.getItem(fidan.arg(STORAGE_KEY)) || '[]')
   ).map(item => {
-    const todo = fidan.arg({
-      id: item.id,
-      completed: item.completed,
-      editing: item.editing,
-      title: item.title,
-    });
+    const todo = {
+      id: fidan.value(item.id),
+      completed: fidan.value(item.completed),
+      editing: fidan.value(item.editing),
+      title: fidan.value(item.title),
+    };
     return todo;
   })
 );
