@@ -1,11 +1,14 @@
 import * as t from '@babel/types';
+import check from './check';
 
 const fidanValAccess = (node: t.Node) => {
   if (
     t.isLiteral(node) === false &&
+    t.isObjectExpression(node) === false &&
     t.isArrowFunctionExpression(node) === false &&
     t.isTaggedTemplateExpression(node) === false &&
-    t.isFunctionExpression(node) === false
+    t.isFunctionExpression(node) === false &&
+    check.isFidanCall(node) === false
   ) {
     return t.callExpression(
       t.memberExpression(t.identifier('fidan'), t.identifier('arg')),
@@ -14,6 +17,13 @@ const fidanValAccess = (node: t.Node) => {
   } else {
     return node as t.Expression;
   }
+};
+
+const fidanValueInit = (init: t.Node) => {
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('value')),
+    [init == null ? t.nullLiteral() : (init as any)]
+  );
 };
 
 const fidanComputedExpressionInit = (init: t.Expression) => {
@@ -30,6 +40,30 @@ const fidanComputedFunction = (
     t.memberExpression(t.identifier('fidan'), t.identifier('computed')),
     [init]
   );
+};
+
+const fidanValueAssign = (expr: t.AssignmentExpression) => {
+  return t.callExpression(
+    t.memberExpression(t.identifier('fidan'), t.identifier('assign')),
+    [expr.left as t.Expression, expr.right]
+  );
+};
+
+const fidanBinary = (expr: t.Expression) => {
+  if (t.isBinaryExpression(expr) || t.isLogicalExpression(expr)) {
+    expr.left = fidanValAccess(fidanBinary(expr.left as t.Expression));
+    expr.right = fidanValAccess(fidanBinary(expr.right));
+  } else if (t.isUnaryExpression(expr)) {
+    return fidanUnary(expr);
+  } else if (t.isMemberExpression(expr) || t.isIdentifier(expr)) {
+    return fidanValAccess(expr);
+  }
+  return expr;
+};
+
+const fidanUnary = (expr: t.UnaryExpression) => {
+  expr.argument = fidanValAccess(expr.argument);
+  return expr;
 };
 
 const insertFidanImport = (body: t.Node[]) => {
@@ -56,12 +90,6 @@ const insertFidanImport = (body: t.Node[]) => {
       body.splice(
         0,
         0,
-        // t.variableDeclaration('var', [
-        // 	t.variableDeclarator(
-        // 		t.identifier('fidan'),
-        // 		t.callExpression(t.identifier('require'), [ t.stringLiteral('@fidanjs/runtime') ])
-        // 	)
-        // ])
         t.importDeclaration(
           [t.importNamespaceSpecifier(t.identifier('fidan'))],
           t.stringLiteral('@fidanjs/runtime')
@@ -69,54 +97,6 @@ const insertFidanImport = (body: t.Node[]) => {
       );
     }
   }
-};
-
-const fidanValueInit = (init: t.Node) => {
-  return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('value')),
-    [init == null ? t.nullLiteral() : (init as any)]
-  );
-};
-
-const fidanValueAssign = (expr: t.AssignmentExpression) => {
-  return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('assign')),
-    [expr.left as t.Expression, expr.right]
-  );
-};
-
-const fidanBinaryArg = (expr: t.Expression) => {
-  return t.isBinaryExpression(expr)
-    ? fidanBinary(expr)
-    : t.isUnaryExpression(expr)
-    ? fidanUnary(expr)
-    : // : t.isCallExpression(expr)  ? t.arrowFunctionExpression([], expr)
-      expr;
-};
-
-const fidanBinary = (expr: t.Expression) => {
-  if (t.isBinaryExpression(expr) || t.isLogicalExpression(expr)) {
-    // return t.callExpression(
-    //   t.memberExpression(t.identifier('fidan'), t.identifier('binary')),
-    //   [
-    //     fidanBinaryArg(expr.left as t.Expression),
-    //     t.stringLiteral(expr.operator),
-    //     fidanBinaryArg(expr.right),
-    //   ]
-    // );
-    expr.left = fidanValAccess(fidanBinaryArg(expr.left as t.Expression));
-    expr.right = fidanValAccess(fidanBinaryArg(expr.right));
-  }
-  return expr;
-};
-
-const fidanUnary = (expr: t.UnaryExpression) => {
-  // return t.callExpression(
-  //   t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
-  //   [t.stringLiteral(expr.operator), fidanBinary(expr.argument)]
-  // );
-  expr.argument = fidanValAccess(expr.argument);
-  return expr;
 };
 
 export default {

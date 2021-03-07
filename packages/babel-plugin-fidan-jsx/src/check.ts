@@ -60,10 +60,24 @@ const pathInTheComputedFn = (
   );
 };
 
+const isObservable = (
+  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>
+) => {
+  const node = t.isVariableDeclarator(path.node)
+    ? path.node.init
+    : path.node.value;
+  return (
+    t.isObjectExpression(node) === false &&
+    t.isTaggedTemplateExpression(node) === false &&
+    pathInTheComputedFn(path) === false
+  );
+};
+
 export default {
   unknownState,
   isEmptyLiteral,
   isRequiredComputedExpression,
   isFidanCall,
   pathInTheComputedFn,
+  isObservable,
 };

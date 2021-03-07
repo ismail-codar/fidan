@@ -20,7 +20,9 @@ const shownTodos = fidan.computed(() => {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.arg(filter) === 'active' ? !todo.completed : todo.completed
+        fidan.arg(filter) === 'active'
+          ? !fidan.arg(todo.completed)
+          : fidan.arg(todo.completed)
       )
     );
   }
@@ -28,7 +30,7 @@ const shownTodos = fidan.computed(() => {
 });
 const updateTodo = (todo, title) => {
   title = fidan.assign(title, title.trim());
-  if (title) {
+  if (fidan.arg(title)) {
     todo.title = fidan.assign(todo.title, title);
     todo.editing = fidan.assign(todo.editing, false);
   } else {
@@ -46,7 +48,7 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (todo.completed) removes.push(fidan.arg(todo));
+    if (fidan.arg(todo.completed)) removes.push(fidan.arg(todo));
   });
   while (removes.length)
     todos.splice(fidan.arg(todos.indexOf(fidan.arg(removes.pop()))), 1);
@@ -118,13 +120,13 @@ const APP = fidan.html`
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
-            if (title) {
-              const todo = fidan.arg({
-                id: Math.random(),
-                title: title,
-                editing: false,
-                completed: false,
-              });
+            if (fidan.arg(title)) {
+              const todo = {
+                id: fidan.value(Math.random()),
+                title: fidan.value(title),
+                editing: fidan.value(false),
+                completed: fidan.value(false),
+              };
               todos.push(fidan.arg(todo));
             }
             e.target.value = fidan.assign(e.target.value, '');

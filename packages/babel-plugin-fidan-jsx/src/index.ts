@@ -71,12 +71,7 @@ export default (babel: any, options: any) => {
                   path.node.init.body
                 );
               }
-            } else if (
-              t.isObjectPattern(path.node.id) === false &&
-              t.isObjectExpression(path.node.init) === false &&
-              t.isTaggedTemplateExpression(path.node.init) === false &&
-              check.pathInTheComputedFn(path) === false
-            ) {
+            } else if (check.isObservable(path)) {
               // counter -> const { value } = props;)
               path.node.init = modify.fidanValueInit(path.node.init);
             } else {
@@ -86,12 +81,7 @@ export default (babel: any, options: any) => {
         }
       },
       ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
-        if (
-          t.isLiteral(path.node.value) &&
-          t.isObjectExpression(path.node.value) === false &&
-          t.isTaggedTemplateExpression(path.node.value) === false &&
-          check.pathInTheComputedFn(path) === false
-        ) {
+        if (check.isObservable(path)) {
           path.node.value = modify.fidanValueInit(path.node.value);
         }
       },
@@ -133,6 +123,8 @@ export default (babel: any, options: any) => {
       },
       ConditionalExpression(path: t.NodePath<t.ConditionalExpression>) {
         path.node.test = modify.fidanBinary(path.node.test);
+        path.node.consequent = modify.fidanBinary(path.node.consequent);
+        path.node.alternate = modify.fidanBinary(path.node.alternate);
       },
       ArrowFunctionExpression(path: t.NodePath<t.ArrowFunctionExpression>) {
         if (t.isExpression(path.node.body)) {
