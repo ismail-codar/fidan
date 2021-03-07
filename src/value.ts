@@ -5,22 +5,22 @@ import { observableArray } from './array';
 var computedTracker = [];
 
 export function value<T>(
-  value?: T
+  val?: T
 ): T extends Observable<any>
   ? ReturnType<T>
   : T extends Array<T>
   ? ObservableArray<T>
   : Observable<T> {
-  if (typeof value === 'function' && value.hasOwnProperty('$val')) {
-    value = value['$val'];
-  }
   var subscribers = [];
 
   var self = function(...args) {
     return args.length ? write(args[0]) : read();
   } as Observable<T>;
-  self.$val = value;
-  if (Array.isArray(value)) {
+  if (typeof val === 'function' && val.hasOwnProperty('$val')) {
+    val = val['$val'];
+  }
+  self.$val = val;
+  if (Array.isArray(val)) {
     observableArray(self as any);
   }
 
@@ -30,7 +30,7 @@ export function value<T>(
       subscribers.push(subscriber);
     }
     if (immediate) {
-      subscriber(value);
+      subscriber(val);
     }
     return self;
   };
@@ -50,16 +50,16 @@ export function value<T>(
     if (Array.isArray(newValue)) {
       observableArray(self as any);
     }
-    if (newValue === value && (value === null || typeof value !== 'object')) {
+    if (newValue === val && (val === null || typeof val !== 'object')) {
       return;
     }
 
-    var oldValue = value;
-    value = newValue;
+    var oldValue = val;
+    val = newValue;
 
     for (let i = subscribers.length - 1; i > -1; i--) {
       // Errors will just terminate the effects
-      subscribers[i](value, oldValue);
+      subscribers[i](val, oldValue);
     }
   }
 
@@ -68,7 +68,7 @@ export function value<T>(
     if (runningComputation) {
       subscribe(runningComputation[0]);
     }
-    return value;
+    return val;
   }
 
   self.toString = self['toJSON'] = () => {
@@ -103,7 +103,7 @@ value['computed'] = <T>(fn: Computation<T>): Observable<T> => {
   }
 };
 
-value['from'] = executor => {
+value['fromValue'] = executor => {
   var self = value();
   executor(self);
   return self;

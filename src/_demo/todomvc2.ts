@@ -14,8 +14,8 @@ let hashFilter = fidan.value('');
 let todos = fidan.value([]);
 let allChecked = fidan.value(false);
 const shownTodos = fidan.computed(() => {
-  let _todos = fidan.value(todos);
-  const filter = fidan.value(hashFilter);
+  let _todos = fidan.value(fidan.arg(todos));
+  const filter = fidan.value(fidan.arg(hashFilter));
   if (fidan.arg(filter) !== '') {
     _todos = fidan.assign(
       _todos,
@@ -59,16 +59,18 @@ const footerLinkCss = waiting =>
   );
 const editItemCss = todo =>
   fidan.computed(() => {
-    const classes = fidan.value([]);
+    const classes = []; // TODO circular fidan.value([]);
     fidan.arg(todo.completed) && classes.push('completed');
     fidan.arg(todo.editing) && classes.push('editing');
     return classes.join(' ');
   });
 const todoCount = fidan.useComputed(() => {
   const count = fidan.value(
-    todos.filter(item => {
-      return !fidan.arg(item.completed);
-    }).length
+    fidan.arg(
+      todos.filter(item => {
+        return !fidan.arg(item.completed);
+      })
+    ).length
   );
   window.requestAnimationFrame(() => {
     if (
@@ -121,12 +123,12 @@ const APP = fidan.html`
               return e.target.value.trim();
             });
             if (title) {
-              const todo = fidan.value({
+              const todo = {
                 id: Math.random(),
                 title: title,
                 editing: fidan.value(false),
                 completed: fidan.value(false),
-              });
+              };
               todos.push(fidan.arg(todo));
             }
             e.target.value = fidan.assign(e.target.value, '');
