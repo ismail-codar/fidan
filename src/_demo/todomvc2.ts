@@ -20,7 +20,9 @@ const shownTodos = fidan.computed(() => {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.arg(filter) === 'active' ? !todo.completed : todo.completed
+        fidan.arg(filter) === 'active'
+          ? !fidan.arg(todo.completed)
+          : fidan.arg(todo.completed)
       )
     );
   }
@@ -46,7 +48,7 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (todo.completed) removes.push(fidan.arg(todo));
+    if (fidan.arg(todo.completed)) removes.push(fidan.arg(todo));
   });
   while (removes.length)
     todos.splice(fidan.arg(todos.indexOf(fidan.arg(removes.pop()))), 1);
@@ -58,8 +60,8 @@ const footerLinkCss = waiting =>
 const editItemCss = todo =>
   fidan.computed(() => {
     const classes = fidan.value([]);
-    fidan.arg(todo.completed) && fidan.arg(classes.push('completed'));
-    fidan.arg(todo.editing) && fidan.arg(classes.push('editing'));
+    fidan.arg(todo.completed) && classes.push('completed');
+    fidan.arg(todo.editing) && classes.push('editing');
     return classes.join(' ');
   });
 const todoCount = fidan.useComputed(() => {
@@ -96,12 +98,12 @@ todos = fidan.assign(
   JSON.parse(
     fidan.arg(localStorage.getItem(fidan.arg(STORAGE_KEY)) || '[]')
   ).map(item => {
-    const todo = fidan.value({
-      id: item.id,
-      completed: item.completed,
-      editing: item.editing,
-      title: item.title,
-    });
+    const todo = {
+      id: fidan.value(item.id),
+      completed: fidan.value(item.completed),
+      editing: fidan.value(item.editing),
+      title: fidan.value(item.title),
+    };
     return todo;
   })
 );
@@ -142,7 +144,9 @@ const APP = fidan.html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos.forEach(todo => (todo.completed = e.target.checked))}"
+                todos.forEach(todo =>
+                  fidan.assign(todo.completed, e.target.checked)
+                )}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">
