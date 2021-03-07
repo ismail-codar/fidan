@@ -47,12 +47,8 @@ export const debounce = (func, wait, immediate?) => {
   };
 };
 
-export const argumentValue = (arg: Observable<any>) => {
-  const newArg = value(arg());
-  arg.subscribe(val => {
-    newArg(val);
-  });
-  return newArg;
+export const arg = arg => {
+  return typeof arg === 'function' ? arg() : arg;
 };
 
 export const assign = (left: any, right: any) => {
@@ -62,16 +58,4 @@ export const assign = (left: any, right: any) => {
     left;
   }
   return left;
-};
-
-export const binary = (left, operator?, right?) => {
-  return null;
-};
-
-export const unary = (left, operator?, right?) => {
-  return null;
-};
-
-export const arg = arg => {
-  return typeof arg === 'function' ? arg() : arg;
 };

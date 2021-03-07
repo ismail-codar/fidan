@@ -88,31 +88,33 @@ const fidanBinaryArg = (expr: t.Expression) => {
     ? fidanBinary(expr)
     : t.isUnaryExpression(expr)
     ? fidanUnary(expr)
-    : t.isCallExpression(expr)
-    ? t.arrowFunctionExpression([], expr)
-    : expr;
+    : // : t.isCallExpression(expr)  ? t.arrowFunctionExpression([], expr)
+      expr;
 };
 
 const fidanBinary = (expr: t.Expression) => {
   if (t.isBinaryExpression(expr) || t.isLogicalExpression(expr)) {
-    return t.callExpression(
-      t.memberExpression(t.identifier('fidan'), t.identifier('binary')),
-      [
-        fidanBinaryArg(expr.left as t.Expression),
-        t.stringLiteral(expr.operator),
-        fidanBinaryArg(expr.right),
-      ]
-    );
-  } else {
-    return expr;
+    // return t.callExpression(
+    //   t.memberExpression(t.identifier('fidan'), t.identifier('binary')),
+    //   [
+    //     fidanBinaryArg(expr.left as t.Expression),
+    //     t.stringLiteral(expr.operator),
+    //     fidanBinaryArg(expr.right),
+    //   ]
+    // );
+    expr.left = fidanValAccess(fidanBinaryArg(expr.left as t.Expression));
+    expr.right = fidanValAccess(fidanBinaryArg(expr.right));
   }
+  return expr;
 };
 
 const fidanUnary = (expr: t.UnaryExpression) => {
-  return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
-    [fidanBinary(expr.argument), t.stringLiteral(expr.operator)]
-  );
+  // return t.callExpression(
+  //   t.memberExpression(t.identifier('fidan'), t.identifier('unary')),
+  //   [t.stringLiteral(expr.operator), fidanBinary(expr.argument)]
+  // );
+  expr.argument = fidanValAccess(expr.argument);
+  return expr;
 };
 
 export default {

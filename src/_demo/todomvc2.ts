@@ -16,11 +16,13 @@ let allChecked = fidan.value(false);
 const shownTodos = fidan.computed(() => {
   let _todos = fidan.value(todos);
   const filter = fidan.value(hashFilter);
-  if (fidan.binary(filter, '!==', '')) {
+  if (fidan.arg(filter) !== fidan.arg('')) {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.binary(filter, '===', 'active') ? !todo.completed : todo.completed
+        fidan.arg(filter) === fidan.arg('active')
+          ? !todo.completed
+          : todo.completed
       )
     );
   }
@@ -37,7 +39,9 @@ const updateTodo = (todo, title) => {
 };
 const removeTodo = id => {
   todos.splice(
-    fidan.arg(shownTodos.findIndex(item => fidan.binary(item.id, '==', id))),
+    fidan.arg(
+      shownTodos.findIndex(item => fidan.arg(item.id) == fidan.arg(id))
+    ),
     1
   );
 };
@@ -51,32 +55,29 @@ const clearCompleted = e => {
 };
 const footerLinkCss = waiting =>
   fidan.computed(() =>
-    fidan.binary(hashFilter, '===', waiting) ? 'selected' : ''
+    fidan.arg(hashFilter) === fidan.arg(waiting) ? 'selected' : ''
   );
 const editItemCss = todo =>
   fidan.computed(() => {
     const classes = fidan.value([]);
-    fidan.binary(todo.completed, '&&', () => classes.push('completed'));
-    fidan.binary(todo.editing, '&&', () => classes.push('editing'));
+    fidan.arg(todo.completed) && fidan.arg(classes.push('completed'));
+    fidan.arg(todo.editing) && fidan.arg(classes.push('editing'));
     return classes.join(' ');
   });
 const todoCount = fidan.useComputed(() => {
   const count = fidan.value(
     todos.filter(item => {
-      return fidan.unary(item.completed, '!');
+      return !fidan.arg(item.completed);
     }).length
   );
   window.requestAnimationFrame(() => {
     if (
-      fidan.binary(
-        fidan.binary(count, '===', 0),
-        '&&',
-        fidan.unary(allChecked, '!')
-      )
+      fidan.arg(fidan.arg(count) === fidan.arg(0)) &&
+      fidan.arg(!fidan.arg(allChecked))
     ) {
       allChecked = fidan.assign(allChecked, true);
     }
-    if (fidan.binary(count, '&&', allChecked)) {
+    if (fidan.arg(count) && fidan.arg(allChecked)) {
       allChecked = fidan.assign(allChecked, false);
     }
   });
@@ -115,7 +116,7 @@ const APP = fidan.value(fidan.html`
         placeholder="What needs to be done?"
         autofocus
         onkeypress="${e => {
-          if (fidan.binary(e.key, '===', 'Enter')) {
+          if (fidan.arg(e.key) === fidan.arg('Enter')) {
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
@@ -134,7 +135,7 @@ const APP = fidan.value(fidan.html`
       />
     </header>
     ${fidan.useComputed(() => {
-      if (fidan.binary(todos.length, '>', 0)) {
+      if (fidan.arg(todos.length) > fidan.arg(0)) {
         return fidan.html`
           <section class="main">
             <input
@@ -178,7 +179,7 @@ const APP = fidan.value(fidan.html`
                       class="edit"
                       value="${todo.title}"
                       onkeypress="${e => {
-                        if (fidan.binary(e.key, '===', 'Enter')) {
+                        if (fidan.arg(e.key) === fidan.arg('Enter')) {
                           updateTodo(
                             fidan.arg(todo),
                             fidan.arg(e.target.value)
@@ -196,7 +197,7 @@ const APP = fidan.value(fidan.html`
           <footer class="footer">
             <span class="todo-count"
               ><strong>${todoCount}</strong> item${fidan.useComputed(() =>
-          fidan.binary(todoCount, '>', 1) ? 's' : ''
+          fidan.arg(todoCount) > fidan.arg(1) ? 's' : ''
         )}
               left</span
             >
@@ -215,7 +216,8 @@ const APP = fidan.value(fidan.html`
             </ul>
             ${fidan.useComputed(() => {
               if (
-                fidan.binary(fidan.binary(todos.length, '-', todoCount), '>', 0)
+                fidan.arg(fidan.arg(todos.length) - fidan.arg(todoCount)) >
+                fidan.arg(0)
               ) {
                 return fidan.html`
                   <button class="clear-completed" onclick="${clearCompleted}">
