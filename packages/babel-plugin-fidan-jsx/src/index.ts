@@ -71,15 +71,27 @@ export default (babel: any, options: any) => {
                   path.node.init.body
                 );
               }
-            } else if (t.isObjectPattern(path.node.id) === false) {
+            } else if (
+              t.isObjectPattern(path.node.id) === false &&
+              t.isObjectExpression(path.node.init) === false &&
+              t.isTaggedTemplateExpression(path.node.init) === false &&
+              check.pathInTheComputedFn(path) === false
+            ) {
               // counter -> const { value } = props;)
               path.node.init = modify.fidanValueInit(path.node.init);
+            } else {
+              path.node.init = modify.fidanValAccess(path.node.init);
             }
           }
         }
       },
       ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
-        if (t.isLiteral(path.node.value)) {
+        if (
+          t.isLiteral(path.node.value) &&
+          t.isObjectExpression(path.node.value) === false &&
+          t.isTaggedTemplateExpression(path.node.value) === false &&
+          check.pathInTheComputedFn(path) === false
+        ) {
           path.node.value = modify.fidanValueInit(path.node.value);
         }
       },

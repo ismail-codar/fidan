@@ -5,15 +5,13 @@ let hashFilter = fidan.value('');
 let todos = fidan.value([]);
 let allChecked = fidan.value(false);
 const shownTodos = fidan.computed(() => {
-  let _todos = fidan.value(todos);
-  const filter = fidan.value(hashFilter);
+  let _todos = fidan.arg(todos);
+  const filter = fidan.arg(hashFilter);
   if (fidan.arg(filter) !== '') {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.arg(filter) === 'active'
-          ? !fidan.arg(todo.completed)
-          : fidan.arg(todo.completed)
+        fidan.arg(filter) === 'active' ? !todo.completed : todo.completed
       )
     );
   }
@@ -39,7 +37,7 @@ const removeTodo = id => {
 const clearCompleted = e => {
   const removes = fidan.value([]);
   todos.forEach(todo => {
-    if (fidan.arg(todo.completed)) removes.push(fidan.arg(todo));
+    if (todo.completed) removes.push(fidan.arg(todo));
   });
   while (removes.length)
     todos.splice(fidan.arg(todos.indexOf(fidan.arg(removes.pop()))), 1);
@@ -50,13 +48,13 @@ const footerLinkCss = waiting =>
   );
 const editItemCss = todo =>
   fidan.computed(() => {
-    const classes = fidan.value([]);
-    fidan.arg(todo.completed) && classes.push('completed');
-    fidan.arg(todo.editing) && classes.push('editing');
+    const classes = fidan.arg([]);
+    fidan.arg(todo.completed) && fidan.arg(classes.push('completed'));
+    fidan.arg(todo.editing) && fidan.arg(classes.push('editing'));
     return classes.join(' ');
   });
 const todoCount = fidan.useComputed(() => {
-  const count = fidan.value(
+  const count = fidan.arg(
     todos.filter(item => {
       return !fidan.arg(item.completed);
     }).length
@@ -89,7 +87,7 @@ todos = fidan.assign(
   JSON.parse(
     fidan.arg(localStorage.getItem(fidan.arg(STORAGE_KEY)) || '[]')
   ).map(item => {
-    const todo = fidan.value({
+    const todo = fidan.arg({
       id: item.id,
       completed: item.completed,
       editing: item.editing,
@@ -112,11 +110,11 @@ const APP = fidan.html`
               return e.target.value.trim();
             });
             if (title) {
-              const todo = fidan.value({
+              const todo = fidan.arg({
                 id: Math.random(),
                 title: title,
-                editing: fidan.value(false),
-                completed: fidan.value(false),
+                editing: false,
+                completed: false,
               });
               todos.push(fidan.arg(todo));
             }
@@ -135,9 +133,7 @@ const APP = fidan.html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos.forEach(todo =>
-                  fidan.assign(todo.completed, e.target.checked)
-                )}"
+                todos.forEach(todo => (todo.completed = e.target.checked))}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">

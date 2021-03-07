@@ -1,16 +1,10 @@
 import * as t from '@babel/types';
 
 const fidanValAccess = (node: t.Node) => {
-  // let name = null;
-  // if (t.isIdentifier(node)) {
-  //   name = node.name;
-  // } else {
-  //   debugger;
-  // }
-  // return t.callExpression(t.identifier(name), []);
   if (
     t.isLiteral(node) === false &&
     t.isArrowFunctionExpression(node) === false &&
+    t.isTaggedTemplateExpression(node) === false &&
     t.isFunctionExpression(node) === false
   ) {
     return t.callExpression(
