@@ -107,13 +107,7 @@ export default (babel: any, options: any) => {
       CallExpression(path: t.NodePath<t.CallExpression>) {
         if (check.isFidanCall(path.node) === false) {
           path.node.arguments.forEach((arg, index) => {
-            if (
-              t.isLiteral(arg) === false &&
-              t.isArrowFunctionExpression(arg) === false &&
-              t.isFunctionExpression(arg) === false
-            ) {
-              path.node.arguments[index] = modify.fidanValAccess(arg);
-            }
+            path.node.arguments[index] = modify.fidanValAccess(arg);
           });
         }
       },

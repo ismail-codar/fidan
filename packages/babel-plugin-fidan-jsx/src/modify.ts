@@ -8,10 +8,18 @@ const fidanValAccess = (node: t.Node) => {
   //   debugger;
   // }
   // return t.callExpression(t.identifier(name), []);
-  return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('arg')),
-    [node as t.Expression]
-  );
+  if (
+    t.isLiteral(node) === false &&
+    t.isArrowFunctionExpression(node) === false &&
+    t.isFunctionExpression(node) === false
+  ) {
+    return t.callExpression(
+      t.memberExpression(t.identifier('fidan'), t.identifier('arg')),
+      [node as t.Expression]
+    );
+  } else {
+    return node as t.Expression;
+  }
 };
 
 const fidanComputedExpressionInit = (init: t.Expression) => {

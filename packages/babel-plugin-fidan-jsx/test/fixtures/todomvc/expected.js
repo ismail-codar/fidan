@@ -7,13 +7,11 @@ let allChecked = fidan.value(false);
 const shownTodos = fidan.computed(() => {
   let _todos = fidan.value(todos);
   const filter = fidan.value(hashFilter);
-  if (fidan.arg(filter) !== fidan.arg('')) {
+  if (fidan.arg(filter) !== '') {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.arg(filter) === fidan.arg('active')
-          ? !todo.completed
-          : todo.completed
+        fidan.arg(filter) === 'active' ? !todo.completed : todo.completed
       )
     );
   }
@@ -63,7 +61,7 @@ const todoCount = fidan.useComputed(() => {
   );
   window.requestAnimationFrame(() => {
     if (
-      fidan.arg(fidan.arg(count) === fidan.arg(0)) &&
+      fidan.arg(fidan.arg(count) === 0) &&
       fidan.arg(!fidan.arg(allChecked))
     ) {
       allChecked = fidan.assign(allChecked, true);
@@ -107,7 +105,7 @@ const APP = fidan.value(fidan.html`
         placeholder="What needs to be done?"
         autofocus
         onkeypress="${e => {
-          if (fidan.arg(e.key) === fidan.arg('Enter')) {
+          if (fidan.arg(e.key) === 'Enter') {
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
@@ -126,7 +124,7 @@ const APP = fidan.value(fidan.html`
       />
     </header>
     ${fidan.useComputed(() => {
-      if (fidan.arg(todos.length) > fidan.arg(0)) {
+      if (fidan.arg(todos.length) > 0) {
         return fidan.html`
           <section class="main">
             <input
@@ -170,7 +168,7 @@ const APP = fidan.value(fidan.html`
                       class="edit"
                       value="${todo.title}"
                       onkeypress="${e => {
-                        if (fidan.arg(e.key) === fidan.arg('Enter')) {
+                        if (fidan.arg(e.key) === 'Enter') {
                           updateTodo(
                             fidan.arg(todo),
                             fidan.arg(e.target.value)
@@ -188,7 +186,7 @@ const APP = fidan.value(fidan.html`
           <footer class="footer">
             <span class="todo-count"
               ><strong>${todoCount}</strong> item${fidan.useComputed(() =>
-          fidan.arg(todoCount) > fidan.arg(1) ? 's' : ''
+          fidan.arg(todoCount) > 1 ? 's' : ''
         )}
               left</span
             >
@@ -207,8 +205,7 @@ const APP = fidan.value(fidan.html`
             </ul>
             ${fidan.useComputed(() => {
               if (
-                fidan.arg(fidan.arg(todos.length) - fidan.arg(todoCount)) >
-                fidan.arg(0)
+                fidan.arg(fidan.arg(todos.length) - fidan.arg(todoCount)) > 0
               ) {
                 return fidan.html`
                   <button class="clear-completed" onclick="${clearCompleted}">
