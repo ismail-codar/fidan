@@ -19,16 +19,16 @@ export const injectToProperty = (
   });
   // else {
   //   // descr.get().c_depends.push(val);
-  //   // val["c_depends"].push(descr.get());
+  //   // val["c_depends"].push(descr.get());s
   // }
 };
 
-export const inject = <T extends Object>(obj: T): T => {
-  for (var key in obj) {
-    injectToProperty(obj, key, observable(obj[key]));
-  }
-  return obj;
-};
+// export const inject = <T extends Object>(obj: T): T => {
+//   for (var key in obj) {
+//     injectToProperty(obj, key, observable(obj[key]) as any);
+//   }
+//   return obj;
+// };
 
 export const debounce = (func, wait, immediate?) => {
   let timeout;

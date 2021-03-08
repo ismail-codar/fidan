@@ -4,7 +4,7 @@ export interface Observable<T> {
 
   subscribe: AddSubscriber<T>;
   unsubscribe: RemoveSubscriber;
-  $val: T;
+  $val?: T;
 }
 
 interface Subscriber<T> {

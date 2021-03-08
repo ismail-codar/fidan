@@ -80,7 +80,7 @@ export function observable<T>(
 }
 
 observable['computed'] = <T>(fn: Computation<T>): Observable<T> => {
-  var self = observable<T>();
+  var self: any = observable<T>();
   var computationToken = [runComputed];
 
   runComputed();
