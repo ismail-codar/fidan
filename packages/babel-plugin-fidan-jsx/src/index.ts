@@ -11,6 +11,13 @@ import check from './check';
 import generate from '@babel/generator';
 import { globalData } from './common';
 
+const bundlerSpecificFunctions = [
+  //parcel
+  '_templateObject',
+  '_taggedTemplateLiteral',
+  //
+];
+
 export default (babel: any, options: any) => {
   return {
     inherits: jsx,
@@ -143,6 +150,11 @@ export default (babel: any, options: any) => {
       ArrowFunctionExpression(path: t.NodePath<t.ArrowFunctionExpression>) {
         if (t.isExpression(path.node.body)) {
           path.node.body = modify.fidanBinary(path.node.body);
+        }
+      },
+      FunctionDeclaration(path: t.NodePath<t.FunctionDeclaration>) {
+        if (bundlerSpecificFunctions.includes(path.node.id.name)) {
+          path.stop();
         }
       },
     },
