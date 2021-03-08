@@ -195,10 +195,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 
       if (attributeName) {
         if (attributeName.startsWith('on')) {
-          (element as Element).addEventListener(
-            attributeName.substr(2),
-            param.$val || param
-          );
+          (element as Element).addEventListener(attributeName.substr(2), param);
         } else if (isDynamic) {
           if (htmlProps[attributeName]) {
             element[attributeName] = param();
