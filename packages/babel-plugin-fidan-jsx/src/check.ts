@@ -49,7 +49,7 @@ const isFidanCall = (node: t.Node) => {
 };
 
 const pathInTheComputedFn = (
-  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>
+  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
 ) => {
   const callExpressionPath = parentPathLoop(path, checkPath => {
     return t.isCallExpression(checkPath);
@@ -61,7 +61,7 @@ const pathInTheComputedFn = (
 };
 
 const isObservable = (
-  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty>
+  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
 ) => {
   const node = t.isVariableDeclarator(path.node)
     ? path.node.init

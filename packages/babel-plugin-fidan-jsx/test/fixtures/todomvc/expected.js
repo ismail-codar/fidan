@@ -135,7 +135,13 @@ const APP = fidan.html`
               type="checkbox"
               checked="${allChecked}"
               onclick="${e =>
-                todos.forEach(todo => (todo.completed = e.target.checked))}"
+                todos.forEach(
+                  todo =>
+                    (todo.completed = fidan.assign(
+                      todo.completed,
+                      fidan.access(e.target.checked)
+                    ))
+                )}"
             />
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list">

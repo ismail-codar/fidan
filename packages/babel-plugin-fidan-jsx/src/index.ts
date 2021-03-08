@@ -101,7 +101,7 @@ export default (babel: any, options: any) => {
           }
         }
       },
-      ObjectProperty(path: t.NodePath<t.ObjectProperty>) {
+      Property(path: t.NodePath<t.Property>) {
         if (check.isObservable(path)) {
           path.node.value = modify.fidanValueInit(path.node.value);
         }
@@ -139,11 +139,11 @@ export default (babel: any, options: any) => {
           });
         }
       },
-      ReturnStatement(path: t.NodePath<t.ReturnStatement>) {
-        if (t.isUnaryExpression(path.node.argument)) {
-          path.node.argument = modify.fidanUnary(path.node.argument);
-        }
-      },
+      // ReturnStatement(path: t.NodePath<t.ReturnStatement>) {
+      //   if (t.isUnaryExpression(path.node.argument)) {
+      //     path.node.argument = modify.fidanUnary(path.node.argument);
+      //   }
+      // },
       IfStatement(path: t.NodePath<t.IfStatement>) {
         path.node.test = modify.fidanBinary(path.node.test);
       },
@@ -155,6 +155,14 @@ export default (babel: any, options: any) => {
       ArrowFunctionExpression(path: t.NodePath<t.ArrowFunctionExpression>) {
         if (t.isExpression(path.node.body)) {
           path.node.body = modify.fidanBinary(path.node.body);
+        }
+      },
+      ReturnStatement(path: t.NodePath<t.ReturnStatement>) {
+        if (
+          t.isExpression(path.node.argument) &&
+          !t.isIdentifier(path.node.argument)
+        ) {
+          path.node.argument = modify.fidanBinary(path.node.argument);
         }
       },
       FunctionDeclaration(path: t.NodePath<t.FunctionDeclaration>) {
