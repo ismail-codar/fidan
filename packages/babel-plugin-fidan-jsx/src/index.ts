@@ -25,7 +25,7 @@ export default (babel: any, options: any) => {
       Program: {
         enter(
           path: t.NodePath<t.Program>,
-          state: { key; filename: string; file }
+          state: { key; filename: string; file; opts: any }
         ) {
           const pluginOptions: typeof globalData.defaultPluginOptions = Object.assign(
             globalData.defaultPluginOptions,
