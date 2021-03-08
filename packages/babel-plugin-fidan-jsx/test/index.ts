@@ -1,5 +1,5 @@
 import { format } from 'prettier';
-import chalk from 'chalk';
+import * as chalk from 'chalk';
 import * as babel from '@babel/core';
 import * as diff from 'diff';
 import * as fs from 'fs';
@@ -14,7 +14,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
 if (!RUN_SINGLE_TEST) {
-  RUN_SINGLE_TEST = 'todomvc';
+  RUN_SINGLE_TEST = 'counter';
 }
 
 var exitCode = 0;

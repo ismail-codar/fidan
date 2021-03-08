@@ -19,7 +19,7 @@ const fidanValAccess = (node: t.Node) => {
   }
 };
 
-const fidanValueInit = (init: t.Node) => {
+const fidanObservableInit = (init: t.Node) => {
   return t.callExpression(
     t.memberExpression(t.identifier('fidan'), t.identifier('observable')),
     [init == null ? t.nullLiteral() : (init as any)]
@@ -53,8 +53,14 @@ const fidanBinary = (expr: t.Expression) => {
   if (t.isBinaryExpression(expr) || t.isLogicalExpression(expr)) {
     expr.left = fidanValAccess(fidanBinary(expr.left as t.Expression));
     expr.right = fidanValAccess(fidanBinary(expr.right));
+  } else if (t.isAssignmentExpression(expr)) {
+    expr.right = fidanValueAssign(
+      t.assignmentExpression(expr.operator, expr.left, fidanBinary(expr.right))
+    );
   } else if (t.isUnaryExpression(expr)) {
     return fidanUnary(expr);
+  } else if (t.isUpdateExpression(expr)) {
+    return fidanUpdate(expr);
   } else if (t.isMemberExpression(expr) || t.isIdentifier(expr)) {
     return fidanValAccess(expr);
   }
@@ -64,6 +70,20 @@ const fidanBinary = (expr: t.Expression) => {
 const fidanUnary = (expr: t.UnaryExpression) => {
   expr.argument = fidanValAccess(expr.argument);
   return expr;
+};
+
+const fidanUpdate = (expr: t.UpdateExpression) => {
+  return fidanValueAssign(
+    t.assignmentExpression(
+      '=',
+      expr.argument as any,
+      t.binaryExpression(
+        expr.operator[0] as any,
+        fidanValAccess(expr.argument),
+        t.identifier(expr.operator[0] === '+' ? '1' : '-1')
+      )
+    )
+  );
 };
 
 const insertFidanImport = (body: t.Node[]) => {
@@ -100,7 +120,7 @@ const insertFidanImport = (body: t.Node[]) => {
 };
 
 export default {
-  fidanValueInit,
+  fidanValueInit: fidanObservableInit,
   fidanValAccess,
   insertFidanImport,
   fidanComputedExpressionInit,

@@ -9,7 +9,7 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "parcel build index.html --no-cache --no-minify",
+    "build": "parcel build index.html --no-cache --no-minify --no-source-maps",
     "yalc-link": "yalc link @fidanjs/runtime @fidanjs/babel-plugin-fidan-jsx",
     "demo": "parcel index.html --no-cache"
   },

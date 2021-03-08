@@ -69,6 +69,9 @@ const isObservable = (
   return (
     t.isObjectExpression(node) === false &&
     t.isTaggedTemplateExpression(node) === false &&
+    t.isArrowFunctionExpression(node) === false &&
+    t.isFunctionExpression(node) === false &&
+    isFidanCall(node) === false &&
     pathInTheComputedFn(path) === false
   );
 };

@@ -13,7 +13,7 @@ import { globalData } from './common';
 
 const bundlerSpecificFunctions = [
   //parcel
-  '_templateObject',
+  '_templateObject*',
   '_taggedTemplateLiteral',
   //
 ];
@@ -49,15 +49,15 @@ export default (babel: any, options: any) => {
           // debugger;
           modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
-          // if (
-          //   process.env['IS_TEST'] &&
-          //   (state.filename.endsWith('.jsx') || state.filename.endsWith('.tsx'))
-          // ) {
-          //   fs.writeFileSync(
-          //     state.filename.substr(0, state.filename.length - 3) + 'html.js',
-          //     generate(path.node).code
-          //   );
-          // }
+          if (
+            process.env['IS_TEST'] &&
+            (state.filename.endsWith('.jsx') || state.filename.endsWith('.tsx'))
+          ) {
+            fs.writeFileSync(
+              state.filename.substr(0, state.filename.length - 3) + 'html.js',
+              generate(path.node as any).code
+            );
+          }
         },
         // exit(path: t.NodePath<t.Program>, state: { key; filename; file }) {
         // 	debugger;
@@ -106,6 +106,11 @@ export default (babel: any, options: any) => {
           path.node.value = modify.fidanValueInit(path.node.value);
         }
       },
+      // Property(path: t.NodePath<t.Property>) {
+      //   if (check.isObservable(path as any)) {
+      //     path.node.value = modify.fidanValueInit(path.node.value);
+      //   }
+      // },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
         if (t.isAssignmentExpression(path.node.expression)) {
           path.node.expression.right = modify.fidanValueAssign(
@@ -153,7 +158,7 @@ export default (babel: any, options: any) => {
         }
       },
       FunctionDeclaration(path: t.NodePath<t.FunctionDeclaration>) {
-        if (bundlerSpecificFunctions.includes(path.node.id.name)) {
+        if (anymatch(bundlerSpecificFunctions, path.node.id.name)) {
           path.stop();
         }
       },
