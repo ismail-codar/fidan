@@ -1,8 +1,6 @@
 {
   "version": "0.1.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -11,20 +9,11 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "build": "parcel build index.html --no-cache --no-minify",
+    "yalc-link": "yalc link @fidanjs/runtime @fidanjs/babel-plugin-fidan-jsx",
+    "demo": "parcel index.html --no-cache"
   },
   "peerDependencies": {},
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
@@ -33,22 +22,12 @@
   },
   "name": "playground",
   "author": "ismail codar",
-  "module": "dist/playground.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/playground.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/playground.esm.js",
-      "limit": "10 KB"
-    }
-  ],
+  "dependencies": {
+    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.11",
+    "@fidanjs/runtime": "^0.0.25"
+  },
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.10.1",
-    "husky": "^5.1.3",
-    "size-limit": "^4.10.1",
-    "tsdx": "^0.14.1",
+    "parcel": "^2.0.0-beta.1",
     "tslib": "^2.1.0",
     "typescript": "^4.2.3"
   }

@@ -1,6 +1,7 @@
 /// <reference path="../typings/babel.d.ts" />
 import * as t from '@babel/types';
 import * as fs from 'fs';
+import anymatch from 'anymatch';
 import jsx from '@babel/plugin-syntax-jsx';
 import jsxToTemplateLiteral from './jsx-to-template-literal';
 import modify from './modify';
@@ -8,8 +9,7 @@ import check from './check';
 // import { stringify } from 'flatted';
 // import * as fs from 'fs';
 import generate from '@babel/generator';
-
-// https://github.com/ismail-codar/fidan/tree/58ed3b07faeb93fb3da18b3f8bb570462c96f48e/packages/babel-plugin-fidan-jsx
+import { globalData } from './common';
 
 export default (babel: any, options: any) => {
   return {
@@ -20,6 +20,20 @@ export default (babel: any, options: any) => {
           path: t.NodePath<t.Program>,
           state: { key; filename: string; file }
         ) {
+          const pluginOptions: typeof globalData.defaultPluginOptions = Object.assign(
+            globalData.defaultPluginOptions,
+            options
+          );
+          if (
+            (pluginOptions.include &&
+              anymatch(pluginOptions.include, state.filename) === false) ||
+            (pluginOptions.exclude &&
+              anymatch(pluginOptions.exclude, state.filename) === true)
+          ) {
+            path.stop();
+            return;
+          }
+
           // JSON.stringify(JSON.parse(stringify(path.node)), null, 1);
           // fs.writeFileSync(
           // 	state.filename.substr(0, state.filename.length - 4) + '.json',
@@ -28,15 +42,15 @@ export default (babel: any, options: any) => {
           // debugger;
           modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
-          if (
-            process.env['IS_TEST'] &&
-            (state.filename.endsWith('.jsx') || state.filename.endsWith('.tsx'))
-          ) {
-            fs.writeFileSync(
-              state.filename.substr(0, state.filename.length - 3) + 'html.js',
-              generate(path.node).code
-            );
-          }
+          // if (
+          //   process.env['IS_TEST'] &&
+          //   (state.filename.endsWith('.jsx') || state.filename.endsWith('.tsx'))
+          // ) {
+          //   fs.writeFileSync(
+          //     state.filename.substr(0, state.filename.length - 3) + 'html.js',
+          //     generate(path.node).code
+          //   );
+          // }
         },
         // exit(path: t.NodePath<t.Program>, state: { key; filename; file }) {
         // 	debugger;

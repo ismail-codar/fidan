@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.0.11",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -11,56 +11,33 @@
     "node": ">=10"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
+    "build": "tsc",
     "testp": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' ts-node test/index.ts",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why",
     "local": "yarn build && yalc publish && yalc push",
     "demo": "parcel src/_demo/index.html --no-cache",
     "yalc-link": "yalc link @fidanjs/runtime"
   },
   "peerDependencies": {},
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
   "prettier": {
     "printWidth": 80,
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "name": "babel-plugin-fidan-jsx",
+  "name": "@fidanjs/babel-plugin-fidan-jsx",
   "author": "ismail codar",
   "module": "dist/babel-plugin-fidan-jsx.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/babel-plugin-fidan-jsx.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/babel-plugin-fidan-jsx.esm.js",
-      "limit": "10 KB"
-    }
-  ],
   "devDependencies": {
     "@babel/generator": "^7.13.9",
     "@babel/plugin-syntax-jsx": "^7.12.13",
     "@babel/register": "^7.13.8",
     "@babel/types": "^7.13.0",
     "@size-limit/preset-small-lib": "^4.10.0",
+    "anymatch": "^3.1.1",
     "better-log": "^1.3.3",
     "chalk": "^4.1.0",
     "diff": "^5.0.0",
-    "husky": "^5.1.3",
-    "size-limit": "^4.10.0",
     "ts-node": "^9.1.1",
-    "tsdx": "^0.14.1",
     "tslib": "^2.1.0",
     "typescript": "^4.2.3"
   },

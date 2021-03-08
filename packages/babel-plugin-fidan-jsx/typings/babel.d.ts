@@ -17,6 +17,8 @@ declare module '@babel/types' {
     scope: Scope;
     parentPath: NodePath<t.Node>;
     parent: t.Node;
+    stop: () => void;
+    skip: () => void;
     additionalInfo: {};
   }
 }
