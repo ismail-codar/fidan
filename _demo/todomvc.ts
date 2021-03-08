@@ -4,7 +4,7 @@ import {
   observable,
   observableArray,
   ObservableArray,
-} from '../';
+} from '../src';
 
 // interface & types
 type FilterType = void | '' | 'active' | 'completed';

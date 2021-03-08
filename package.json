@@ -20,7 +20,7 @@
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "demo": "parcel src/_demo/index.html --no-cache --port 1233",
+    "demo": "parcel _demo/index.html --no-cache --port 1233",
     "local": "yarn build && yalc publish && yalc push"
   },
   "peerDependencies": {},

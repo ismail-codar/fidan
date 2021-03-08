@@ -1,4 +1,4 @@
-import * as fidan from '..';
+import * as fidan from '../src';
 
 // interface & types
 type FilterType = '' | 'active' | 'completed';
