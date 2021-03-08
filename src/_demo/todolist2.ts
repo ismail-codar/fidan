@@ -1,24 +1,24 @@
 import { observableArray } from '../array';
 import { html } from '../html';
-import { Observable, value } from '../value';
+import { Observable, observable } from '../observable';
 interface ITodo {
   title: Observable<string>;
   completed: Observable<boolean>;
 }
 
 const todos = observableArray(
-  value<ITodo[]>([
+  observable<ITodo[]>([
     {
-      title: value('item 1'),
-      completed: value(false),
+      title: observable('item 1'),
+      completed: observable(false),
     },
     {
-      title: value('item 2'),
-      completed: value(false),
+      title: observable('item 2'),
+      completed: observable(false),
     },
     {
-      title: value('item 3'),
-      completed: value(false),
+      title: observable('item 3'),
+      completed: observable(false),
     },
   ])
 );
@@ -26,8 +26,8 @@ const todos = observableArray(
 setTimeout(() => {
   const arr = todos().slice(0);
   arr.push({
-    title: value('item 4'),
-    completed: value(false),
+    title: observable('item 4'),
+    completed: observable(false),
   });
   todos(arr);
 

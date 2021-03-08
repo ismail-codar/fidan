@@ -4,7 +4,7 @@ import { observableArray } from './array';
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];
 
-export function value<T>(
+export function observable<T>(
   val?: T
 ): T extends Observable<any>
   ? ReturnType<T>
@@ -79,8 +79,8 @@ export function value<T>(
   return self as any;
 }
 
-value['computed'] = <T>(fn: Computation<T>): Observable<T> => {
-  var self = value<T>();
+observable['computed'] = <T>(fn: Computation<T>): Observable<T> => {
+  var self = observable<T>();
   var computationToken = [runComputed];
 
   runComputed();
@@ -103,8 +103,8 @@ value['computed'] = <T>(fn: Computation<T>): Observable<T> => {
   }
 };
 
-value['fromValue'] = executor => {
-  var self = value();
+observable['fromValue'] = executor => {
+  var self = observable();
   executor(self);
   return self;
 };

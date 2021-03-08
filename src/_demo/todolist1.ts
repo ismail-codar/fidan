@@ -1,5 +1,5 @@
 import { html } from '../html';
-import { value } from '../value';
+import { observable } from '../observable';
 
 interface ITodo {
   title: string;

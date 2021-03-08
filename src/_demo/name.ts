@@ -1,7 +1,7 @@
 import { html } from '../html';
-import { value } from '../value';
+import { observable } from '../observable';
 
-const name = value('ismail');
+const name = observable('ismail');
 
 setTimeout(() => {
   name('codar');

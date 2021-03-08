@@ -1,5 +1,5 @@
 import { Observable } from '../typings/fidan';
-import { value } from './value';
+import { observable } from './observable';
 
 export const injectToProperty = (
   obj: Object,
@@ -25,7 +25,7 @@ export const injectToProperty = (
 
 export const inject = <T extends Object>(obj: T): T => {
   for (var key in obj) {
-    injectToProperty(obj, key, value(obj[key]));
+    injectToProperty(obj, key, observable(obj[key]));
   }
   return obj;
 };
@@ -48,7 +48,7 @@ export const debounce = (func, wait, immediate?) => {
   };
 };
 
-export const arg = arg => {
+export const access = arg => {
   return typeof arg === 'function' ? arg() : arg;
 };
 

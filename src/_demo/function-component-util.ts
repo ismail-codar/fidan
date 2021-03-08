@@ -1,7 +1,7 @@
 import * as fidan from '..';
 
 export const countValue = (val, onChange) => {
-  val = fidan.value(val);
+  val = fidan.observable(val);
   return fidan.html`
     <div>${val}
   <button onclick="${() => {

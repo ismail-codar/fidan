@@ -11,7 +11,7 @@ const fidanValAccess = (node: t.Node) => {
     check.isFidanCall(node) === false
   ) {
     return t.callExpression(
-      t.memberExpression(t.identifier('fidan'), t.identifier('arg')),
+      t.memberExpression(t.identifier('fidan'), t.identifier('access')),
       [node as t.Expression]
     );
   } else {
@@ -21,7 +21,7 @@ const fidanValAccess = (node: t.Node) => {
 
 const fidanValueInit = (init: t.Node) => {
   return t.callExpression(
-    t.memberExpression(t.identifier('fidan'), t.identifier('value')),
+    t.memberExpression(t.identifier('fidan'), t.identifier('observable')),
     [init == null ? t.nullLiteral() : (init as any)]
   );
 };

@@ -10,7 +10,7 @@ const CountItem = props => {
 };
 
 export const App = () => {
-  let a = fidan.value(0);
+  let a = fidan.observable(0);
   return fidan.html`<div>${CountItem({
     count: a,
   })}App-count: ${a}<button onclick="${() => {

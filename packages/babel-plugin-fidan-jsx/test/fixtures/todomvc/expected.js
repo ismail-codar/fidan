@@ -1,19 +1,19 @@
 import * as fidan from '@fidanjs/runtime';
 
-const STORAGE_KEY = fidan.value('fidan_todomvc');
-let hashFilter = fidan.value('');
-let todos = fidan.value([]);
-let allChecked = fidan.value(false);
+const STORAGE_KEY = fidan.observable('fidan_todomvc');
+let hashFilter = fidan.observable('');
+let todos = fidan.observable([]);
+let allChecked = fidan.observable(false);
 const shownTodos = fidan.computed(() => {
-  let _todos = fidan.arg(todos);
-  const filter = fidan.arg(hashFilter);
-  if (fidan.arg(filter) !== '') {
+  let _todos = fidan.access(todos);
+  const filter = fidan.access(hashFilter);
+  if (fidan.access(filter) !== '') {
     _todos = fidan.assign(
       _todos,
       _todos.filter(todo =>
-        fidan.arg(filter) === 'active'
-          ? !fidan.arg(todo.completed)
-          : fidan.arg(todo.completed)
+        fidan.access(filter) === 'active'
+          ? !fidan.access(todo.completed)
+          : fidan.access(todo.completed)
       )
     );
   }
@@ -21,54 +21,54 @@ const shownTodos = fidan.computed(() => {
 });
 const updateTodo = (todo, title) => {
   title = fidan.assign(title, title.trim());
-  if (fidan.arg(title)) {
+  if (fidan.access(title)) {
     todo.title = fidan.assign(todo.title, title);
     todo.editing = fidan.assign(todo.editing, false);
   } else {
-    removeTodo(fidan.arg(todo.id));
+    removeTodo(fidan.access(todo.id));
   }
 };
 const removeTodo = id => {
   todos.splice(
-    fidan.arg(
-      shownTodos.findIndex(item => fidan.arg(item.id) == fidan.arg(id))
+    fidan.access(
+      shownTodos.findIndex(item => fidan.access(item.id) == fidan.access(id))
     ),
     1
   );
 };
 const clearCompleted = e => {
-  const removes = fidan.value([]);
+  const removes = fidan.observable([]);
   todos.forEach(todo => {
-    if (fidan.arg(todo.completed)) removes.push(fidan.arg(todo));
+    if (fidan.access(todo.completed)) removes.push(fidan.access(todo));
   });
   while (removes.length)
-    todos.splice(fidan.arg(todos.indexOf(fidan.arg(removes.pop()))), 1);
+    todos.splice(fidan.access(todos.indexOf(fidan.access(removes.pop()))), 1);
 };
 const footerLinkCss = waiting =>
   fidan.computed(() =>
-    fidan.arg(hashFilter) === fidan.arg(waiting) ? 'selected' : ''
+    fidan.access(hashFilter) === fidan.access(waiting) ? 'selected' : ''
   );
 const editItemCss = todo =>
   fidan.computed(() => {
-    const classes = fidan.arg([]);
-    fidan.arg(todo.completed) && fidan.arg(classes.push('completed'));
-    fidan.arg(todo.editing) && fidan.arg(classes.push('editing'));
+    const classes = fidan.access([]);
+    fidan.access(todo.completed) && fidan.access(classes.push('completed'));
+    fidan.access(todo.editing) && fidan.access(classes.push('editing'));
     return classes.join(' ');
   });
 const todoCount = fidan.useComputed(() => {
-  const count = fidan.arg(
+  const count = fidan.access(
     todos.filter(item => {
-      return !fidan.arg(item.completed);
+      return !fidan.access(item.completed);
     }).length
   );
   window.requestAnimationFrame(() => {
     if (
-      fidan.arg(fidan.arg(count) === 0) &&
-      fidan.arg(!fidan.arg(allChecked))
+      fidan.access(fidan.access(count) === 0) &&
+      fidan.access(!fidan.access(allChecked))
     ) {
       allChecked = fidan.assign(allChecked, true);
     }
-    if (fidan.arg(count) && fidan.arg(allChecked)) {
+    if (fidan.access(count) && fidan.access(allChecked)) {
       allChecked = fidan.assign(allChecked, false);
     }
   });
@@ -79,21 +79,21 @@ window.addEventListener('hashchange', () => {
 });
 hashFilter = fidan.assign(hashFilter, window.location.hash.substr(2));
 fidan.useSubscribe(
-  fidan.useComputed(() => JSON.stringify(fidan.arg(todos))),
+  fidan.useComputed(() => JSON.stringify(fidan.access(todos))),
   strTodos => {
-    localStorage.setItem(fidan.arg(STORAGE_KEY), fidan.arg(strTodos));
+    localStorage.setItem(fidan.access(STORAGE_KEY), fidan.access(strTodos));
   }
 );
 todos = fidan.assign(
   todos,
   JSON.parse(
-    fidan.arg(localStorage.getItem(fidan.arg(STORAGE_KEY)) || '[]')
+    fidan.access(localStorage.getItem(fidan.access(STORAGE_KEY)) || '[]')
   ).map(item => {
     const todo = {
-      id: fidan.value(item.id),
-      completed: fidan.value(item.completed),
-      editing: fidan.value(item.editing),
-      title: fidan.value(item.title),
+      id: fidan.observable(item.id),
+      completed: fidan.observable(item.completed),
+      editing: fidan.observable(item.editing),
+      title: fidan.observable(item.title),
     };
     return todo;
   })
@@ -107,18 +107,18 @@ const APP = fidan.html`
         placeholder="What needs to be done?"
         autofocus
         onkeypress="${e => {
-          if (fidan.arg(e.key) === 'Enter') {
+          if (fidan.access(e.key) === 'Enter') {
             const title = fidan.computed(() => {
               return e.target.value.trim();
             });
-            if (fidan.arg(title)) {
+            if (fidan.access(title)) {
               const todo = {
-                id: fidan.value(Math.random()),
-                title: fidan.value(title),
-                editing: fidan.value(false),
-                completed: fidan.value(false),
+                id: fidan.observable(Math.random()),
+                title: fidan.observable(title),
+                editing: fidan.observable(false),
+                completed: fidan.observable(false),
               };
-              todos.push(fidan.arg(todo));
+              todos.push(fidan.access(todo));
             }
             e.target.value = fidan.assign(e.target.value, '');
           }
@@ -126,7 +126,7 @@ const APP = fidan.html`
       />
     </header>
     ${fidan.useComputed(() => {
-      if (fidan.arg(todos.length) > 0) {
+      if (fidan.access(todos.length) > 0) {
         return fidan.html`
           <section class="main">
             <input
@@ -142,7 +142,7 @@ const APP = fidan.html`
               ${shownTodos.map(
                 todo => fidan.html`
                   <li
-                    class="${editItemCss(fidan.arg(todo))}"
+                    class="${editItemCss(fidan.access(todo))}"
                     ondblclick="${e => {
                       todo.editing = fidan.assign(todo.editing, true);
                       e.currentTarget.lastElementChild.focus();
@@ -163,22 +163,25 @@ const APP = fidan.html`
                       <label>${todo.title}</label>
                       <button
                         class="destroy"
-                        onclick="${e => removeTodo(fidan.arg(todo.id))}"
+                        onclick="${e => removeTodo(fidan.access(todo.id))}"
                       ></button>
                     </div>
                     <input
                       class="edit"
                       value="${todo.title}"
                       onkeypress="${e => {
-                        if (fidan.arg(e.key) === 'Enter') {
+                        if (fidan.access(e.key) === 'Enter') {
                           updateTodo(
-                            fidan.arg(todo),
-                            fidan.arg(e.target.value)
+                            fidan.access(todo),
+                            fidan.access(e.target.value)
                           );
                         }
                       }}"
                       onblur="${e =>
-                        updateTodo(fidan.arg(todo), fidan.arg(e.target.value))}"
+                        updateTodo(
+                          fidan.access(todo),
+                          fidan.access(e.target.value)
+                        )}"
                     />
                   </li>
                 `
@@ -188,7 +191,7 @@ const APP = fidan.html`
           <footer class="footer">
             <span class="todo-count"
               ><strong>${todoCount}</strong> item${fidan.useComputed(() =>
-          fidan.arg(todoCount) > 1 ? 's' : ''
+          fidan.access(todoCount) > 1 ? 's' : ''
         )}
               left</span
             >
@@ -207,7 +210,9 @@ const APP = fidan.html`
             </ul>
             ${fidan.useComputed(() => {
               if (
-                fidan.arg(fidan.arg(todos.length) - fidan.arg(todoCount)) > 0
+                fidan.access(
+                  fidan.access(todos.length) - fidan.access(todoCount)
+                ) > 0
               ) {
                 return fidan.html`
                   <button class="clear-completed" onclick="${clearCompleted}">
