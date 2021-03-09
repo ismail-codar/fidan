@@ -11,14 +11,14 @@ export function observable<T>(
   : T extends Array<T>
   ? ObservableArray<T>
   : Observable<T> {
+  if (typeof val === 'function') {
+    return val as any;
+  }
   var subscribers = [];
 
   var self = function(...args) {
     return args.length ? write(args[0]) : read();
   } as Observable<T>;
-  if (typeof val === 'function' && val.hasOwnProperty('$val')) {
-    val = val['$val'];
-  }
   self.$val = val;
   if (Array.isArray(val)) {
     observableArray(self as any);
@@ -43,9 +43,6 @@ export function observable<T>(
   };
 
   function write(newValue) {
-    if (typeof newValue === 'function' && newValue.hasOwnProperty('$val')) {
-      newValue = newValue['$val'];
-    }
     self.$val = newValue;
     if (Array.isArray(newValue)) {
       observableArray(self as any);
