@@ -109,6 +109,13 @@ const transforms = {
 
     // Attributes
     node.openingElement.attributes.forEach(attr => {
+      if (attr.name) {
+        if (attr.name.name === 'className') {
+          attr.name.name = 'class';
+        } else if (attr.name.name === 'onDoubleClick') {
+          attr.name.name = 'ondblclick';
+        }
+      }
       if (attr.type === 'JSXSpreadAttribute') {
         debugger;
         throw new Error('JSXSpreadAttribute is not supported');

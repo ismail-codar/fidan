@@ -46,7 +46,7 @@ const updateTodo = (todo: Todo, title: string) => {
 };
 const removeTodo = id => {
   todos.splice(
-    shownTodos.findIndex(item => item.id == id),
+    todos.findIndex(item => item.id == id),
     1
   );
 };

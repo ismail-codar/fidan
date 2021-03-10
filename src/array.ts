@@ -1,4 +1,4 @@
-import { Observable, ObservableArray } from '../typings/fidan';
+import { Observable, ObservableArray } from './types';
 import reconcile from './reconcile';
 import { reuseNodes } from './reuse-nodes';
 

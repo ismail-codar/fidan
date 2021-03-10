@@ -40,7 +40,7 @@ const updateTodo = (todo, title) => {
 const removeTodo = id => {
   todos.splice(
     fidan.access(
-      shownTodos.findIndex(item => fidan.access(item.id) == fidan.access(id))
+      todos.findIndex(item => fidan.access(item.id) == fidan.access(id))
     ),
     1
   );

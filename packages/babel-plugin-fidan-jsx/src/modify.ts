@@ -94,6 +94,9 @@ const insertFidanImport = (body: t.Node[]) => {
     imports.length &&
     imports[0].specifiers.length &&
     imports[0].specifiers[0].local.name === 'fidan';
+  // let exists =
+  //   imports.find(imp => imp.source.value === '@fidanjs/runtime') !==
+  //   undefined;
   if (!exists) {
     exists =
       body

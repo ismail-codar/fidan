@@ -31,7 +31,7 @@ const updateTodo = (todo, title) => {
 const removeTodo = id => {
   todos.splice(
     fidan.access(
-      shownTodos.findIndex(item => fidan.access(item.id) == fidan.access(id))
+      todos.findIndex(item => fidan.access(item.id) == fidan.access(id))
     ),
     1
   );
@@ -233,3 +233,8 @@ const APP = fidan.html`
     })}
   </div>
 `;
+const styleSheets = fidan.html`
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-common/base.css" />
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css/index.css" />
+`;
+document.head.appendChild(fidan.access(styleSheets));

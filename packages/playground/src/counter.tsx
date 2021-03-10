@@ -4,10 +4,10 @@ const CountItem = props => {
 };
 
 const CounterButton = ({ text, onClick }) => (
-  <button onclick={onClick}>{text}</button>
+  <button onClick={onClick}>{text}</button>
 );
 
-const APP = () => {
+const CounterApp = () => {
   let count = 0;
 
   return (
@@ -19,4 +19,4 @@ const APP = () => {
   );
 };
 
-document.getElementById('main').appendChild(APP());
+document.getElementById('main').appendChild(CounterApp() as any);

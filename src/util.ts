@@ -1,4 +1,4 @@
-import { Observable } from '../typings/fidan';
+import { Observable } from './types';
 import { observable } from './observable';
 
 export const injectToProperty = (

@@ -1,6 +1,6 @@
 import { observable } from './observable';
 
-export * from '../typings/fidan';
+export * from './types';
 export * from './observable';
 export * from './array';
 export * from './util';

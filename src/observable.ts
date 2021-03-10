@@ -1,5 +1,5 @@
 // https://github.com/jbreckmckye/trkl/blob/master/trkl.js
-import { Observable, ObservableArray, Computation } from '../typings/fidan';
+import { Observable, ObservableArray, Computation } from './types';
 import { observableArray } from './array';
 // Computations are a tuple of: [ subscriber ]
 var computedTracker = [];

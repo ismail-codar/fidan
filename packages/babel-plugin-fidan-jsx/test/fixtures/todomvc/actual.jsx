@@ -27,7 +27,7 @@ const updateTodo = (todo, title) => {
 };
 const removeTodo = id => {
   todos.splice(
-    shownTodos.findIndex(item => item.id == id),
+    todos.findIndex(item => item.id == id),
     1
   );
 };
@@ -201,3 +201,9 @@ const APP = fidan.html`
     })}
   </div>
 `;
+
+const styleSheets = fidan.html`
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-common/base.css" />
+  <link rel="stylesheet" href="https://unpkg.com/todomvc-app-css/index.css" />
+`;
+document.head.appendChild(styleSheets);
