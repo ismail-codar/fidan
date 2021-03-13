@@ -99,13 +99,21 @@ const declarationSource = (
 };
 
 const nodeInitName = (node: t.Node): string => {
-  return t.isVariableDeclarator(node) && t.isIdentifier(node.init)
-    ? node.init.name
-    : t.isObjectProperty(node) || t.isProperty(node)
-    ? node.value + '' // TODO others...
-    : t.isIdentifier(node)
-    ? node.name
-    : null;
+  if (t.isIdentifier(node)) {
+    return node.name;
+  } else if (t.isVariableDeclarator(node)) {
+    if (t.isIdentifier(node.init)) {
+      return node.init.name;
+    } else if (t.isMemberExpression(node.init)) {
+      if (t.isIdentifier(node.init.object)) {
+        return node.init.object.name;
+      }
+    }
+  } else {
+    if (t.isObjectProperty(node) || t.isProperty(node)) {
+      return node.value + ''; // TODO others...
+    }
+  }
 };
 
 const isComponentPropertyPath = (
@@ -128,6 +136,12 @@ const canBeObservable = (
   const node = t.isVariableDeclarator(path.node)
     ? path.node.init
     : path.node.value;
+  if (
+    path.parentPath.parentPath &&
+    isComponentCall(path.parentPath.parentPath.node)
+  ) {
+    return t.isLiteral(node);
+  }
   return (
     t.isObjectExpression(node) === false &&
     t.isTaggedTemplateExpression(node) === false &&
@@ -135,31 +149,18 @@ const canBeObservable = (
     t.isFunctionExpression(node) === false &&
     isFidanCall(node) === false &&
     pathInTheComputedFn(path) === false &&
-    t.isVariableDeclarator(path.node) && // const { value } = props
-    t.isObjectPattern(path.node.id) === false
+    path.parentPath &&
+    t.isObjectPattern(path.parentPath.node) === false
   );
 };
 
-const isComponentPropParameterPath = (path: t.NodePath<any>) => {
-  const parentPath = parentComponentPath(path);
-  if (!parentPath) {
-    return false;
-  }
-  let params: any[] = null;
-  if (t.isVariableDeclarator(parentPath.node)) {
-    if (
-      t.isArrowFunctionExpression(parentPath.node.init) ||
-      t.isFunctionExpression(parentPath.node.init)
-    ) {
-      params = parentPath.node.init.params;
-    }
-  } else if (t.isFunctionDeclaration(parentPath.node)) {
-    params = parentPath.node.params;
-  }
+const isComponentCall = (node: t.Node) => {
   return (
-    params.length === 1 &&
-    t.isIdentifier(params[0]) &&
-    params[0].name === path.node.init.name
+    t.isCallExpression(node) &&
+    t.isIdentifier(node.callee) &&
+    isComponentName(node.callee.name) &&
+    node.arguments.length === 1 &&
+    t.isObjectExpression(node.arguments[0])
   );
 };
 
@@ -171,6 +172,5 @@ export default {
   pathInTheComputedFn,
   canBeObservable,
   parentComponentPath,
-  isComponentPropParameterPath,
   isComponentPropertyPath,
 };

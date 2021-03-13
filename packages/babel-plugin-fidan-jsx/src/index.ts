@@ -79,6 +79,8 @@ export default (babel: any, options: any) => {
           } else if (check.isRequiredComputedExpression(path)) {
             path.node.init = modify.fidanComputedExpressionInit(path.node.init);
           } else {
+            // console.log(generate(path.node as any).code);
+            // debugger;
             if (
               t.isFunctionExpression(path.node.init) ||
               t.isArrowFunctionExpression(path.node.init)
@@ -92,10 +94,7 @@ export default (babel: any, options: any) => {
                   path.node.init.body
                 );
               }
-            } else if (
-              check.isComponentPropParameterPath(path) === false &&
-              check.isComponentPropertyPath(path) === false
-            ) {
+            } else if (check.isComponentPropertyPath(path) === false) {
               if (check.canBeObservable(path)) {
                 path.node.init = modify.fidanObservableInit(path.node.init);
               } else {
