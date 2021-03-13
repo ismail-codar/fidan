@@ -92,7 +92,10 @@ export default (babel: any, options: any) => {
                   path.node.init.body
                 );
               }
-            } else if (check.isComponentPropParameterPath(path) === false) {
+            } else if (
+              check.isComponentPropParameterPath(path) === false &&
+              check.isComponentPropertyPath(path) === false
+            ) {
               if (check.canBeObservable(path)) {
                 path.node.init = modify.fidanObservableInit(path.node.init);
               } else {

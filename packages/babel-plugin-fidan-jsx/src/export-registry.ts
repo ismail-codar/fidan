@@ -109,40 +109,38 @@ export const variableBindingInScope = (
   searchName: string
 ): t.Binding => {
   while (scope != null && searchName) {
-    for (var bindingKey in scope.bindings) {
-      if (bindingKey == searchName) {
-        return scope.bindings[bindingKey];
-      }
+    if (scope.bindings[searchName]) {
+      return scope.bindings[searchName];
     }
     scope = scope.parent;
   }
   return null;
 };
 
-export const declarationPathInScope = (
-  scope: t.Scope,
-  searchName: string
-): t.NodePath => {
-  const variableBinding = variableBindingInScope(scope, searchName);
-  if (!variableBinding) return null;
-  if (t.isVariableDeclarator(variableBinding.path.node)) {
-    return variableBinding.path;
-  } else if (
-    t.isImportSpecifier(variableBinding.path.node) ||
-    t.isImportDefaultSpecifier(variableBinding.path.node)
-  ) {
-    debugger;
-    const exported = loadImportedFileExports(
-      globalData.currentFile.path,
-      variableBinding.path.parent['source'].value
-    );
-    return exported.nodePaths.find(node => {
-      if (t.isVariableDeclarator(node) && t.isIdentifier(node.id)) {
-        return node.id.name === searchName;
-      } else {
-        debugger;
-      }
-      return false;
-    });
-  }
-};
+// export const declarationPathInScope = (
+//   scope: t.Scope,
+//   searchName: string
+// ): t.NodePath => {
+//   const variableBinding = variableBindingInScope(scope, searchName);
+//   if (!variableBinding) return null;
+//   if (t.isVariableDeclarator(variableBinding.path.node)) {
+//     return variableBinding.path;
+//   } else if (
+//     t.isImportSpecifier(variableBinding.path.node) ||
+//     t.isImportDefaultSpecifier(variableBinding.path.node)
+//   ) {
+//     debugger;
+//     const exported = loadImportedFileExports(
+//       globalData.currentFile.path,
+//       variableBinding.path.parent['source'].value
+//     );
+//     return exported.nodePaths.find(node => {
+//       if (t.isVariableDeclarator(node) && t.isIdentifier(node.id)) {
+//         return node.id.name === searchName;
+//       } else {
+//         debugger;
+//       }
+//       return false;
+//     });
+//   }
+// };

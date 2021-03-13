@@ -1,6 +1,6 @@
 import * as t from '@babel/types';
 import generate from '@babel/generator';
-import { declarationPathInScope } from './export-registry';
+import { variableBindingInScope } from './export-registry';
 
 const unknownState = (path: t.NodePath<t.Node>, data?: any) => {
   // debugger;
@@ -82,30 +82,42 @@ const parentComponentPath = (
   );
 
 const declarationSource = (
-  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
-) => {
-  const nodeInit = t.isVariableDeclarator(path.node)
-    ? path.node.init
-    : t.isObjectProperty(path.node) || t.isProperty(path.node)
-    ? path.node.value
-    : null;
-  if (nodeInit && t.isIdentifier(nodeInit)) {
-    const binding = declarationPathInScope(path.scope, nodeInit.name);
-    if (binding && binding.node && t.isVariableDeclarator(binding.node)) {
-      // return declarationSource(binding.parentPath);
-      console.log(generate(binding.node as any).code);
-      debugger;
+  path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>,
+  variableName: string
+): t.Binding => {
+  const binding = variableBindingInScope(path.scope, variableName);
+  if (binding) {
+    if (binding.kind === 'param') {
+      return binding;
     }
+    const nodeName = nodeInitName(binding.path.node);
+    if (!nodeName) {
+      return binding;
+    }
+    return declarationSource(path, nodeName);
   }
 };
 
-const isComponentProperty = (
+const nodeInitName = (node: t.Node): string => {
+  return t.isVariableDeclarator(node) && t.isIdentifier(node.init)
+    ? node.init.name
+    : t.isObjectProperty(node) || t.isProperty(node)
+    ? node.value + '' // TODO others...
+    : t.isIdentifier(node)
+    ? node.name
+    : null;
+};
+
+const isComponentPropertyPath = (
   path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
 ) => {
-  const parentFunctionPath = parentComponentPath(path);
-  if (parentFunctionPath) {
-    const declSource = declarationSource(path);
-    return true;
+  const initName = nodeInitName(path.node);
+  if (initName) {
+    const declSource = declarationSource(path, initName);
+    const parentCmp = parentComponentPath(declSource.path as any);
+    if (parentCmp) {
+      return true;
+    }
   }
   return false;
 };
@@ -113,9 +125,6 @@ const isComponentProperty = (
 const canBeObservable = (
   path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
 ) => {
-  if (isComponentProperty(path)) {
-    return false;
-  }
   const node = t.isVariableDeclarator(path.node)
     ? path.node.init
     : path.node.value;
@@ -163,4 +172,5 @@ export default {
   canBeObservable,
   parentComponentPath,
   isComponentPropParameterPath,
+  isComponentPropertyPath,
 };

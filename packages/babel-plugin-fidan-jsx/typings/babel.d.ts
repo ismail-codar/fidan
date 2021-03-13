@@ -14,6 +14,7 @@ declare module '@babel/types' {
   }
   export class Binding {
     path: NodePath;
+    kind?: string;
   }
   export class NodePath<T = t.Node> {
     node: T;
