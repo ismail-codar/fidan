@@ -12,9 +12,9 @@ const CounterApp = () => {
 
   return (
     <div>
-      <CounterButton text="+" onClick={() => count++} />
-      <CountItem value={count} />
       <CounterButton text="-" onClick={() => (count = count - 1)} />
+      <CountItem value={count} />
+      <CounterButton text="+" onClick={() => count++} />
     </div>
   );
 };

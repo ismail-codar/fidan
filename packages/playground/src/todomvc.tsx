@@ -178,8 +178,7 @@ const TodoAPP = (
             <footer className="footer">
               <span className="todo-count">
                 <strong>{todoCount}</strong> item
-                {fidan.useComputed(() => (todoCount > 1 ? 's' : ''))}
-                left
+                {fidan.useComputed(() => (todoCount > 1 ? 's' : ''))} left
               </span>
               <ul className="filters">
                 <li>
