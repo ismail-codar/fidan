@@ -6,6 +6,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import '../node_modules/better-log/install';
 import '@babel/register';
+import { globalData } from '../src/common';
 
 process.env['IS_TEST'] = 'true';
 
@@ -14,7 +15,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
 if (!RUN_SINGLE_TEST) {
-  RUN_SINGLE_TEST = 'todomvc';
+  RUN_SINGLE_TEST = 'counter';
 }
 
 var exitCode = 0;
@@ -53,17 +54,12 @@ function runTest(dir) {
   if (fs.existsSync(testFile) === false) {
     testFile = dir.path + '/actual.tsx';
   }
-  var output = babel.transformFileSync(testFile, {
-    plugins: [
-      [
-        process.env.IS_TEST ? './src/index.ts' : './dist/index.js',
-        {
-          lowercaseEventNames: true,
-          eventNamesPrefix: 'on',
-        },
-      ],
-    ],
-  });
+  var output = babel.transformFileSync(
+    testFile,
+    globalData.babelConfig(
+      process.env.IS_TEST ? './src/index.ts' : './dist/index.js'
+    )
+  );
 
   var expected = fs.readFileSync(dir.path + '/expected.js', 'utf-8');
   process.stdout.write(chalk.bgWhite.blue(dir.name));

@@ -10,6 +10,10 @@ declare module '@babel/types' {
         referencePaths: t.NodePath<t.Node>[];
       };
     };
+    parent: Scope;
+  }
+  export class Binding {
+    path: NodePath;
   }
   export class NodePath<T = t.Node> {
     node: T;

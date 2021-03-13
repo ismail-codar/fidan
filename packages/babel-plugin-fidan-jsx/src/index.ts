@@ -92,25 +92,21 @@ export default (babel: any, options: any) => {
                   path.node.init.body
                 );
               }
-            } else if (check.isObservable(path)) {
-              // counter -> const { value } = props;)
-              path.node.init = modify.fidanValueInit(path.node.init);
-            } else {
-              path.node.init = modify.fidanValAccess(path.node.init);
+            } else if (check.isComponentPropParameterPath(path) === false) {
+              if (check.canBeObservable(path)) {
+                path.node.init = modify.fidanObservableInit(path.node.init);
+              } else {
+                path.node.init = modify.fidanValAccess(path.node.init);
+              }
             }
           }
         }
       },
       Property(path: t.NodePath<t.Property>) {
-        if (check.isObservable(path)) {
-          path.node.value = modify.fidanValueInit(path.node.value);
+        if (check.canBeObservable(path)) {
+          path.node.value = modify.fidanObservableInit(path.node.value);
         }
       },
-      // Property(path: t.NodePath<t.Property>) {
-      //   if (check.isObservable(path as any)) {
-      //     path.node.value = modify.fidanValueInit(path.node.value);
-      //   }
-      // },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
         if (t.isAssignmentExpression(path.node.expression)) {
           path.node.expression.right = modify.fidanValueAssign(
@@ -172,4 +168,12 @@ export default (babel: any, options: any) => {
       },
     },
   };
+};
+
+const errorReport = (e: Error, path: t.NodePath<any>, file) => {
+  const nodeCode = generate(path.node).code;
+  console.log('FILE: ', file.filename);
+  console.log('PART: ', nodeCode);
+  console.error('ERROR: ', e);
+  debugger;
 };

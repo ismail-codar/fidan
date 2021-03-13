@@ -1,6 +1,11 @@
 const CountItem = props => {
-  const { value } = props;
-  return <span>{value}</span>;
+  const {
+    value
+  } = props;
+  const count = value;
+  const end = props.end;
+  const c = count
+  return  <span>{props.start}{c}{end}</span>;
 };
 
 const CounterButton = ({ text, onClick }) => (

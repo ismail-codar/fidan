@@ -2,7 +2,10 @@ import * as fidan from '@fidanjs/runtime';
 
 const CountItem = props => {
   const { value } = props;
-  return fidan.html`<span>${value}</span>`;
+  const count = value;
+  const end = props.end;
+  const c = count;
+  return fidan.html`<span>${props.start}${c}${end}</span>`;
 };
 
 const CounterButton = ({ text, onClick }) =>
@@ -14,7 +17,7 @@ const APP = () => {
     text: fidan.observable('+'),
     onClick: () => fidan.assign(count, fidan.access(count) + 1),
   })}${CountItem({
-    value: fidan.observable(count),
+    value: count,
   })}${CounterButton({
     text: fidan.observable('-'),
     onClick: () => (count = fidan.assign(count, fidan.access(count) - 1)),

@@ -123,7 +123,7 @@ const insertFidanImport = (body: t.Node[]) => {
 };
 
 export default {
-  fidanValueInit: fidanObservableInit,
+  fidanObservableInit,
   fidanValAccess,
   insertFidanImport,
   fidanComputedExpressionInit,
