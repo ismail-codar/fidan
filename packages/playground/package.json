@@ -24,7 +24,8 @@
   "author": "ismail codar",
   "dependencies": {
     "@fidanjs/babel-plugin-fidan-jsx": "^0.0.11",
-    "@fidanjs/runtime": "^0.0.25"
+    "@fidanjs/runtime": "^0.0.25",
+    "insert-stylesheet": "^0.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",

@@ -150,7 +150,7 @@ const canBeObservable = (
     isFidanCall(node) === false &&
     pathInTheComputedFn(path) === false &&
     path.parentPath &&
-    t.isObjectPattern(path.parentPath.node) === false
+    t.isObjectPattern(path.parentPath.node) === false // const { value } = props
   );
 };
 

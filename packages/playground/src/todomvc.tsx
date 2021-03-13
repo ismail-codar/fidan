@@ -1,4 +1,5 @@
 import * as fidan from '@fidanjs/runtime';
+import insertSyleSheet from 'insert-stylesheet';
 
 // interface & types
 type FilterType = void | '' | 'active' | 'completed';
@@ -217,4 +218,6 @@ const TodoAPP = (
   </div>
 );
 
+insertSyleSheet('https://unpkg.com/todomvc-common/base.css');
+insertSyleSheet('https://unpkg.com/todomvc-app-css/index.css');
 document.getElementById('main').appendChild(TodoAPP as any);
