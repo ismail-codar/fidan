@@ -1,11 +1,11 @@
 import { arrayMap } from './array';
 
 const TEXT = 1;
-const DOM = 2;
+const ELEMENT = 2;
 const FN = 4; // "function" && !isDynamic
 const HTM = 8;
 const ARRAY = 16;
-const TEXT_OR_DOM = TEXT | DOM;
+const TEXT_OR_ELEMENT = TEXT | ELEMENT;
 
 export const htmlProps = {
   id: true,
@@ -21,7 +21,12 @@ export const htmlProps = {
   contentEditable: true,
 };
 
-let template = document.createElement('template');
+if (!global['createDocument']) {
+  global['createDocument'] = () => global['document'];
+}
+
+const _document: Document = global['createDocument']();
+let template: HTMLTemplateElement = _document.createElement('template');
 
 export const html = (literals, ...vars): DocumentFragment => {
   let raw = literals.raw,
@@ -80,14 +85,18 @@ export const html = (literals, ...vars): DocumentFragment => {
 };
 
 const walkForCommentNodes = (element, commentNodes) => {
-  var treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_COMMENT, {
-    acceptNode: function(node) {
-      var nodeValue = node.nodeValue.trim();
-      return nodeValue.startsWith('$cmt')
-        ? NodeFilter.FILTER_ACCEPT
-        : NodeFilter.FILTER_REJECT;
-    },
-  });
+  var treeWalker = _document.createTreeWalker(
+    element,
+    NodeFilter.SHOW_COMMENT,
+    {
+      acceptNode: function(node) {
+        var nodeValue = node.nodeValue.trim();
+        return nodeValue.startsWith('$cmt')
+          ? NodeFilter.FILTER_ACCEPT
+          : NodeFilter.FILTER_REJECT;
+      },
+    }
+  );
 
   while (treeWalker.nextNode()) {
     commentNodes.push(treeWalker.currentNode);
@@ -106,7 +115,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     const attrIdx = commentValue.indexOf('_');
     const paramType =
       attrIdx !== -1
-        ? DOM
+        ? ELEMENT
         : typeof param === 'function' && !isDynamic
         ? FN
         : Array.isArray(param)
@@ -115,7 +124,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         ? HTM
         : TEXT;
 
-    if (paramType & TEXT_OR_DOM) {
+    if (paramType & TEXT_OR_ELEMENT) {
       if (paramType === TEXT) {
         if (isDynamic) {
           //COMPUTED
@@ -125,7 +134,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
               ? null
               : value instanceof Node
               ? value
-              : document.createTextNode(value);
+              : _document.createTextNode(value);
           let firstChild: Node = null;
           let lastChild: Node = null;
           if (value != null) {
@@ -169,7 +178,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
                     ? null
                     : value instanceof Node
                     ? value
-                    : document.createTextNode(value);
+                    : _document.createTextNode(value);
                 firstChild = valueElement.firstChild;
                 lastChild = valueElement.lastChild;
                 parentElement.insertBefore(valueElement, nextLastSibling);
@@ -177,7 +186,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
             });
           })(commentNode.parentElement, valueElement, firstChild, lastChild);
         } else {
-          element = document.createTextNode(param);
+          element = _document.createTextNode(param);
           commentNode.parentElement.insertBefore(
             element,
             commentNode.nextSibling
@@ -188,7 +197,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
             }
           }
         }
-      } else if (paramType === DOM) {
+      } else if (paramType === ELEMENT) {
         attributeName = commentValue.substr(attrIdx + 1);
         element = commentNode.nextElementSibling;
       }
@@ -221,7 +230,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     } else if (paramType === FN) {
       param(commentNode.parentElement, commentNode.nextElementSibling);
     } else if (paramType === ARRAY) {
-      const fragment = document.createDocumentFragment();
+      const fragment = _document.createDocumentFragment();
       param.forEach(p => {
         fragment.appendChild(p);
       });

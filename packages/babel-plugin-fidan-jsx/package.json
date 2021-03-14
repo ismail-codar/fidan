@@ -42,7 +42,7 @@
     "typescript": "^4.2.3"
   },
   "dependencies": {
-    "@fidanjs/runtime": "^0.0.25",
+    "@fidanjs/runtime": "^1.0.0",
     "flatted": "^3.1.1"
   }
 }

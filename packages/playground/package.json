@@ -23,11 +23,11 @@
   "name": "playground",
   "author": "ismail codar",
   "dependencies": {
-    "@fidanjs/babel-plugin-fidan-jsx": "^0.0.11",
-    "@fidanjs/runtime": "^0.0.25",
+    "@fidanjs/runtime": "^1.0.0",
     "insert-stylesheet": "^0.1.0"
   },
   "devDependencies": {
+    "@fidanjs/babel-plugin-fidan-jsx": "^1.0.0",
     "@babel/core": "^7.13.8",
     "express": "^4.17.1",
     "typescript": "^4.2.3"
