@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "parcel build index.html --no-cache --no-minify --no-source-maps",
-    "yalc-link": "yalc link @fidanjs/runtime @fidanjs/babel-plugin-fidan-jsx",
+    "yalc-link": "yalc link @fidanjs/runtime @fidanjs/babel-plugin-fidan-jsx @fidanjs/localization",
     "demo": "parcel index.html --no-cache"
   },
   "peerDependencies": {},
@@ -24,6 +24,7 @@
   "author": "ismail codar",
   "dependencies": {
     "@fidanjs/runtime": "^1.0.0",
+    "@fidanjs/localization": "^0.1.0",
     "insert-stylesheet": "^0.1.0"
   },
   "devDependencies": {
