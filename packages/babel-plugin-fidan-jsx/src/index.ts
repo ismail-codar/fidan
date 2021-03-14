@@ -49,6 +49,10 @@ export default (babel: any, options: any) => {
           // debugger;
           modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
+          if (pluginOptions.automaticObserve === false) {
+            path.stop();
+            return;
+          }
           if (
             process.env['IS_TEST'] &&
             (state.filename.endsWith('.jsx') || state.filename.endsWith('.tsx'))

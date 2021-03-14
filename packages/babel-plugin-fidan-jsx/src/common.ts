@@ -6,6 +6,7 @@ export const globalData = {
   defaultPluginOptions: {
     lowercaseEventNames: true,
     eventNamesPrefix: 'on',
+    automaticObserve: true,
     include: ['**/*.jsx', '**/*.tsx', '**/*.view.*'],
     exclude: ['**/*.react*'],
   },
