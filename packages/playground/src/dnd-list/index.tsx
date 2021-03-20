@@ -1,11 +1,20 @@
 import Sortable from 'sortablejs';
+import { styles } from '../utils/fela';
 
 export const StatefulList = () => {
+  const rule = props => ({
+    backgroundColor: 'red',
+    fontSize: 14,
+    color: 'blue',
+  });
+
+  const liStyle = styles.renderRule(rule, { size: 12 });
+
   const el = (
     <ul>
-      <li>item 1</li>
-      <li>item 2</li>
-      <li>item 3</li>
+      {[1, 2, 3, 4].map(item => (
+        <li className={liStyle}>item {item}</li>
+      ))}
     </ul>
   );
 

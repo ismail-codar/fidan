@@ -25,6 +25,8 @@
   "dependencies": {
     "@fidanjs/localization": "^0.1.0",
     "@fidanjs/runtime": "^1.0.0",
+    "fela": "^11.6.0",
+    "fela-dom": "^11.6.0",
     "insert-stylesheet": "^0.1.0",
     "react": "^17.0.1",
     "sortablejs": "^1.13.0"

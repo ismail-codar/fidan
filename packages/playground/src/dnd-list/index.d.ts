@@ -1,8 +1,6 @@
 import * as React from 'react';
 import { Override } from '../overrides';
 
-// export {arrayMove, arrayRemove} from 'react-movable';
-
 export interface STATE_CHANGE_TYPE {
   change: 'change';
 }
@@ -86,5 +84,3 @@ export const StyledCloseHandle: React.FC<any>;
 export const StyledLabel: React.FC<any>;
 
 export const STATE_CHANGE_TYPE: STATE_CHANGE_TYPE;
-export const arrayMove: typeof arrayMoveT;
-export const arrayRemove: typeof arrayRemoveT;

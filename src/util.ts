@@ -49,7 +49,7 @@ export const debounce = (func, wait, immediate?) => {
 };
 
 export const access = arg => {
-  return typeof arg === 'function' ? arg() : arg;
+  return typeof arg === 'function' && arg.hasOwnProperty('$val') ? arg() : arg;
 };
 
 export const assign = (left: any, right: any) => {
