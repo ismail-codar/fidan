@@ -18,7 +18,15 @@ const bundlerSpecificFunctions = [
   //
 ];
 
-export default (babel: any, options: any) => {
+export default (
+  babel: any,
+  options: typeof globalData.defaultPluginOptions
+) => {
+  for (var key in globalData.defaultPluginOptions) {
+    if (options[key] === undefined) {
+      options[key] = globalData.defaultPluginOptions[key];
+    }
+  }
   return {
     inherits: jsx,
     visitor: {
@@ -27,15 +35,11 @@ export default (babel: any, options: any) => {
           path: t.NodePath<t.Program>,
           state: { key; filename: string; file; opts: any }
         ) {
-          const pluginOptions: typeof globalData.defaultPluginOptions = Object.assign(
-            globalData.defaultPluginOptions,
-            options
-          );
           if (
-            (pluginOptions.include &&
-              anymatch(pluginOptions.include, state.filename) === false) ||
-            (pluginOptions.exclude &&
-              anymatch(pluginOptions.exclude, state.filename) === true)
+            (options.include &&
+              anymatch(options.include, state.filename) === false) ||
+            (options.exclude &&
+              anymatch(options.exclude, state.filename) === true)
           ) {
             path.stop();
             return;
@@ -49,7 +53,7 @@ export default (babel: any, options: any) => {
           // debugger;
           modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
-          if (pluginOptions.automaticObserve === false) {
+          if (options.automaticObserve === false) {
             path.stop();
             return;
           }

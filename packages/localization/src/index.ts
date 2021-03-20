@@ -27,3 +27,10 @@ export const __l = (str: string) =>
     }
     return dict[str] || str;
   });
+
+/*
+\<(.*?)\>
+\>([\s\S]*?)\<
+\<.*?\>
+\>[\s\S]*?\<
+  */
