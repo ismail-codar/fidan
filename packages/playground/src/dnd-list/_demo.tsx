@@ -1,31 +1,89 @@
 import React from 'react';
 import { StatefulList } from './index';
-import { TRule } from 'fela';
-import { styles } from '../utils/fela';
 
 const DndDemoApp = () => {
-  const rule: TRule = (props: { size: number }) => ({
-    fontSize: props.size,
-    color: 'blue',
-    listStyle: 'none',
-    padding: '20px',
-    borderBottom: 'solid 1px',
-    backgroundColor: 'white',
-  });
-
-  const liStyle = styles.renderRule(rule, { size: 12 });
-
-  const el = (
-    <ul>
-      {[1, 2, 3, 4].map(item => (
-        <li className={liStyle}>item {item}</li>
-      ))}
-    </ul>
-  );
-
+  const LiComponent = _props => <li {..._props}>{_props.children}</li>;
   return (
     <div>
-      <StatefulList element={el} overrides={{}} />
+      <LiComponent>Test1</LiComponent>
+      {/*    
+      <a
+        target="_blank"
+        href="https://baseweb.design/guides/understanding-overrides#subcomponents"
+      >
+        Subcomponents
+      </a>
+      <StatefulList
+        initialState={{
+          items: ['Item 1', 'Item 2', 'Item 3'],
+        }}
+      />
+      <hr />
+
+      <a
+        target="_blank"
+        href="https://baseweb.design/guides/understanding-overrides#introducing-overrides"
+      >
+        Introducing Overrides
+      </a>
+      <StatefulList
+        initialState={{
+          items: ['Item 1', 'Item 2', 'Item 3'],
+        }}
+        overrides={{
+          Label: {
+            style: {
+              color: '#892C21',
+            },
+            props: {
+              'data-testid': 'dnd-list-label',
+            },
+          },
+        }}
+      />
+      <hr />
+   
+      <a
+        target="_blank"
+        href="https://baseweb.design/guides/understanding-overrides#theme"
+      >
+        $theme
+      </a>
+      <StatefulList
+        initialState={{
+          items: ['Item 1', 'Item 2', 'Item 3'],
+        }}
+        overrides={{
+          Label: {
+            style: ({ $theme }) => ({
+              color: $theme.colors.negative600,
+            }),
+          },
+        }}
+      />
+      <hr />
+
+      <a
+        target="_blank"
+        href="https://baseweb.design/guides/understanding-overrides#state-props"
+      >
+        State Props
+      </a>
+      <StatefulList
+        initialState={{
+          items: ['Item 1', 'Item 2', 'Item 3'],
+        }}
+        overrides={{
+          Label: {
+            style: ({ $theme, $isDragged }) => ({
+              color: $isDragged
+                ? $theme.colors.primary
+                : $theme.colors.accent400,
+            }),
+          },
+        }}
+      />
+      <hr /> */}
     </div>
   );
 };

@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Override } from '../overrides';
+import { Override } from '../types/overrides';
 
 export interface StatefulListProps {
-  element: HTMLElement;
+  initialState?: State;
   removable?: boolean;
   removableByMove?: boolean;
   onChange?: (params: {
@@ -11,6 +11,27 @@ export interface StatefulListProps {
     newIndex: number;
   }) => any;
   overrides?: ListOverrides;
+}
+
+export interface State {
+  items: React.ReactNode[];
+}
+export type StatefulComponentContainerProps = StatefulListProps & {
+  initialState?: State;
+  children: React.ReactNode;
+};
+
+export class StatefulListContainer extends React.Component<
+  StatefulComponentContainerProps,
+  State
+> {
+  onChange({
+    oldIndex,
+    newIndex,
+  }: {
+    oldIndex: number;
+    newIndex: number;
+  }): void;
 }
 
 export interface SharedStylePropsArgT {
