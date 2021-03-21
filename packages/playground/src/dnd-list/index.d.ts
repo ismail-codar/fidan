@@ -1,19 +1,8 @@
 import * as React from 'react';
 import { Override } from '../overrides';
 
-export interface STATE_CHANGE_TYPE {
-  change: 'change';
-}
-
-export type StateReducer = (
-  stateChangeType: STATE_CHANGE_TYPE[keyof STATE_CHANGE_TYPE],
-  nextState: State,
-  currentState: State
-) => State;
-
 export interface StatefulListProps {
-  initialState?: State;
-  stateReducer?: StateReducer;
+  element: HTMLElement;
   removable?: boolean;
   removableByMove?: boolean;
   onChange?: (params: {
@@ -22,31 +11,6 @@ export interface StatefulListProps {
     newIndex: number;
   }) => any;
   overrides?: ListOverrides;
-}
-
-export interface State {
-  items: React.ReactNode[];
-}
-export type StatefulComponentContainerProps = StatefulListProps & {
-  initialState?: State;
-  children: React.ReactNode;
-};
-
-export class StatefulListContainer extends React.Component<
-  StatefulComponentContainerProps,
-  State
-> {
-  onChange({
-    oldIndex,
-    newIndex,
-  }: {
-    oldIndex: number;
-    newIndex: number;
-  }): void;
-  internalSetState(
-    type: STATE_CHANGE_TYPE[keyof STATE_CHANGE_TYPE],
-    changes: State
-  ): void;
 }
 
 export interface SharedStylePropsArgT {
@@ -82,5 +46,3 @@ export const StyledItem: React.FC<any>;
 export const StyledDragHandle: React.FC<any>;
 export const StyledCloseHandle: React.FC<any>;
 export const StyledLabel: React.FC<any>;
-
-export const STATE_CHANGE_TYPE: STATE_CHANGE_TYPE;

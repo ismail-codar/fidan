@@ -15,3 +15,9 @@ export const computed = <T>(fn: () => T): T => {
 export const useSubscribe = (computed: any, subscriber: (val: any) => void) => {
   computed.subscribe(subscriber);
 };
+
+declare global {
+  namespace JSX {
+    interface Element extends HTMLElement {}
+  }
+}

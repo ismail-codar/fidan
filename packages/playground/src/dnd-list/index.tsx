@@ -1,26 +1,12 @@
 import Sortable from 'sortablejs';
-import { styles } from '../utils/fela';
+import { StatefulListProps } from './index.d';
 
-export const StatefulList = () => {
-  const rule = props => ({
-    backgroundColor: 'red',
-    fontSize: 14,
-    color: 'blue',
+export const StatefulList = (props: StatefulListProps) => {
+  const { element } = props;
+
+  var sortable = Sortable.create(element.firstElementChild, {
+    animation: 150,
   });
 
-  const liStyle = styles.renderRule(rule, { size: 12 });
-
-  const el = (
-    <ul>
-      {[1, 2, 3, 4].map(item => (
-        <li className={liStyle}>item {item}</li>
-      ))}
-    </ul>
-  );
-
-  var sortable = Sortable.create(
-    ((el as any) as HTMLElement).firstElementChild
-  );
-
-  return el;
+  return element as JSX.Element;
 };
