@@ -203,28 +203,17 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
       }
 
       if (attributeName) {
-        if (attributeName.startsWith('on')) {
-          (element as Element).addEventListener(attributeName.substr(2), param);
-        } else if (isDynamic) {
-          if (htmlProps[attributeName]) {
-            element[attributeName] = param();
-            param.subscribe(() => {
-              element[attributeName] = param();
-            });
-          } else {
-            element.setAttribute(attributeName, param());
-            param.subscribe(() => {
-              element.setAttribute(attributeName, param());
-            });
+        if (attributeName === '__spread') {
+          for (var key in param) {
+            setElementAttribute(
+              element,
+              key,
+              param[key],
+              param[key] && param[key].hasOwnProperty('$val')
+            );
           }
         } else {
-          if (htmlProps[attributeName]) {
-            element[attributeName] = param;
-          } else if (typeof param === 'function') {
-            param(element);
-          } else {
-            element.setAttribute(attributeName, param);
-          }
+          setElementAttribute(element, attributeName, param, isDynamic);
         }
       }
     } else if (paramType === FN) {
@@ -252,3 +241,33 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     commentNode.remove();
   }
 };
+function setElementAttribute(
+  element: any,
+  attributeName: string,
+  param: any,
+  isDynamic
+) {
+  if (attributeName.startsWith('on')) {
+    (element as Element).addEventListener(attributeName.substr(2), param);
+  } else if (isDynamic) {
+    if (htmlProps[attributeName]) {
+      element[attributeName] = param();
+      param.subscribe(() => {
+        element[attributeName] = param();
+      });
+    } else {
+      element.setAttribute(attributeName, param());
+      param.subscribe(() => {
+        element.setAttribute(attributeName, param());
+      });
+    }
+  } else {
+    if (htmlProps[attributeName]) {
+      element[attributeName] = param;
+    } else if (typeof param === 'function') {
+      param(element);
+    } else {
+      element.setAttribute(attributeName, param);
+    }
+  }
+}

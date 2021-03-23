@@ -15,7 +15,7 @@ process.env['IS_TEST'] = 'true';
 ////////////////////////////////////////////////////////////////////////////
 var RUN_SINGLE_TEST = process.argv[2];
 if (!RUN_SINGLE_TEST) {
-  RUN_SINGLE_TEST = 'counter';
+  RUN_SINGLE_TEST = 'spread';
 }
 
 var exitCode = 0;

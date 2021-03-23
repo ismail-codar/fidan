@@ -108,7 +108,7 @@ const transforms = {
     addString(strings, keys, `<${name}`);
 
     // Attributes
-    node.openingElement.attributes.forEach(attr => {
+    node.openingElement.attributes.forEach((attr, index) => {
       if (attr.name) {
         if (attr.name.name === 'className') {
           attr.name.name = 'class';
@@ -117,8 +117,11 @@ const transforms = {
         }
       }
       if (attr.type === 'JSXSpreadAttribute') {
-        debugger;
-        throw new Error('JSXSpreadAttribute is not supported');
+        // addString(strings, keys, ' __spread="${' + attr.argument.name + '}"');
+        attr = node.openingElement.attributes[index] = t.jsxAttribute(
+          t.jsxIdentifier('__spread'),
+          t.jSXExpressionContainer(t.identifier(attr.argument.name))
+        );
       }
 
       addString(

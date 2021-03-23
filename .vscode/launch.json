@@ -12,7 +12,7 @@
       "cwd": "${workspaceFolder}/packages/babel-plugin-fidan-jsx",
       "sourceMaps": true,
       "args": [
-        "${workspaceFolder}/packages/babel-plugin-fidan-jsx/test/index.ts", "counter"
+        "${workspaceFolder}/packages/babel-plugin-fidan-jsx/test/index.ts", "spread"
       ],
       "env": {
         "TS_NODE_COMPILER_OPTIONS": "{\"module\":\"commonjs\"}",
