@@ -112,12 +112,13 @@ const transforms = {
       if (attr.name) {
         if (attr.name.name === 'className') {
           attr.name.name = 'class';
+        } else if (attr.name.name === 'style') {
+          attr.name.name = '__style';
         } else if (attr.name.name === 'onDoubleClick') {
           attr.name.name = 'ondblclick';
         }
       }
       if (attr.type === 'JSXSpreadAttribute') {
-        // addString(strings, keys, ' __spread="${' + attr.argument.name + '}"');
         attr = node.openingElement.attributes[index] = t.jsxAttribute(
           t.jsxIdentifier('__spread'),
           t.jSXExpressionContainer(t.identifier(attr.argument.name))

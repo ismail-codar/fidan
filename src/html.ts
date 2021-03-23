@@ -203,14 +203,32 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
       }
 
       if (attributeName) {
-        if (attributeName === '__spread') {
-          for (var key in param) {
-            setElementAttribute(
-              element,
-              key,
-              param[key],
-              param[key] && param[key].hasOwnProperty('$val')
-            );
+        if (attributeName.substr(0, 2) === '__') {
+          if (attributeName === '__spread') {
+            for (var key in param) {
+              (key => {
+                setElementAttribute(
+                  element,
+                  key,
+                  param[key],
+                  param[key] && param[key].hasOwnProperty('$val')
+                );
+              })(key);
+            }
+          } else if (attributeName === '__style') {
+            for (var key in param) {
+              (key => {
+                if (param[key]) {
+                  if (param[key].hasOwnProperty('$val')) {
+                    param[key].subscribe(() => {
+                      element.style[key] = param[key]();
+                    });
+                    element.style[key] = param[key]();
+                  }
+                  element.style[key] = param[key];
+                }
+              })(key);
+            }
           }
         } else {
           setElementAttribute(element, attributeName, param, isDynamic);

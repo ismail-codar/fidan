@@ -113,6 +113,7 @@ export default (
         }
       },
       Property(path: t.NodePath<t.Property>) {
+        // TODO __style=
         if (check.canBeObservable(path)) {
           path.node.value = modify.fidanObservableInit(path.node.value);
         }
