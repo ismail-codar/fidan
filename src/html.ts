@@ -206,29 +206,25 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         if (attributeName.substr(0, 2) === '__') {
           if (attributeName === '__spread') {
             for (var key in param) {
-              (key => {
+              if (key === 'style') {
+                if (param.style.hasOwnProperty('$val')) {
+                  param.style.subscribe(() => {
+                    setElementStyles(element, param.style());
+                  });
+                } else {
+                  setElementStyles(element, param.style);
+                }
+              } else {
                 setElementAttribute(
                   element,
                   key,
                   param[key],
                   param[key] && param[key].hasOwnProperty('$val')
                 );
-              })(key);
+              }
             }
           } else if (attributeName === '__style') {
-            for (var key in param) {
-              (key => {
-                if (param[key]) {
-                  if (param[key].hasOwnProperty('$val')) {
-                    param[key].subscribe(() => {
-                      element.style[key] = param[key]();
-                    });
-                    element.style[key] = param[key]();
-                  }
-                  element.style[key] = param[key];
-                }
-              })(key);
-            }
+            setElementStyles(element, param);
           }
         } else {
           setElementAttribute(element, attributeName, param, isDynamic);
@@ -259,12 +255,27 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     commentNode.remove();
   }
 };
-function setElementAttribute(
-  element: any,
+
+const setElementStyles = (element: HTMLElement, param: any) => {
+  for (var key in param) {
+    if (param[key]) {
+      if (param[key].hasOwnProperty('$val')) {
+        param[key].subscribe(() => {
+          element.style[key] = param[key]();
+        });
+        element.style[key] = param[key]();
+      }
+      element.style[key] = param[key];
+    }
+  }
+};
+
+const setElementAttribute = (
+  element: HTMLElement,
   attributeName: string,
   param: any,
   isDynamic
-) {
+) => {
   if (attributeName.startsWith('on')) {
     (element as Element).addEventListener(attributeName.substr(2), param);
   } else if (isDynamic) {
@@ -288,4 +299,4 @@ function setElementAttribute(
       element.setAttribute(attributeName, param);
     }
   }
-}
+};
