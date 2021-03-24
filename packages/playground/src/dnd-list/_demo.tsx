@@ -2,15 +2,8 @@ import React from 'react';
 import { StatefulList } from './index';
 
 const DndDemoApp = () => {
-  const LiComponent = (_props, children) => (
-    <li onClick={() => alert(1)} {..._props}>
-      {children}
-    </li>
-  );
   return (
     <div>
-      <LiComponent style={{ color: 'red' }}>Test1</LiComponent>
-      {/*    
       <a
         target="_blank"
         href="https://baseweb.design/guides/understanding-overrides#subcomponents"
@@ -23,7 +16,7 @@ const DndDemoApp = () => {
         }}
       />
       <hr />
-
+      {/* 
       <a
         target="_blank"
         href="https://baseweb.design/guides/understanding-overrides#introducing-overrides"

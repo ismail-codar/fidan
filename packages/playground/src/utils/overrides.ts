@@ -7,7 +7,7 @@ export const getOverrides = (
   defaultStyleRule: TRule,
   override: Override<any>
 ) => {
-  const Component = override.component || defaultComponent;
+  const Component = override?.component || defaultComponent;
   const componentProps = {};
 
   // const style = styles.renderRule(labelStyle, { size: 12 });
