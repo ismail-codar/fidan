@@ -5,6 +5,7 @@ export * from './observable';
 export * from './array';
 export * from './util';
 export * from './html';
+export * from './reactive-runtime';
 
 export const useComputed = <T>(fn: () => T): T => {
   return observable.computed(fn) as any;
