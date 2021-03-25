@@ -113,7 +113,13 @@ export default (
         }
       },
       Property(path: t.NodePath<t.Property>) {
-        // TODO __style=
+        if (
+          t.isLiteral(path.node.value) &&
+          check.isInVariablePath(path) === false &&
+          check.isInComponentCall(path) === false
+        ) {
+          return;
+        }
         if (check.canBeObservable(path)) {
           path.node.value = modify.fidanObservableInit(path.node.value);
         }

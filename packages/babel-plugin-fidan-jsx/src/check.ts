@@ -130,6 +130,28 @@ const isComponentPropertyPath = (
   return false;
 };
 
+const isInVariablePath = (path: t.NodePath<t.Node>) => {
+  const parent: t.NodePath<t.Node> = parentPathLoop(
+    path,
+    checkPath =>
+      t.isVariableDeclarator(checkPath.node) ||
+      t.isStatement(checkPath.node) ||
+      t.isTemplateLiteral(checkPath.node)
+  );
+  return t.isVariableDeclarator(parent.node);
+};
+
+const isInComponentCall = (path: t.NodePath<t.Node>) => {
+  const parent: t.NodePath<t.Node> = parentPathLoop(
+    path,
+    checkPath =>
+      t.isCallExpression(checkPath.node) ||
+      t.isStatement(checkPath.node) ||
+      t.isTemplateLiteral(checkPath.node)
+  );
+  return t.isCallExpression(parent.node);
+};
+
 const canBeObservable = (
   path: t.NodePath<t.VariableDeclarator | t.ObjectProperty | t.Property>
 ) => {
@@ -173,4 +195,6 @@ export default {
   canBeObservable,
   parentComponentPath,
   isComponentPropertyPath,
+  isInVariablePath,
+  isInComponentCall,
 };
