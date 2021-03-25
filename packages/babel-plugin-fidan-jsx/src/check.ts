@@ -186,6 +186,24 @@ const isComponentCall = (node: t.Node) => {
   );
 };
 
+const isPatternVariable = (path: t.NodePath<t.VariableDeclarator>) => {
+  /*  TODO isPatternInit
+    var _a = createOverrides(function (_props) {
+    return fidan.html`<li __spread="${_props}">${_props.children}</li>`;
+  }, overrides),
+      Label = _a.Label,
+      labelProps = _a.labelProps;
+
+  var _b = __read(getOverrides(null, null, null), 2),
+      Label1 = _b[0],
+      labelProps1 = _b[1];
+       */
+  return (
+    t.isPattern(path.node.id) ||
+    (t.isIdentifier(path.node.id) && path.node.id.name.startsWith('_'))
+  );
+};
+
 export default {
   unknownState,
   isEmptyLiteral,
@@ -197,4 +215,5 @@ export default {
   isComponentPropertyPath,
   isInVariablePath,
   isInComponentCall,
+  isPatternVariable,
 };

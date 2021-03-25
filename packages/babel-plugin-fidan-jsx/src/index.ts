@@ -73,9 +73,10 @@ export default (
         // }
       },
       VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
+        // console.log(generate(path.node.id as any).code, path.node.id.type);
         if (
           check.isFidanCall(path.node.init) === false &&
-          t.isPattern(path.node.id) === false
+          check.isPatternVariable(path) === false
         ) {
           if (
             t.isCallExpression(path.node.init) &&
