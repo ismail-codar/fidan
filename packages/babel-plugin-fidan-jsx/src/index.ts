@@ -73,7 +73,10 @@ export default (
         // }
       },
       VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-        if (check.isFidanCall(path.node.init) === false) {
+        if (
+          check.isFidanCall(path.node.init) === false &&
+          t.isPattern(path.node.id) === false
+        ) {
           if (
             t.isCallExpression(path.node.init) &&
             path.node.init.arguments.length === 0 &&
