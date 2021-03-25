@@ -259,15 +259,17 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
 
 const setElementStyles = (element: HTMLElement, param: any) => {
   for (var key in param) {
-    if (param[key]) {
-      if (param[key].hasOwnProperty('$val')) {
-        element.style[key] = param[key]();
-        param[key].subscribe(() => {
+    (key => {
+      if (param[key]) {
+        if (param[key].hasOwnProperty('$val')) {
           element.style[key] = param[key]();
-        });
+          param[key].subscribe(() => {
+            element.style[key] = param[key]();
+          });
+        }
+        element.style[key] = param[key];
       }
-      element.style[key] = param[key];
-    }
+    })(key);
   }
 };
 
