@@ -1,6 +1,5 @@
 import { StatefulListProps } from './types';
 import { createOverrides, createSortable } from './dnd-list';
-import { getOverrides } from '../utils/overrides';
 
 export const StatefulList = (props: StatefulListProps) => {
   const {

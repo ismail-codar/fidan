@@ -16,7 +16,7 @@ const DndDemoApp = () => {
         }}
       />
       <hr />
-      {/* 
+
       <a
         target="_blank"
         href="https://baseweb.design/guides/understanding-overrides#introducing-overrides"
@@ -30,7 +30,7 @@ const DndDemoApp = () => {
         overrides={{
           Label: {
             style: {
-              color: '#892C21',
+              color: 'red',
             },
             props: {
               'data-testid': 'dnd-list-label',
@@ -39,7 +39,7 @@ const DndDemoApp = () => {
         }}
       />
       <hr />
-   
+      {/* 
       <a
         target="_blank"
         href="https://baseweb.design/guides/understanding-overrides#theme"

@@ -9,20 +9,27 @@ export const getOverrides = (
   override: Override<any> = {}
 ) => {
   const Component = override?.component || defaultComponent;
-  const componentProps = {};
+  const componentProps = { className: '' };
 
+  let renderStyle = style;
   if (override.style) {
-    const styleOverride =
-      typeof override.style === 'function'
-        ? override.style(null)
-        : override.style;
-    merge(style, styleOverride);
+    renderStyle = arg => {
+      // TODO arg.$theme & arg.isDragging (state-props)
+      const styleOverride = (typeof override.style === 'function'
+        ? override.style
+        : () => override.style) as TRule;
+      return merge(
+        style(arg, undefined) as any,
+        styleOverride(arg, undefined) as any
+      );
+    };
   }
 
   if (override.props) {
   }
 
-  const cssClasses = styles.renderRule(style, {});
+  const cssClasses = styles.renderRule(renderStyle, { theme: undefined });
+  componentProps.className += (' ' + cssClasses).trim();
 
   return [Component, componentProps];
 };
