@@ -1,4 +1,4 @@
-import { StatefulListProps } from './index.d';
+import { StatefulListProps } from './types';
 import { createOverrides, createSortable } from './dnd-list';
 import { getOverrides } from '../utils/overrides';
 
@@ -8,12 +8,9 @@ export const StatefulList = (props: StatefulListProps) => {
     overrides,
   } = props;
 
-  const { Label, labelProps } = createOverrides(
-    _props => <li {..._props}>{_props.children}</li>,
-    overrides
-  );
-
-  const [Label1, labelProps1] = getOverrides(null, null, null);
+  const { Label, labelProps } = createOverrides((_props, _children) => {
+    return <li {..._props}>{_children}</li>;
+  }, overrides);
 
   const element = (
     <ul>

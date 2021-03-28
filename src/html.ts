@@ -106,6 +106,7 @@ const walkForCommentNodes = (element, commentNodes) => {
 const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
   for (var i = 0; i < commentNodes.length; i++) {
     const commentNode = commentNodes[i];
+    let commentNodeParent = commentNode.parentNode;
     var commentValue = commentNode.nodeValue;
     let element = null;
     let attributeName: string = null;
@@ -140,7 +141,7 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
           if (value != null) {
             firstChild = valueElement.firstChild;
             lastChild = valueElement.lastChild;
-            commentNode.parentElement.insertBefore(
+            commentNodeParent.insertBefore(
               valueElement,
               commentNode.nextSibling
             );
@@ -184,16 +185,13 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
                 parentElement.insertBefore(valueElement, nextLastSibling);
               }
             });
-          })(commentNode.parentElement, valueElement, firstChild, lastChild);
+          })(commentNodeParent, valueElement, firstChild, lastChild);
         } else {
           element = _document.createTextNode(param);
-          commentNode.parentElement.insertBefore(
-            element,
-            commentNode.nextSibling
-          );
+          commentNodeParent.insertBefore(element, commentNode.nextSibling);
           if (Array.isArray(param)) {
             for (var p = 0; p < param.length; p++) {
-              commentNode.parentElement.appendChild(param[p]);
+              commentNodeParent.appendChild(param[p]);
             }
           }
         }
@@ -232,24 +230,24 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
         }
       }
     } else if (paramType === FN) {
-      param(commentNode.parentElement, commentNode.nextElementSibling);
+      param(commentNodeParent, commentNode.nextElementSibling);
     } else if (paramType === ARRAY) {
       const fragment = _document.createDocumentFragment();
       param.forEach(p => {
         fragment.appendChild(p);
       });
-      commentNode.parentElement.insertBefore(fragment, commentNode.nextSibling);
+      commentNodeParent.insertBefore(fragment, commentNode.nextSibling);
     } else if (paramType === HTM) {
       if (param.renderFn) {
         arrayMap(
           param.arr,
-          commentNode.parentElement,
+          commentNodeParent,
           commentNode.nextSibling as any,
           param.renderFn,
           param.renderMode
         );
       } else {
-        commentNode.parentElement.insertBefore(param, commentNode.nextSibling);
+        commentNodeParent.insertBefore(param, commentNode.nextSibling);
       }
     }
 

@@ -1,16 +1,28 @@
 import { TRule } from 'fela';
+import merge from 'deepmerge';
 import { Override } from '../types/overrides';
 import { styles } from '../utils/fela';
 
 export const getOverrides = (
   defaultComponent,
-  defaultStyleRule: TRule,
-  override: Override<any>
+  style: TRule,
+  override: Override<any> = {}
 ) => {
   const Component = override?.component || defaultComponent;
   const componentProps = {};
 
-  // const style = styles.renderRule(labelStyle, { size: 12 });
+  if (override.style) {
+    const styleOverride =
+      typeof override.style === 'function'
+        ? override.style(null)
+        : override.style;
+    merge(style, styleOverride);
+  }
+
+  if (override.props) {
+  }
+
+  const cssClasses = styles.renderRule(style, {});
 
   return [Component, componentProps];
 };

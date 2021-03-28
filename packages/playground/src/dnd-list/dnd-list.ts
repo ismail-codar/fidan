@@ -1,6 +1,7 @@
 import { TRule } from 'fela';
 import Sortable from 'sortablejs';
 import { getOverrides } from '../utils/overrides';
+import { ListOverrides } from './types';
 
 export const createSortable = (element: HTMLElement) => {
   Sortable.create(element.firstElementChild, {
@@ -8,7 +9,7 @@ export const createSortable = (element: HTMLElement) => {
   });
 };
 
-export const createOverrides = (defaultComponent, overrides) => {
+export const createOverrides = (defaultComponent, overrides: ListOverrides) => {
   const labelStyle: TRule = (props: { size: number }) => ({
     fontSize: props.size,
     listStyle: 'none',

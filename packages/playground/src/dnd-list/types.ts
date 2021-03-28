@@ -21,19 +21,6 @@ export type StatefulComponentContainerProps = StatefulListProps & {
   children: React.ReactNode;
 };
 
-export class StatefulListContainer extends React.Component<
-  StatefulComponentContainerProps,
-  State
-> {
-  onChange({
-    oldIndex,
-    newIndex,
-  }: {
-    oldIndex: number;
-    newIndex: number;
-  }): void;
-}
-
 export interface SharedStylePropsArgT {
   $isDragged: boolean;
   $isSelected: boolean;
@@ -61,9 +48,9 @@ export interface ListProps {
 
 export class List extends React.Component<ListProps> {}
 
-export const StyledRoot: React.FC<any>;
-export const StyledList: React.FC<any>;
-export const StyledItem: React.FC<any>;
-export const StyledDragHandle: React.FC<any>;
-export const StyledCloseHandle: React.FC<any>;
-export const StyledLabel: React.FC<any>;
+export type StyledRoot = React.FC<any>;
+export type StyledList = React.FC<any>;
+export type StyledItem = React.FC<any>;
+export type StyledDragHandle = React.FC<any>;
+export type StyledCloseHandle = React.FC<any>;
+export type StyledLabel = React.FC<any>;
