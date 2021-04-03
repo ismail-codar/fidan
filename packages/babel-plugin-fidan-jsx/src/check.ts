@@ -200,7 +200,9 @@ const isPatternVariable = (path: t.NodePath<t.VariableDeclarator>) => {
        */
   return (
     t.isPattern(path.node.id) ||
-    (t.isIdentifier(path.node.id) && path.node.id.name.startsWith('_'))
+    (t.isIdentifier(path.node.id) &&
+      t.isMemberExpression(path.node.init) &&
+      path.node.id.name.startsWith('_'))
   );
 };
 
