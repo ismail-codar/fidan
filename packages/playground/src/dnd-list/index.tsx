@@ -8,7 +8,7 @@ export const StatefulList = (props: StatefulListProps) => {
   } = props;
 
   const { Label, labelProps } = createDndLabelOverrides((_props, _children) => {
-    return <li {..._props}>{_children}</li>;
+    return <li {..._props}>{_children()}</li>;
   }, overrides);
 
   const element = (

@@ -187,7 +187,10 @@ const isComponentCall = (node: t.Node) => {
 };
 
 const isPatternVariable = (path: t.NodePath<t.VariableDeclarator>) => {
-  /*  TODO isPatternInit
+  if (t.isPattern(path.node.id)) {
+    return true;
+  } else {
+    /* 
     var _a = createOverrides(function (_props) {
     return fidan.html`<li __spread="${_props}">${_props.children}</li>`;
   }, overrides),
@@ -198,12 +201,25 @@ const isPatternVariable = (path: t.NodePath<t.VariableDeclarator>) => {
       Label1 = _b[0],
       labelProps1 = _b[1];
        */
-  return (
-    t.isPattern(path.node.id) ||
-    (t.isIdentifier(path.node.id) &&
-      t.isMemberExpression(path.node.init) &&
-      path.node.id.name.startsWith('_'))
-  );
+    if (
+      t.isIdentifier(path.node.id) &&
+      path.node.id.name.startsWith('_') &&
+      t.isVariableDeclaration(path.parentPath.node)
+    ) {
+      const lastDecl =
+        path.parentPath.node.declarations[
+          path.parentPath.node.declarations.length - 1
+        ];
+      if (
+        t.isMemberExpression(lastDecl.init) &&
+        t.isIdentifier(lastDecl.init.object) &&
+        lastDecl.init.object.name === path.node.id.name
+      ) {
+        return true;
+      }
+    }
+    return false;
+  }
 };
 
 export default {
