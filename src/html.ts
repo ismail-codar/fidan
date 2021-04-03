@@ -28,7 +28,7 @@ if (!global['createDocument']) {
 const _document: Document = global['createDocument']();
 let template: HTMLTemplateElement = _document.createElement('template');
 
-export const html = (literals, ...vars): DocumentFragment => {
+export const html = (literals, ...vars): (() => DocumentFragment) => {
   let raw = literals.raw,
     result = '',
     i = 0,
@@ -73,15 +73,17 @@ export const html = (literals, ...vars): DocumentFragment => {
   }
   result += extra;
 
-  template = template.cloneNode(false) as HTMLTemplateElement;
-  template.innerHTML = result.trim();
+  return function $render() {
+    template = template.cloneNode(false) as HTMLTemplateElement;
+    template.innerHTML = result.trim();
 
-  const element = template.content;
-  const commentNodes = [];
-  walkForCommentNodes(element, commentNodes);
-  updateNodesByCommentNodes(commentNodes, vars);
+    const element = template.content;
+    const commentNodes = [];
+    walkForCommentNodes(element, commentNodes);
+    updateNodesByCommentNodes(commentNodes, vars);
 
-  return element;
+    return element;
+  };
 };
 
 const walkForCommentNodes = (element, commentNodes) => {
@@ -110,7 +112,13 @@ const updateNodesByCommentNodes = (commentNodes: Comment[], params: any[]) => {
     var commentValue = commentNode.nodeValue;
     let element = null;
     let attributeName: string = null;
+
     let param = params[i];
+
+    if (typeof param === 'function' && param.name === '$render') {
+      param = param();
+    }
+
     const isDynamic = param && param.hasOwnProperty('$val');
 
     const attrIdx = commentValue.indexOf('_');

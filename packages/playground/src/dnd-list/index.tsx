@@ -1,5 +1,5 @@
 import { StatefulListProps } from './types';
-import { createOverrides, createSortable } from './dnd-list';
+import { createDndLabelOverrides, createSortable } from './dnd-list';
 
 export const StatefulList = (props: StatefulListProps) => {
   const {
@@ -7,7 +7,7 @@ export const StatefulList = (props: StatefulListProps) => {
     overrides,
   } = props;
 
-  const { Label, labelProps } = createOverrides((_props, _children) => {
+  const { Label, labelProps } = createDndLabelOverrides((_props, _children) => {
     return <li {..._props}>{_children}</li>;
   }, overrides);
 

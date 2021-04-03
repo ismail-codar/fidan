@@ -3,6 +3,7 @@ import { observable } from './observable';
 export * from './types';
 export * from './observable';
 export * from './array';
+export * from './context';
 export * from './util';
 export * from './html';
 

@@ -10,8 +10,11 @@ export const createSortable = (element: HTMLElement) => {
   });
 };
 
-export const createOverrides = (defaultComponent, overrides: ListOverrides) => {
-  const labelStyle: TRule = (props: { theme: Theme }) => ({
+export const createDndLabelOverrides = (
+  defaultComponent,
+  overrides: ListOverrides
+) => {
+  const labelStyle: TRule = (props: { $theme: Theme }) => ({
     listStyle: 'none',
     padding: '20px',
     borderBottom: 'solid 1px',

@@ -39,7 +39,6 @@ const DndDemoApp = () => {
         }}
       />
       <hr />
-      {/* 
       <a
         target="_blank"
         href="https://baseweb.design/guides/understanding-overrides#theme"
@@ -80,7 +79,7 @@ const DndDemoApp = () => {
           },
         }}
       />
-      <hr /> */}
+      <hr />
     </div>
   );
 };
