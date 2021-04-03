@@ -16,5 +16,5 @@ const [Label2, labelProps2] = createOverrides2(
 );
 const element = fidan.html`<ul>${Label1(
   { ...labelProps1 },
-  fidan.html`Label1`
-)}${Label2({ ...labelProps1 }, fidan.html`Label2`)}</ul>`;
+  () => fidan.html`Label1`
+)}${Label2({ ...labelProps1 }, () => fidan.html`Label2`)}</ul>`;

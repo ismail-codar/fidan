@@ -7,4 +7,4 @@ const LiComponent1 = _props =>
     color: 'red',
   }}" onclick="${() => alert(1)}" __spread="${_props}">${_props.children}</li>`;
 const LiComponent2 = (_props, children) =>
-  fidan.html`${Component({ ..._props }, fidan.html`${children}`)}`;
+  fidan.html`${Component({ ..._props }, () => fidan.html`${children}`)}`;

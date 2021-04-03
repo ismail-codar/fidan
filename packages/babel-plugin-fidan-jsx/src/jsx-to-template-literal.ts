@@ -68,13 +68,19 @@ function createComponent(name, node) {
     })
   );
 
-  const children = t.jsxFragment(
-    t.jsxOpeningFragment(),
-    t.jsxClosingFragment(),
-    node.children
-  );
-
-  return t.callExpression(t.identifier(name), [attributes, children]);
+  if (node.children.length) {
+    const children = t.jsxFragment(
+      t.jsxOpeningFragment(),
+      t.jsxClosingFragment(),
+      node.children
+    );
+    return t.callExpression(t.identifier(name), [
+      attributes,
+      t.arrowFunctionExpression([], children),
+    ]);
+  } else {
+    return t.callExpression(t.identifier(name), [attributes]);
+  }
 }
 
 function transformListenerName(
