@@ -1,6 +1,10 @@
 // https://github.com/ismail-codar/fjsx/blob/master/packages/fjsx-examples/examples/context/_.demo.tsx
-import { Context, getContextValue } from '../src/context';
+import { Context, contextValue } from '../src/context';
 import { html } from '../src/html';
+
+interface AppContext {
+  theme: string;
+}
 
 const themes = {
   dark: {
@@ -18,9 +22,10 @@ const themes = {
 };
 
 const Button = (props, children?) => {
-  const theme = themes[(getContextValue('theme'), props)];
+  const themeName = contextValue<AppContext>('theme');
+  const theme = themes[themeName];
   return html`
-    <button style="${theme ? theme.button : null}">
+    <button style="${theme?.button}">
       ${children}
     </button>
   `;
@@ -44,40 +49,40 @@ const Component1 = (props, children?) => {
   `;
 };
 
-// const App = () => html`
-//   <div>
-//     ${Component1({})}${Context(
-//       {
-//         key: 'theme',
-//         value: 'dark',
-//       },
-//       html`
-//         ${Component1({})}${Context(
-//           {
-//             key: 'theme',
-//             value: 'light',
-//           },
-//           html`
-//             ${Component1({})}
-//           `
-//         )}${Component1({})}
-//       `
-//     )}${Component1({})}
-//   </div>
-// `;
-
-const App = html`
+const App = () => html`
   <div>
-    ${Context(
+    ${Component1({})}${Context(
       {
         key: 'theme',
         value: 'dark',
       },
-      html`
-        ${Component1({})}
+      () => html`
+        ${Component1({})}${Context(
+          {
+            key: 'theme',
+            value: 'light',
+          },
+          () => html`
+            ${Component1({})}
+          `
+        )}${Component1({})}
       `
-    )}
+    )}${Component1({})}
   </div>
 `;
+
+// const App = () => html`
+//   <div>
+//     ${Context(
+//       {
+//         key: 'theme',
+//         value: 'dark',
+//       },
+//       () => html`
+//         ${Component1({})}
+//       `
+//     )}
+//   </div>
+// `;
 
 document.getElementById('main').appendChild(App());

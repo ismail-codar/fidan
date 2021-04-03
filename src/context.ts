@@ -1,6 +1,6 @@
 import { html } from './html';
 
-const appContext: { [key: string]: any[] } = {};
+const appContext: any = {};
 
 export const startContext = (key: string, value: any) => {
   if (!appContext[key]) appContext[key] = [];
@@ -8,7 +8,7 @@ export const startContext = (key: string, value: any) => {
   return '';
 };
 
-export const getContextValue = (key: string) => {
+export const contextValue = <T>(key: keyof T): T[typeof key] => {
   if (appContext[key]) return appContext[key][appContext[key].length - 1];
 };
 
@@ -17,8 +17,11 @@ export const endContext = (key: string) => {
   return '';
 };
 
-export const Context = (props: { key: string; value: any }, children?: any) => {
+export const Context = (
+  props: { key: string; value: any },
+  children?: () => DocumentFragment
+) => {
   return html`
-    ${startContext(props.key, props.value)}${children}
+    ${startContext(props.key, props.value)}${children()}${endContext(props.key)}
   `;
 };
