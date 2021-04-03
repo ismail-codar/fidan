@@ -760,18 +760,18 @@ export interface ZIndex {
 }
 
 export interface Theme {
-  name: string;
-  direction: 'auto' | 'rtl' | 'ltr';
-  breakpoints: Breakpoints;
-  mediaQuery: MediaQuery;
-  grid: Grid;
-  colors: Colors;
-  typography: Typography;
-  sizing: Sizing;
-  lighting: Lighting;
-  animation: Animation;
-  borders: Borders;
-  zIndex: ZIndex;
+  name?: string;
+  direction?: 'auto' | 'rtl' | 'ltr';
+  breakpoints?: Breakpoints;
+  mediaQuery?: MediaQuery;
+  grid?: Grid;
+  colors: Partial<Colors>;
+  typography?: Typography;
+  sizing?: Sizing;
+  lighting?: Lighting;
+  animation?: Animation;
+  borders?: Borders;
+  zIndex?: ZIndex;
 }
 
 export interface ThemePrimitives {

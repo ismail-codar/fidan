@@ -18,9 +18,9 @@ export const endContext = (key: string) => {
 };
 
 export const Context = (
-  props: { key: string; value: any },
-  children?: () => DocumentFragment
-) => {
+  props: { key: string; value: any; children?: any },
+  children?: () => any
+): any => {
   return html`
     ${startContext(props.key, props.value)}${children()}${endContext(props.key)}
   `;

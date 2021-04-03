@@ -2,6 +2,7 @@ import { TRule } from 'fela';
 import merge from 'deepmerge';
 import { Override } from '../types/overrides';
 import { styles } from '../utils/fela';
+import { contextValue } from '@fidanjs/runtime';
 
 export const getOverrides = (
   defaultComponent,
@@ -10,11 +11,13 @@ export const getOverrides = (
 ) => {
   const Component = override?.component || defaultComponent;
   const componentProps = { className: '' };
+  const $theme = contextValue('theme')();
+  // TODO $isDragging (state-props)
+  const $isDragging = false;
 
   let renderStyle = style;
   if (override.style) {
     renderStyle = arg => {
-      // TODO arg.$theme & arg.isDragging (state-props)
       const styleOverride = (typeof override.style === 'function'
         ? override.style
         : () => override.style) as TRule;
@@ -28,7 +31,7 @@ export const getOverrides = (
   if (override.props) {
   }
 
-  const cssClasses = styles.renderRule(renderStyle, { theme: undefined });
+  const cssClasses = styles.renderRule(renderStyle, { $theme, $isDragging });
   componentProps.className += (' ' + cssClasses).trim();
 
   return [Component, componentProps];
