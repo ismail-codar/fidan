@@ -22,7 +22,7 @@ export type StatefulComponentContainerProps = StatefulListProps & {
 };
 
 export interface SharedStylePropsArgT {
-  $isDragged: boolean;
+  $isDragging: boolean;
   $isSelected: boolean;
   $isRemovable: boolean;
   $isRemovableByMove: boolean;

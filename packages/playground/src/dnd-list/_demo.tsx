@@ -74,8 +74,8 @@ const DndDemoApp = () => {
           }}
           overrides={{
             Label: {
-              style: ({ $theme, $isDragged }) => ({
-                color: $isDragged
+              style: ({ $theme, $isDragging }) => ({
+                color: $isDragging
                   ? $theme.colors.primary
                   : $theme.colors.accent400,
               }),

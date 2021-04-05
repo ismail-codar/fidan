@@ -4,9 +4,13 @@ import { Theme } from '../types/theme';
 import { getOverrides } from '../utils/overrides';
 import { ListOverrides } from './types';
 
-export const createSortable = (element: HTMLElement) => {
+export const createSortable = (
+  element: HTMLElement,
+  onChange: (evt) => void
+) => {
   Sortable.create(element.firstElementChild, {
     animation: 150,
+    onChange,
   });
 };
 
@@ -22,11 +26,11 @@ export const createDndLabelOverrides = (
     fontWeight: 'bold',
   });
 
-  const [Label, labelProps] = getOverrides(
+  const [Label, labelProps, labelRenderClassName] = getOverrides(
     defaultComponent,
     labelStyle,
     overrides?.Label
   );
 
-  return { Label, labelProps };
+  return { Label, labelProps, labelRenderClassName };
 };

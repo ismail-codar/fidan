@@ -29,6 +29,21 @@ const nonMutationmethods = [
   'valueOf',
 ];
 
+const defineIndexProperty = (_self: any, _array: any[], index: number) => {
+  if (!(index in _self)) {
+    Object.defineProperty(_self, index, {
+      configurable: true,
+      enumerable: true,
+      get: () => {
+        return _array[index];
+      },
+      set: v => {
+        _array[index] = v;
+      },
+    });
+  }
+};
+
 export const observableArray = <T>(dataArray?: Observable<T[]>) => {
   nonMutationmethods.forEach(method => {
     dataArray[method] = (...args) => {
@@ -55,6 +70,10 @@ export const observableArray = <T>(dataArray?: Observable<T[]>) => {
       const ret = Array.prototype[method].apply(arr, arguments);
       // TODO event based strategy for -> simpleMutationMethods
       dataArray(arr);
+      // TODO only effected index
+      for (var i = 0; i < arr.length; i++) {
+        defineIndexProperty(dataArray, arr, i);
+      }
       return ret;
     };
   });
