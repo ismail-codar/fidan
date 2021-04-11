@@ -21,7 +21,7 @@ export const StatefulList = (props: StatefulListProps) => {
     <ul>
       {items.map((value, index) => {
         labelMetadata[index] = {
-          $isdragging: false,
+          $isdragging: index === 1,
         };
         return <Label {...labelProps}>{value}</Label>;
       })}
