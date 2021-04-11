@@ -24,7 +24,7 @@
   "author": "ismail codar",
   "dependencies": {
     "@fidanjs/localization": "^0.1.0",
-    "@fidanjs/runtime": "^1.0.1",
+    "@fidanjs/runtime": "^1.0.2",
     "deepmerge": "^4.2.2",
     "fela": "^11.6.1",
     "fela-dom": "^11.6.1",
@@ -33,9 +33,9 @@
     "sortablejs": "^1.13.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.14",
-    "@fidanjs/babel-plugin-fidan-jsx": "^1.0.2",
+    "@babel/core": "^7.13.15",
+    "@fidanjs/babel-plugin-fidan-jsx": "^1.0.3",
     "express": "^4.17.1",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.4"
   }
 }

@@ -1,6 +1,5 @@
 {
-  "name": "@fidanjs/runtime",
-  "version": "1.0.2",
+  "version": "0.1.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -15,12 +14,11 @@
     "start": "tsdx watch",
     "build": "tsdx build",
     "test": "tsdx test",
-    "testp": "cd packages/babel-plugin-fidan-jsx && npm run testp && cd ..",
     "lint": "tsdx lint",
     "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
-    "demo": "parcel _demo/index.html --no-cache --port 1233",
+    "yalc-link": "yalc link @fidanjs/runtime",
     "local": "yarn build && yalc publish && yalc push"
   },
   "peerDependencies": {},
@@ -35,27 +33,36 @@
     "singleQuote": true,
     "trailingComma": "es5"
   },
+  "name": "@fidanjs/storybook",
   "author": "ismail codar",
-  "module": "dist/runtime.esm.js",
+  "module": "dist/storybook.esm.js",
   "size-limit": [
     {
-      "path": "dist/runtime.cjs.production.min.js",
+      "path": "dist/storybook.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/runtime.esm.js",
+      "path": "dist/storybook.esm.js",
       "limit": "10 KB"
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^4.10.2",
-    "@types/react": "^17.0.3",
-    "husky": "^6.0.0",
-    "size-limit": "^4.10.2",
-    "ts-node": "^9.1.1",
+    "@size-limit/preset-small-lib": "^4.10.1",
+    "husky": "^5.1.3",
+    "size-limit": "^4.10.1",
     "tsdx": "^0.14.1",
-    "tslib": "^2.2.0",
-    "typescript": "^4.2.4"
+    "tslib": "^2.1.0",
+    "typescript": "^4.2.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@fidanjs/runtime": "^1.0.2",
+    "@storybook/addons": "6.1.21",
+    "@storybook/client-api": "6.1.21",
+    "@storybook/core": "6.1.21"
+  },
+  "bin": {
+    "build-storybook": "./bin/build.js",
+    "start-storybook": "./bin/index.js",
+    "storybook-server": "./bin/index.js"
+  }
 }

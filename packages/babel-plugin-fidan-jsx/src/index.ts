@@ -27,6 +27,7 @@ export default (
       options[key] = globalData.defaultPluginOptions[key];
     }
   }
+  let skipPath = false;
   return {
     inherits: jsx,
     visitor: {
@@ -35,13 +36,14 @@ export default (
           path: t.NodePath<t.Program>,
           state: { key; filename: string; file; opts: any }
         ) {
+          skipPath = false;
           if (
             (options.include &&
               anymatch(options.include, state.filename) === false) ||
             (options.exclude &&
               anymatch(options.exclude, state.filename) === true)
           ) {
-            path.stop();
+            skipPath = true;
             return;
           }
 
@@ -54,7 +56,7 @@ export default (
           modify.insertFidanImport(path.node.body);
           path.traverse(jsxToTemplateLiteral(babel).visitor, state);
           if (options.automaticObserve === false) {
-            path.stop();
+            skipPath = true;
             return;
           }
           if (
@@ -73,11 +75,12 @@ export default (
         // }
       },
       VariableDeclarator(path: t.NodePath<t.VariableDeclarator>) {
-        // console.log(generate(path.node.id as any).code, path.node.id.type);
+        if (skipPath) return;
         if (
           check.isFidanCall(path.node.init) === false &&
           check.isPatternVariable(path) === false
         ) {
+          // console.log(generate(path.node.id as any).code, path.node.id.type);
           if (
             t.isCallExpression(path.node.init) &&
             path.node.init.arguments.length === 0 &&
@@ -117,6 +120,7 @@ export default (
         }
       },
       Property(path: t.NodePath<t.Property>) {
+        if (skipPath) return;
         if (
           t.isLiteral(path.node.value) &&
           check.isInVariablePath(path) === false &&
@@ -129,6 +133,7 @@ export default (
         }
       },
       ExpressionStatement(path: t.NodePath<t.ExpressionStatement>) {
+        if (skipPath) return;
         if (t.isAssignmentExpression(path.node.expression)) {
           path.node.expression.right = modify.fidanValueAssign(
             path.node.expression
@@ -150,6 +155,7 @@ export default (
         }
       },
       CallExpression(path: t.NodePath<t.CallExpression>) {
+        if (skipPath) return;
         if (check.isFidanCall(path.node) === false) {
           path.node.arguments.forEach((arg, index) => {
             path.node.arguments[index] = modify.fidanValAccess(arg);
@@ -162,19 +168,23 @@ export default (
       //   }
       // },
       IfStatement(path: t.NodePath<t.IfStatement>) {
+        if (skipPath) return;
         path.node.test = modify.fidanBinary(path.node.test);
       },
       ConditionalExpression(path: t.NodePath<t.ConditionalExpression>) {
+        if (skipPath) return;
         path.node.test = modify.fidanBinary(path.node.test);
         path.node.consequent = modify.fidanBinary(path.node.consequent);
         path.node.alternate = modify.fidanBinary(path.node.alternate);
       },
       ArrowFunctionExpression(path: t.NodePath<t.ArrowFunctionExpression>) {
+        if (skipPath) return;
         if (t.isExpression(path.node.body)) {
           path.node.body = modify.fidanBinary(path.node.body);
         }
       },
       ReturnStatement(path: t.NodePath<t.ReturnStatement>) {
+        if (skipPath) return;
         if (
           t.isExpression(path.node.argument) &&
           !t.isIdentifier(path.node.argument)
@@ -183,8 +193,9 @@ export default (
         }
       },
       FunctionDeclaration(path: t.NodePath<t.FunctionDeclaration>) {
+        if (skipPath) return;
         if (anymatch(bundlerSpecificFunctions, path.node.id.name)) {
-          path.stop();
+          skipPath = true;
         }
       },
     },
