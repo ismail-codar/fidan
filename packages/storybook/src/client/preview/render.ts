@@ -12,7 +12,6 @@ export default function renderMain({
   name,
   showMain,
   showError,
-  forceRender,
 }: RenderContext) {
   if (typeof storyFn !== 'function') {
     showError({
