@@ -1,0 +1,14 @@
+{
+  "name": "babel-preset-fidan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ismail codar",
+  "license": "ISC",
+  "dependencies": {
+    "@fidanjs/babel-plugin-fidan-jsx": "*"
+  }
+}
