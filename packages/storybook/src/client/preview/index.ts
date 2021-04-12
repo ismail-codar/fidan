@@ -18,10 +18,8 @@ export const storiesOf: ClientApi['storiesOf'] = (kind, m) => {
 
 export const configure: ClientApi['configure'] = (...args) =>
   api.configure(framework, ...args);
-export const addDecorator: ClientApi['addDecorator'] =
-  api.clientApi.addDecorator;
-export const addParameters: ClientApi['addParameters'] =
-  api.clientApi.addParameters;
+export const addDecorator = api.clientApi.addDecorator;
+export const addParameters = api.clientApi.addParameters;
 export const clearDecorators: ClientApi['clearDecorators'] =
   api.clientApi.clearDecorators;
 export const setAddon: ClientApi['setAddon'] = api.clientApi.setAddon;
